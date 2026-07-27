@@ -1,0 +1,77 @@
+name: Weekly GA4 Dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      mock:
+        description: Build with mock data instead of GA4.
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: "0 23 * * 0"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write GA4 service account
+        if: ${{ github.event_name == 'schedule' || inputs.mock == false }}
+        env:
+          GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
+        run: |
+          test -n "$GA4_SERVICE_ACCOUNT_JSON"
+          printf '%s' "$GA4_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/ga4-service-account.json"
+
+      - name: Build dashboard
+        env:
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/ga4-service-account.json
+          GA4_API_TRANSPORT: rest
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.mock }}" = "true" ]; then
+            ./scripts/weekly_update.sh --mock --fetch-only
+          else
+            ./scripts/weekly_update.sh --fetch-only
+          fi
+
+      - name: Upload raw artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ga4-dashboard-data
+          path: |
+            data/raw
+            data/normalized
+            dashboard/data
+          retention-days: 90
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

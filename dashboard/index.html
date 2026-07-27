@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GA4 Weekly Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #d9dee7;
+      --blue: #2f6fed;
+      --green: #0f9f6e;
+      --red: #cf423b;
+      --gold: #b7791f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    header {
+      padding: 24px 28px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: 0; }
+    .sub { color: var(--muted); font-size: 13px; }
+    main { padding: 20px 28px 32px; display: grid; gap: 16px; }
+    .kpis { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 12px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .value { font-size: 24px; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    canvas { width: 100%; min-height: 280px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { color: var(--muted); font-weight: 600; }
+    @media (max-width: 900px) {
+      header, main { padding-left: 16px; padding-right: 16px; }
+      .kpis, .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GA4 Weekly Dashboard</h1>
+    <div class="sub">Last loaded: 2026-07-27 15:23:56</div>
+  </header>
+  <main>
+    <section class="kpis">
+      <div class="card"><div class="label">Views</div><div class="value" id="views"></div></div>
+      <div class="card"><div class="label">Active Users</div><div class="value" id="users"></div></div>
+      <div class="card"><div class="label">Sessions</div><div class="value" id="sessions"></div></div>
+      <div class="card"><div class="label">Conversions</div><div class="value" id="conversions"></div></div>
+      <div class="card"><div class="label">Revenue</div><div class="value" id="revenue"></div></div>
+    </section>
+    <section class="grid">
+      <div class="card"><div class="label">Views by Day</div><canvas id="dayChart"></canvas></div>
+      <div class="card"><div class="label">Views by Channel</div><canvas id="channelChart"></canvas></div>
+    </section>
+    <section class="card">
+      <div class="label">Top Pages</div>
+      <table>
+        <thead><tr><th>Page Path</th><th>Views</th></tr></thead>
+        <tbody id="topPages"></tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    const data = {"total_views": 341927, "active_users": 185565, "sessions": 231619, "conversions": 7893, "revenue": 402292.7399999999, "by_day": {"2026-06-29": 14251, "2026-06-30": 11787, "2026-07-01": 13409, "2026-07-02": 13267, "2026-07-03": 11002, "2026-07-04": 10090, "2026-07-05": 13301, "2026-07-06": 9033, "2026-07-07": 14875, "2026-07-08": 11827, "2026-07-09": 14836, "2026-07-10": 10859, "2026-07-11": 10173, "2026-07-12": 11319, "2026-07-13": 12382, "2026-07-14": 10868, "2026-07-15": 11182, "2026-07-16": 12449, "2026-07-17": 10937, "2026-07-18": 13254, "2026-07-19": 9791, "2026-07-20": 10604, "2026-07-21": 14853, "2026-07-22": 13678, "2026-07-23": 13781, "2026-07-24": 12673, "2026-07-25": 12789, "2026-07-26": 12657}, "by_channel": {"Organic Search": 87272, "Referral": 85493, "Direct": 85184, "Paid Search": 83978}, "top_pages": {"/reference-designs": 71640, "/contact": 70317, "/case-studies": 68374, "/": 67922, "/category/solutions": 63674}};
+    const fmt = new Intl.NumberFormat("en-US");
+    document.getElementById("views").textContent = fmt.format(data.total_views);
+    document.getElementById("users").textContent = fmt.format(data.active_users);
+    document.getElementById("sessions").textContent = fmt.format(data.sessions);
+    document.getElementById("conversions").textContent = fmt.format(data.conversions);
+    document.getElementById("revenue").textContent = "$" + fmt.format(Math.round(data.revenue));
+    new Chart(document.getElementById("dayChart"), {
+      type: "line",
+      data: { labels: Object.keys(data.by_day), datasets: [{ label: "Views", data: Object.values(data.by_day), borderColor: "#2f6fed", backgroundColor: "rgba(47,111,237,.12)", tension: .25, fill: true }] },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+    new Chart(document.getElementById("channelChart"), {
+      type: "bar",
+      data: { labels: Object.keys(data.by_channel), datasets: [{ label: "Views", data: Object.values(data.by_channel), backgroundColor: "#0f9f6e" }] },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+    document.getElementById("topPages").innerHTML = Object.entries(data.top_pages)
+      .map(([path, views]) => `<tr><td>${path}</td><td>${fmt.format(views)}</td></tr>`).join("");
+  </script>
+</body>
+</html>

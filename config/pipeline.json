@@ -1,0 +1,40 @@
+{
+  "timezone": "Asia/Shanghai",
+  "ga4": {
+    "property_id_env": "GA4_PROPERTY_ID",
+    "lookback_days": 28,
+    "dimensions": [
+      "date",
+      "hostName",
+      "pagePath",
+      "pageTitle",
+      "sessionDefaultChannelGroup",
+      "deviceCategory"
+    ],
+    "metrics": [
+      "screenPageViews",
+      "activeUsers",
+      "sessions",
+      "engagementRate",
+      "bounceRate",
+      "userEngagementDuration",
+      "keyEvents",
+      "totalRevenue"
+    ],
+    "row_limit": 100000
+  },
+  "base": {
+    "profile_env": "LARK_CLI_PROFILE",
+    "base_token_env": "LARK_BASE_TOKEN",
+    "table_id_env": "LARK_BASE_TABLE_ID",
+    "dashboard_id_env": "LARK_BASE_DASHBOARD_ID",
+    "base_name": "GA4 Website Analytics",
+    "table_name": "GA4 Daily Pages",
+    "dashboard_name": "GA4 Weekly Dashboard"
+  },
+  "outputs": {
+    "raw_dir": "data/raw",
+    "normalized_dir": "data/normalized",
+    "dashboard_file": "dashboard/index.html"
+  }
+}
