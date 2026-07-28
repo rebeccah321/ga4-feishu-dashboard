@@ -18,6 +18,21 @@ DATA_JSON = ROOT / "dashboard/data/latest.json"
 DATA_CSV = ROOT / "dashboard/data/latest.csv"
 OUT_DIR = ROOT / "exports/feishu-base-import"
 PLATFORMS = ["LinkedIn", "X", "FB", "小红书", "抖音"]
+SOLUTION_CATEGORY_PATHS = ["/category/solutions-zh-hans", "/category/solutions"]
+SOLUTIONS = [
+    {"name": "语音采集与分析", "slug": "/solutions/voicecollectionanalysis", "english": "Voice Collection and Analysis"},
+    {"name": "智能仓储管理", "slug": "/solutions/smart-warehouse-management", "english": "Smart Warehouse Management"},
+    {"name": "智能视频分析", "slug": "/solutions/intelligent-video-analytics", "english": "Intelligent Video Analytics"},
+    {"name": "室内外定位", "slug": "/solutions/indoor-outdoor-positioning", "english": "Indoor and Outdoor Positioning"},
+    {"name": "对话式语音 AI", "slug": "/solutions/conversational-voice-ai", "english": "Conversational Voice AI"},
+    {"name": "环境监测", "slug": "/solutions/environment-monitoring", "english": "Environment Monitoring"},
+    {"name": "楼宇能源改造", "slug": "/solutions/building-energy-retrofit", "english": "Building Energy Retrofit"},
+    {"name": "智能畜牧养殖", "slug": "/solutions/smart-livestock-farming", "english": "Smart Livestock Farming"},
+    {"name": "智慧农业传感", "slug": "/solutions/smart-agriculture-sensing", "english": "Smart Agriculture Sensing"},
+    {"name": "校园安全管理", "slug": "/solutions/campus-safety-management", "english": "Campus Safety Management"},
+    {"name": "应急响应", "slug": "/solutions/hazard-response", "english": "Hazard Response"},
+    {"name": "楼宇能源管理", "slug": "/solutions/building-energy-management", "english": "Building Energy Management"},
+]
 
 
 def num(value: Any) -> float:
@@ -77,6 +92,23 @@ def date_bounds(rows: Sequence[Dict[str, str]]) -> Tuple[str, str]:
         today = dt.date.today().isoformat()
         return today, today
     return dates[0], dates[-1]
+
+
+def latest_week(rows: Sequence[Dict[str, str]]) -> str:
+    weeks = sorted({row.get("Week Start", "") for row in rows if row.get("Week Start")})
+    if weeks:
+        return weeks[-1]
+    start, _ = date_bounds(rows)
+    return start
+
+
+def path_matches(row: Dict[str, str], paths: Sequence[str]) -> bool:
+    page_path = row.get("Page Path", "")
+    return any(page_path == path or page_path.startswith(f"{path}/") for path in paths)
+
+
+def rows_for_paths(rows: Sequence[Dict[str, str]], paths: Sequence[str]) -> List[Dict[str, str]]:
+    return [row for row in rows if path_matches(row, paths)]
 
 
 def split_period(rows: Sequence[Dict[str, str]]) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
@@ -201,6 +233,133 @@ def build_overview(rows: Sequence[Dict[str, str]], payload: Dict[str, Any]) -> L
         row("转化效果", "转化率", fmt_pct(all_total["conversion_rate"]), "%", trend(current_total["conversion_rate"], previous_total["conversion_rate"]), "多少用户完成了我们期望的动作（如提交表单）？", judgement("conversion", all_total["conversion_rate"]), "按渠道和页面定位高转化入口并复用内容主题"),
         row("转化效果", "加购率", "待接入", "%", "待接入 add_to_cart 事件", "多少用户完成了我们期望的动作（如提交表单）？", "当前 GA4 导出未包含加购事件明细", "在 GA4 事件维度中加入 add_to_cart 并单独成表"),
     ]
+
+
+def dominant_channel(rows: Sequence[Dict[str, str]]) -> str:
+    channels = aggregate(rows, ["Channel Group"])
+    if not channels:
+        return "未命中"
+    channels.sort(key=lambda item: item.get("Sessions", 0), reverse=True)
+    return str(channels[0].get("Channel Group") or "Unassigned")
+
+
+def solution_growth_status(total: Dict[str, float], matched_rows: Sequence[Dict[str, str]]) -> str:
+    if not matched_rows:
+        return "GA4未命中：需确认 seeed.cc / 中文站是否接入当前 GA4 Property，或下一次用 /solutions 过滤专项拉数"
+    if total.get("sessions", 0) < 50:
+        return "样本偏少：先确认埋点和入口曝光，再判断增长"
+    if total.get("conversion_rate", 0) <= 0.01:
+        return "有流量但转化偏弱：优先检查CTA、表单入口和案例承接"
+    return "有可观察流量：建议按渠道和页面继续下钻"
+
+
+def build_solution_growth(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    start, end = date_bounds(rows)
+    week = latest_week(rows)
+    solution_paths = [item["slug"] for item in SOLUTIONS]
+    solution_rows = rows_for_paths(rows, solution_paths)
+    category_rows = rows_for_paths(rows, SOLUTION_CATEGORY_PATHS)
+    all_related_rows = rows_for_paths(rows, [*SOLUTION_CATEGORY_PATHS, *solution_paths])
+    total = totals(solution_rows)
+    category_total = totals(category_rows)
+    all_total = totals(all_related_rows)
+    matched_solution_count = sum(1 for item in SOLUTIONS if rows_for_paths(rows, [item["slug"]]))
+    return [
+        {
+            "最新周次": week,
+            "周期开始": start,
+            "周期结束": end,
+            "看板模块": "落地页官网增长看板",
+            "指标": "解决方案入口页访问量",
+            "指标值": fmt_number(category_total.get("views", 0.0)),
+            "单位": "PV",
+            "口径": "中文 /category/solutions-zh-hans + 英文 /category/solutions",
+            "业务问题": "解决方案入口是否有足够访问量？",
+            "判断结论": solution_growth_status(category_total, category_rows),
+            "下一步动作": "若为0，先确认 GA4 property 是否覆盖 seeed.cc 和 seeedstudio.com.cn",
+        },
+        {
+            "最新周次": week,
+            "周期开始": start,
+            "周期结束": end,
+            "看板模块": "落地页官网增长看板",
+            "指标": "12个方案页合计访问量",
+            "指标值": fmt_number(total.get("views", 0.0)),
+            "单位": "PV",
+            "口径": "Solutions tab 下 12 个 solution slug",
+            "业务问题": "用户是否继续进入具体方案页？",
+            "判断结论": solution_growth_status(total, solution_rows),
+            "下一步动作": "为入口页到方案页点击建立事件，追踪 tab 点击与卡片点击",
+        },
+        {
+            "最新周次": week,
+            "周期开始": start,
+            "周期结束": end,
+            "看板模块": "落地页官网增长看板",
+            "指标": "有GA4命中的方案数",
+            "指标值": f"{matched_solution_count}/12",
+            "单位": "个",
+            "口径": "12个指定 solution 页面",
+            "业务问题": "哪些方案已经被用户访问？",
+            "判断结论": "用于判断是否是流量问题、埋点问题或内容露出问题",
+            "下一步动作": "对0访问方案检查页面URL、站点埋点、入口链接和UTM",
+        },
+        {
+            "最新周次": week,
+            "周期开始": start,
+            "周期结束": end,
+            "看板模块": "落地页官网增长看板",
+            "指标": "平均停留时长",
+            "指标值": fmt_number(all_total.get("avg_engagement_seconds", 0.0), 2),
+            "单位": "秒(以平均互动秒近似)",
+            "口径": "入口页 + 12个方案页",
+            "业务问题": "用户是否认真阅读方案内容？",
+            "判断结论": judgement("engagement", all_total.get("avg_engagement_seconds", 0.0)) if all_related_rows else "GA4未命中",
+            "下一步动作": "对低停留页面优化首屏价值、结构化案例和CTA",
+        },
+        {
+            "最新周次": week,
+            "周期开始": start,
+            "周期结束": end,
+            "看板模块": "落地页官网增长看板",
+            "指标": "表单提交/关键事件",
+            "指标值": fmt_number(all_total.get("conversions", 0.0)),
+            "单位": "次",
+            "口径": "当前用 GA4 keyEvents/Conversions 汇总，尚未拆具体表单事件",
+            "业务问题": "解决方案页是否带来销售线索？",
+            "判断结论": judgement("conversion", all_total.get("conversion_rate", 0.0)) if all_related_rows else "GA4未命中",
+            "下一步动作": "把 Request a Solution / 获取专属方案 / contacts 表单设为单独事件",
+        },
+    ]
+
+
+def build_solution_detail(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    _, end = date_bounds(rows)
+    week = latest_week(rows)
+    output = []
+    for item in SOLUTIONS:
+        matched = rows_for_paths(rows, [item["slug"]])
+        total = totals(matched)
+        output.append({
+            "最新周次": week,
+            "solution名称": item["name"],
+            "英文名称": item["english"],
+            "页面路径": item["slug"],
+            "中文URL": f"https://www.seeedstudio.com.cn{item['slug']}",
+            "英文URL": f"https://www.seeed.cc{item['slug']}",
+            "落地页访问量": fmt_number(total.get("views", 0.0)),
+            "独立访客数": fmt_number(total.get("users", 0.0)),
+            "平均停留时长": fmt_number(total.get("avg_engagement_seconds", 0.0), 2),
+            "参与率": fmt_pct(total.get("engagement_rate", 0.0)),
+            "CTA点击量": "待接入 CTA 点击事件",
+            "表单提交": fmt_number(total.get("conversions", 0.0)),
+            "主要流量来源": dominant_channel(matched),
+            "数据状态": "GA4已命中" if matched else "GA4未命中",
+            "分析结论": solution_growth_status(total, matched),
+            "建议动作": "若未命中，确认页面埋点和 GA4 property；若已命中，按渠道/CTA/表单继续拆解",
+            "更新时间": end,
+        })
+    return output
 
 
 def build_channels(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
@@ -359,12 +518,15 @@ def build_social_content(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]
 
 def build_field_notes() -> List[Dict[str, str]]:
     return [
-        {"表名": "01_看板指标总览", "字段": "指标值", "说明": "GA4能直接计算的指标已自动填入；新用户占比、加购率需要下一版GA4事件/指标接入。", "维护方式": "每周脚本更新"},
-        {"表名": "02_流量来源渠道", "字段": "渠道", "说明": "按 GA4 Channel Group 浏览量排序，仅保留前5个渠道。", "维护方式": "每周脚本更新"},
-        {"表名": "03_热门页面与行为", "字段": "关键事件触发次数", "说明": "当前用 GA4 Conversions 汇总近似，后续可拆成咨询、表单、加购等事件。", "维护方式": "每周脚本更新"},
-        {"表名": "04_社媒平台表现", "字段": "平台", "说明": "LinkedIn/X/FB/小红书/抖音为平台后台手动或API导入字段；GA4合计行只代表网站侧社交流量。", "维护方式": "平台数据手动补录或后续API接入"},
-        {"表名": "05_社媒内容表现", "字段": "内容类型", "说明": "建议统一选项：产品发布、案例、教程、活动、观点、短视频、用户故事。", "维护方式": "每次发布内容后补录"},
-        {"表名": "05_社媒内容表现", "字段": "下次动作", "说明": "建议统一选项：复投、改标题、换平台、做二创、暂停、转销售跟进。", "维护方式": "周复盘时填写"},
+        {"表名": "01_落地页官网增长看板", "字段": "指标值", "说明": "围绕 Seeed 解决方案入口页和12个方案页输出增长判断。", "维护方式": "每周脚本更新"},
+        {"表名": "02_单方案流量明细", "字段": "solution名称", "说明": "固定包含用户指定的12个解决方案；中文站匹配不到时按同 slug 的英文站路径观察。", "维护方式": "每周脚本更新"},
+        {"表名": "02_单方案流量明细", "字段": "CTA点击量", "说明": "当前GA4导出没有 eventName 维度，需下一版接入 CTA 点击事件后自动填入。", "维护方式": "事件接入后每周更新"},
+        {"表名": "02_单方案流量明细", "字段": "表单提交", "说明": "当前用 GA4 keyEvents/Conversions 汇总近似，后续可拆成具体 contacts/form_submit。", "维护方式": "每周脚本更新"},
+        {"表名": "03_流量来源渠道", "字段": "渠道", "说明": "按 GA4 Channel Group 浏览量排序，仅保留前5个渠道。", "维护方式": "每周脚本更新"},
+        {"表名": "04_热门页面与行为", "字段": "关键事件触发次数", "说明": "当前用 GA4 Conversions 汇总近似，后续可拆成咨询、表单、加购等事件。", "维护方式": "每周脚本更新"},
+        {"表名": "06_社媒平台表现", "字段": "平台", "说明": "LinkedIn/X/FB/小红书/抖音字段保留，用于后续平台后台手动或API导入。", "维护方式": "平台数据手动补录或后续API接入"},
+        {"表名": "07_社媒内容表现", "字段": "内容类型", "说明": "建议统一选项：产品发布、案例、教程、活动、观点、短视频、用户故事。", "维护方式": "每次发布内容后补录"},
+        {"表名": "07_社媒内容表现", "字段": "下次动作", "说明": "建议统一选项：复投、改标题、换平台、做二创、暂停、转销售跟进。", "维护方式": "周复盘时填写"},
         {"表名": "导入建议", "字段": "视图", "说明": "导入飞书多维表格后，为渠道表建柱状图；为页面表建Top列表；为社媒平台表建平台对比图。", "维护方式": "飞书内配置一次即可"},
     ]
 
@@ -430,13 +592,14 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 1. 打开飞书多维表格，新建一个空 Base。
 2. 选择「导入 Excel/CSV」。
-3. 优先上传 `seeed_社媒_GA4_多维表格导入.xlsx`，它已经包含多张工作表。
-4. 如果飞书没有自动识别多 Sheet，就逐个导入 `01_看板指标总览.csv` 到 `06_字段说明.csv`。
+3. 优先上传 `seeed_解决方案增长_多维表格导入.xlsx`，它已经包含多张工作表。
+4. 如果飞书没有自动识别多 Sheet，就逐个导入 `01_落地页官网增长看板.csv` 到 `08_字段说明.csv`。
 
 本包数据来源：
 
 - GA4 网站真实数据：`{source_path.name}`
-- 社媒平台原生数据：LinkedIn / X / FB / 小红书 / 抖音字段已建好，当前等待平台后台或API补录。
+- Seeed 解决方案页面：中文入口 `https://www.seeedstudio.com.cn/category/solutions-zh-hans`，英文入口 `https://www.seeed.cc/category/solutions`，以及 Solutions tab 下 12 个 solution 页面。
+- 社媒平台原生数据：LinkedIn / X / FB / 小红书 / 抖音字段保留，当前等待平台后台或API补录。
 
 包含表：
 
@@ -444,8 +607,9 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 注意：
 
-- `新用户占比`、`加购率`、具体按钮点击事件目前标记为「待接入」，因为当前 GA4 导出没有 newUsers、add_to_cart、eventName 维度。
+- `新用户占比`、`加购率`、具体 CTA 点击事件目前标记为「待接入」，因为当前 GA4 导出没有 newUsers、add_to_cart、eventName 维度。
 - `平均会话时长`当前用 GA4 的 `Avg Engagement Seconds` 近似。
+- 如果 12 个 solution 页面显示 `GA4未命中`，优先确认 seeed.cc / 中文站是否接入当前 GA4 Property `258704823`，或在下一次拉数中使用 `/solutions` 过滤专项拉取。
 - 后续发布社媒内容时，请统一使用表内建议的 UTM 参数，这样下一版可以把 LinkedIn/X/FB/小红书/抖音的网站效果拆开。
 """, encoding="utf-8")
 
@@ -458,12 +622,14 @@ def main() -> None:
         raise SystemExit(f"No rows found in {source_path}")
 
     sheets: List[Tuple[str, Sequence[Dict[str, str]]]] = [
-        ("01_看板指标总览", build_overview(rows, payload)),
-        ("02_流量来源渠道", build_channels(rows)),
-        ("03_热门页面与行为", build_pages(rows)),
-        ("04_社媒平台表现", build_social_platforms(rows)),
-        ("05_社媒内容表现", build_social_content(rows)),
-        ("06_字段说明", build_field_notes()),
+        ("01_落地页官网增长看板", build_solution_growth(rows)),
+        ("02_单方案流量明细", build_solution_detail(rows)),
+        ("03_流量来源渠道", build_channels(rows)),
+        ("04_热门页面与行为", build_pages(rows)),
+        ("05_看板指标总览", build_overview(rows, payload)),
+        ("06_社媒平台表现", build_social_platforms(rows)),
+        ("07_社媒内容表现", build_social_content(rows)),
+        ("08_字段说明", build_field_notes()),
     ]
 
     if OUT_DIR.exists():
@@ -473,8 +639,8 @@ def main() -> None:
     for name, table_rows in sheets:
         write_csv_file(OUT_DIR / f"{name}.csv", table_rows)
 
-    xlsx_path = OUT_DIR / "seeed_社媒_GA4_多维表格导入.xlsx"
-    zip_path = OUT_DIR / "seeed_社媒_GA4_飞书多维表格导入包.zip"
+    xlsx_path = OUT_DIR / "seeed_解决方案增长_多维表格导入.xlsx"
+    zip_path = OUT_DIR / "seeed_解决方案增长_飞书多维表格导入包.zip"
     readme_path = OUT_DIR / "README_导入说明.md"
     write_xlsx(xlsx_path, sheets)
     write_readme(readme_path, source_path, sheets)

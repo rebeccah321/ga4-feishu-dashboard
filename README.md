@@ -103,12 +103,24 @@ exports/feishu-base-import/
 
 Main files:
 
-- `seeed_社媒_GA4_多维表格导入.xlsx`: import this first. It contains six sheets for Base tables.
-- `seeed_社媒_GA4_飞书多维表格导入包.zip`: the same Excel, CSV tables, and README bundled for upload.
-- `01_看板指标总览.csv` to `06_字段说明.csv`: import these one by one if Feishu does not split the Excel sheets automatically.
+- `seeed_解决方案增长_多维表格导入.xlsx`: import this first. It contains eight sheets for Base tables.
+- `seeed_解决方案增长_飞书多维表格导入包.zip`: the same Excel, CSV tables, and README bundled for upload.
+- `01_落地页官网增长看板.csv` to `08_字段说明.csv`: import these one by one if Feishu does not split the Excel sheets automatically.
 
 The generated tables cover:
 
-- GA4 traffic overview, quality, top channels, top pages, behavior, and conversion metrics.
-- A social media platform dashboard template for LinkedIn, X, FB, 小红书, and 抖音.
-- A post-level social content performance template for deciding what to publish and where.
+- `01_落地页官网增长看板`: Seeed solutions landing page growth summary for the Chinese entry page, English fallback page, and 12 solution pages.
+- `02_单方案流量明细`: one row per requested solution with latest week, solution name, landing page views, unique visitors, average engagement time, engagement rate, CTA clicks, form submissions, and main traffic source.
+- `03_流量来源渠道`: top 5 GA4 channel groups by views.
+- `04_热门页面与行为`: top pages and behavior metrics.
+- `05_看板指标总览`: GA4 traffic overview, traffic quality, source, behavior, and conversion metrics.
+- `06_社媒平台表现`: retained platform-level social media fields for LinkedIn, X, FB, 小红书, and 抖音.
+- `07_社媒内容表现`: retained post-level social media fields for deciding what to publish and where.
+- `08_字段说明`: field definitions and maintenance notes for Feishu Base.
+
+Current solution URL coverage:
+
+- Chinese entry: `https://www.seeedstudio.com.cn/category/solutions-zh-hans`
+- English fallback entry: `https://www.seeed.cc/category/solutions`
+- The 12 requested solution pages are matched by their `/solutions/...` slugs.
+- If the current GA4 export has no matching solution rows, the generated tables explicitly mark those rows as `GA4未命中` instead of inventing traffic data. In that case, confirm whether GA4 property `258704823` covers `seeed.cc` and `seeedstudio.com.cn`, then run a `/solutions` filtered pull.
