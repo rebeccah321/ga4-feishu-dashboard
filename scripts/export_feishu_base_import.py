@@ -130,11 +130,28 @@ def week_list(rows: Sequence[Dict[str, str]]) -> List[str]:
 
 
 def solution_rows(rows: Sequence[Dict[str, str]], item: Dict[str, Any]) -> List[Dict[str, str]]:
-    return rows_for_paths(rows, item["aliases"])
+    return rows_for_paths(rows, [item["slug"]])
 
 
 def solution_week_rows(rows: Sequence[Dict[str, str]], week: str, item: Dict[str, Any]) -> List[Dict[str, str]]:
-    return rows_for_paths(rows_for_week(rows, week), item["aliases"])
+    return rows_for_paths(rows_for_week(rows, week), [item["slug"]])
+
+
+def is_solution_related_path(path: str) -> bool:
+    path = (path or "").lower()
+    if path.startswith("/solutions"):
+        return True
+    if path in SOLUTION_CATEGORY_PATHS:
+        return True
+    return False
+
+
+def solution_related_rows(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    related = []
+    for row in rows:
+        if is_solution_related_path(row.get("Page Path", "")):
+            related.append(row)
+    return related
 
 
 def read_payload() -> Dict[str, Any]:
@@ -303,7 +320,7 @@ def build_growth_overview(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]
     if not week_rows:
         return []
     total = totals(week_rows)
-    solution_rows_in_week = rows_for_paths(week_rows, [path for item in SOLUTIONS for path in item["aliases"]])
+    solution_rows_in_week = solution_related_rows(week_rows)
     solution_total = totals(solution_rows_in_week)
     cta_total = 0.0
     social_total = 0.0
@@ -352,7 +369,7 @@ def build_solution_funnel(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]
 def build_channels(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     week, week_rows = latest_week_rows(rows)
     start, end = date_bounds(week_rows)
-    items = aggregate(week_rows, ["Channel Group"])
+    items = aggregate(solution_related_rows(week_rows), ["Channel Group"])
     items.sort(key=lambda item: item.get("Views", 0), reverse=True)
     output = []
     for index, item in enumerate(items[:5], start=1):
@@ -392,10 +409,10 @@ def infer_topic(path: str, title: str) -> str:
     return "其他"
 
 
-def build_pages(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+def build_solution_pages(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     _, week_rows = latest_week_rows(rows)
     start, end = date_bounds(week_rows)
-    items = aggregate(week_rows, ["Page Path", "Page Title"])
+    items = aggregate(solution_related_rows(week_rows), ["Page Path", "Page Title"])
     items.sort(key=lambda item: item.get("Views", 0), reverse=True)
     output = []
     for item in items[:20]:
@@ -425,7 +442,7 @@ def build_pages(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
 def build_social_platforms(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     _, week_rows = latest_week_rows(rows)
     start, end = date_bounds(week_rows)
-    social_rows = [row for row in week_rows if row.get("Channel Group") == "Organic Social"]
+    social_rows = [row for row in week_rows if row.get("Channel Group") == "Organic Social" and is_solution_related_path(row.get("Page Path", ""))]
     social_total = totals(social_rows)
     output = [{
         "周期开始": start,
@@ -573,7 +590,7 @@ def main() -> None:
         ("01_方案增长总览表", build_growth_overview(rows)),
         ("02_转化漏斗表", build_solution_funnel(rows)),
         ("03_流量来源渠道", build_channels(rows)),
-        ("04_热门页面与行为", build_pages(rows)),
+        ("04_解决方案页面与行为", build_solution_pages(rows)),
         ("05_社媒平台表现", build_social_platforms(rows)),
     ]
 
