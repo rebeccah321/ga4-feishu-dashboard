@@ -19,19 +19,56 @@ DATA_CSV = ROOT / "dashboard/data/latest.csv"
 OUT_DIR = ROOT / "exports/feishu-base-import"
 PLATFORMS = ["LinkedIn", "X", "FB", "小红书", "抖音"]
 SOLUTION_CATEGORY_PATHS = ["/category/solutions-zh-hans", "/category/solutions"]
+def solution_item(name: str, slug: str, english: str, extras: Sequence[str] | None = None) -> Dict[str, Any]:
+    bare = "/" + slug.removeprefix("/solutions/")
+    aliases = [slug, bare]
+    if extras:
+        aliases.extend(extras)
+    return {"name": name, "slug": slug, "aliases": aliases, "english": english}
+
+
 SOLUTIONS = [
-    {"name": "语音采集与分析", "slug": "/solutions/voicecollectionanalysis", "english": "Voice Collection and Analysis"},
-    {"name": "智能仓储管理", "slug": "/solutions/smart-warehouse-management", "english": "Smart Warehouse Management"},
-    {"name": "智能视频分析", "slug": "/solutions/intelligent-video-analytics", "english": "Intelligent Video Analytics"},
-    {"name": "室内外定位", "slug": "/solutions/indoor-outdoor-positioning", "english": "Indoor and Outdoor Positioning"},
-    {"name": "对话式语音 AI", "slug": "/solutions/conversational-voice-ai", "english": "Conversational Voice AI"},
-    {"name": "环境监测", "slug": "/solutions/environment-monitoring", "english": "Environment Monitoring"},
-    {"name": "楼宇能源改造", "slug": "/solutions/building-energy-retrofit", "english": "Building Energy Retrofit"},
-    {"name": "智能畜牧养殖", "slug": "/solutions/smart-livestock-farming", "english": "Smart Livestock Farming"},
-    {"name": "智慧农业传感", "slug": "/solutions/smart-agriculture-sensing", "english": "Smart Agriculture Sensing"},
-    {"name": "校园安全管理", "slug": "/solutions/campus-safety-management", "english": "Campus Safety Management"},
-    {"name": "应急响应", "slug": "/solutions/hazard-response", "english": "Hazard Response"},
-    {"name": "楼宇能源管理", "slug": "/solutions/building-energy-management", "english": "Building Energy Management"},
+    solution_item("语音采集与分析", "/solutions/voicecollectionanalysis", "Voice Collection and Analysis", [
+        "/respeaker-clip-wearable-ai-recorder.html",
+        "/blog/2026/02/03/from-hearing-clearly-to-understanding-sound-how-respeaker-brings-voice-ai-into-real-world-scenarios/",
+    ]),
+    solution_item("智能仓储管理", "/solutions/smart-warehouse-management", "Smart Warehouse Management"),
+    solution_item("智能视频分析", "/solutions/intelligent-video-analytics", "Intelligent Video Analytics", [
+        "/intelligent-video-analytics",
+    ]),
+    solution_item("室内外定位", "/solutions/indoor-outdoor-positioning", "Indoor and Outdoor Positioning", [
+        "/sensecap-t1000-tracker",
+        "/Positioning-Tracker-c-2495.html",
+    ]),
+    solution_item("对话式语音 AI", "/solutions/conversational-voice-ai", "Conversational Voice AI", [
+        "/Home-Assistant-Voice-p-6998.html",
+        "/ReSpeaker-Lite-Voice-Assistant-Kit-p-5929.html",
+    ]),
+    solution_item("环境监测", "/solutions/environment-monitoring", "Environment Monitoring", [
+        "/industries/environment-monitoring",
+        "/Environment-Monitoring-c-2535.html",
+        "/blog/environment-monitoring/",
+    ]),
+    solution_item("楼宇能源改造", "/solutions/building-energy-retrofit", "Building Energy Retrofit", [
+        "/blog/2024/05/14/introducing-recomputer-r1000-an-industrial-edge-iot-gateway-powered-by-raspberry-pi-ideal-for-smart-building-and-energy-management/",
+    ]),
+    solution_item("智能畜牧养殖", "/solutions/smart-livestock-farming", "Smart Livestock Farming", [
+        "/Farming-Environment-Monitoring.html",
+    ]),
+    solution_item("智慧农业传感", "/solutions/smart-agriculture-sensing", "Smart Agriculture Sensing", [
+        "/Wireless-Smart-Agriculture-Kit-Outdoor-p-4950.html",
+    ]),
+    solution_item("校园安全管理", "/solutions/campus-safety-management", "Campus Safety Management", [
+        "/lorawan-safety-badge",
+    ]),
+    solution_item("应急响应", "/solutions/hazard-response", "Hazard Response", [
+        "/Mission-Pack.html",
+        "/blog/2023/11/29/hazard-response-mission-pack-october-workshops-recap/",
+    ]),
+    solution_item("楼宇能源管理", "/solutions/building-energy-management", "Building Energy Management", [
+        "/Energy-Shield.html",
+        "/blog/2024/05/14/introducing-recomputer-r1000-an-industrial-edge-iot-gateway-powered-by-raspberry-pi-ideal-for-smart-building-and-energy-management/",
+    ]),
 ]
 
 
@@ -256,14 +293,14 @@ def solution_growth_status(total: Dict[str, float], matched_rows: Sequence[Dict[
 def build_solution_growth(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     start, end = date_bounds(rows)
     week = latest_week(rows)
-    solution_paths = [item["slug"] for item in SOLUTIONS]
+    solution_paths = [path for item in SOLUTIONS for path in item["aliases"]]
     solution_rows = rows_for_paths(rows, solution_paths)
     category_rows = rows_for_paths(rows, SOLUTION_CATEGORY_PATHS)
     all_related_rows = rows_for_paths(rows, [*SOLUTION_CATEGORY_PATHS, *solution_paths])
     total = totals(solution_rows)
     category_total = totals(category_rows)
     all_total = totals(all_related_rows)
-    matched_solution_count = sum(1 for item in SOLUTIONS if rows_for_paths(rows, [item["slug"]]))
+    matched_solution_count = sum(1 for item in SOLUTIONS if rows_for_paths(rows, item["aliases"]))
     return [
         {
             "最新周次": week,
@@ -338,7 +375,7 @@ def build_solution_detail(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]
     week = latest_week(rows)
     output = []
     for item in SOLUTIONS:
-        matched = rows_for_paths(rows, [item["slug"]])
+        matched = rows_for_paths(rows, item["aliases"])
         total = totals(matched)
         output.append({
             "最新周次": week,

@@ -9,7 +9,7 @@
 
 本包数据来源：
 
-- GA4 网站真实数据：`ga4_normalized_2026-06-30_to_2026-07-27.csv`
+- GA4 网站真实数据：`ga4_normalized_with_solutions_2026-06-30_to_2026-07-27.csv`
 - Seeed 解决方案页面：中文入口 `https://www.seeedstudio.com.cn/category/solutions-zh-hans`，英文入口 `https://www.seeed.cc/category/solutions`，以及 Solutions tab 下 12 个 solution 页面。
 - 社媒平台原生数据：LinkedIn / X / FB / 小红书 / 抖音字段保留，当前等待平台后台或API补录。
 
