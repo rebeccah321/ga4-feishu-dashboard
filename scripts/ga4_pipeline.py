@@ -548,19 +548,23 @@ def render_dashboard(rows: List[Dict[str, Any]], path: Path) -> None:
     path.write_text(html_text, encoding="utf-8")
 
 
-def write_dashboard_data(rows: List[Dict[str, Any]], csv_path: Path, dashboard_file: Path) -> Dict[str, str]:
+def write_dashboard_data(config: Dict[str, Any], rows: List[Dict[str, Any]], csv_path: Path, dashboard_file: Path) -> Dict[str, str]:
     data_dir = dashboard_file.parent / "data"
     ensure_dir(data_dir)
     json_path = data_dir / "latest.json"
     csv_target = data_dir / "latest.csv"
+    limit = int(config.get("outputs", {}).get("published_row_limit", 5000))
+    published_rows = sorted(rows, key=lambda row: int_number(row["Views"]), reverse=True)[:limit]
     payload = {
         "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
         "source_csv": csv_path.name,
         "summary": aggregate(rows),
-        "rows": rows
+        "published_row_limit": limit,
+        "published_rows": len(published_rows),
+        "rows": published_rows
     }
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    shutil.copyfile(csv_path, csv_target)
+    write_csv(published_rows, csv_target)
     return {"data_json": str(json_path), "data_csv": str(csv_target)}
 
 
@@ -621,7 +625,7 @@ def cmd_render_dashboard(args: argparse.Namespace) -> None:
     rows = read_csv(csv_path)
     target = ROOT / config["outputs"]["dashboard_file"]
     render_dashboard(rows, target)
-    data_paths = write_dashboard_data(rows, csv_path, target)
+    data_paths = write_dashboard_data(config, rows, csv_path, target)
     result = {"ok": True, "dashboard": str(target), "rows": len(rows), **data_paths}
     print(json.dumps(result, ensure_ascii=False))
 

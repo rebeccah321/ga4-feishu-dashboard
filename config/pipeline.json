@@ -35,6 +35,7 @@
   "outputs": {
     "raw_dir": "data/raw",
     "normalized_dir": "data/normalized",
-    "dashboard_file": "dashboard/index.html"
+    "dashboard_file": "dashboard/index.html",
+    "published_row_limit": 5000
   }
 }

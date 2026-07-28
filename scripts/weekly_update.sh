@@ -26,8 +26,10 @@ if [[ "$MOCK" == "1" ]]; then
   FETCH_ARGS+=(--mock)
 fi
 
-python3 scripts/ga4_pipeline.py "${FETCH_ARGS[@]}"
-python3 scripts/ga4_pipeline.py render-dashboard
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+"$PYTHON_BIN" scripts/ga4_pipeline.py "${FETCH_ARGS[@]}"
+"$PYTHON_BIN" scripts/ga4_pipeline.py render-dashboard
 
 if [[ "$FETCH_ONLY" == "1" ]]; then
   exit 0
@@ -38,5 +40,5 @@ if [[ "$PUSH_BASE" == "1" ]]; then
   if [[ "$DRY_RUN" == "1" ]]; then
     PUSH_ARGS+=(--dry-run)
   fi
-  python3 scripts/ga4_pipeline.py "${PUSH_ARGS[@]}"
+  "$PYTHON_BIN" scripts/ga4_pipeline.py "${PUSH_ARGS[@]}"
 fi
