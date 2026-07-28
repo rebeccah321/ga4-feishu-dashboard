@@ -3,3 +3,6 @@
 .venv/
 __pycache__/
 *.pyc
+exports/
+data/raw/ga4_raw_*.json
+data/normalized/ga4_normalized_*.csv
