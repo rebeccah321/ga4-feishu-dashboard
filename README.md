@@ -86,3 +86,29 @@ Use Feishu only as the display/notification layer:
 
 The Feishu Base scripts remain in `scripts/setup_base.py` and `push-base`, but they
 are no longer on the critical path.
+
+## Feishu Base Import Package
+
+To generate a package that can be imported directly into Feishu Base:
+
+```bash
+python3 scripts/export_feishu_base_import.py
+```
+
+The package is written to:
+
+```text
+exports/feishu-base-import/
+```
+
+Main files:
+
+- `seeed_社媒_GA4_多维表格导入.xlsx`: import this first. It contains six sheets for Base tables.
+- `seeed_社媒_GA4_飞书多维表格导入包.zip`: the same Excel, CSV tables, and README bundled for upload.
+- `01_看板指标总览.csv` to `06_字段说明.csv`: import these one by one if Feishu does not split the Excel sheets automatically.
+
+The generated tables cover:
+
+- GA4 traffic overview, quality, top channels, top pages, behavior, and conversion metrics.
+- A social media platform dashboard template for LinkedIn, X, FB, 小红书, and 抖音.
+- A post-level social content performance template for deciding what to publish and where.
