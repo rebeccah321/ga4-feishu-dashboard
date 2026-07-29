@@ -522,6 +522,49 @@ def build_solution_funnel(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]
     return output
 
 
+def build_dashboard_main_table(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    details = build_single_solution_detail(rows)
+    funnels = build_solution_funnel(rows)
+    funnel_by_key = {(row["最新周次"], row["solution名称"]): row for row in funnels}
+    output = []
+    for row in details:
+        funnel = funnel_by_key.get((row["最新周次"], row["solution名称"]), {})
+        output.append({
+            "周次": row["最新周次"],
+            "周范围": row["周范围"],
+            "数据覆盖": row["数据覆盖"],
+            "solution名称": row["solution名称"],
+            "solution路径": row["solution路径"],
+            "英文名称": row["英文名称"],
+            "中英日URL": row["中英日URL"],
+            "匹配路径别名": row["匹配路径别名"],
+            "落地页访问量": row["落地页访问量"],
+            "独立访客数": row["独立访客数"],
+            "会话数": row["会话数"],
+            "平均停留时长秒": row["平均停留时长秒"],
+            "参与率": row["参与率"],
+            "跳出率": row["跳出率"],
+            "主要流量来源": row["主要流量来源"],
+            "页面浏览事件_page_view": row["页面浏览事件(page_view)"],
+            "滚动事件_scroll": row["滚动事件(scroll)"],
+            "用户互动_user_engagement": row["用户互动(user_engagement)"],
+            "关键事件_keyEvents": row["关键事件(keyEvents)"],
+            "关键事件数_GA_conversions": row["关键事件数(GA conversions)"],
+            "关键事件转化率": row["关键事件转化率"],
+            "滚动率_scroll_page_view": funnel.get("滚动率_scroll/page_view", "0.00%"),
+            "互动率_user_engagement_page_view": funnel.get("互动率_user_engagement/page_view", "0.00%"),
+            "会话关键事件率": funnel.get("会话关键事件率_keyEvents/session_start", "0.00%"),
+            "CTA状态": "GA4未发现可验证CTA事件",
+            "表单提交状态": "GA4未发现可验证表单事件",
+            "一键加购状态": "GA4未发现可验证加购事件",
+            "销售跟进状态": "未接入CRM/销售跟进数据",
+            "社媒平台数据状态": "平台后台数据未接入；GA4仅可观察Organic Social网站会话",
+            "GA已接入口径": solution_supported_metrics(),
+            "数据状态": row["数据状态"],
+        })
+    return output
+
+
 def build_channels(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     output = []
     for week in reporting_weeks(rows):
@@ -728,12 +771,13 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 1. 打开飞书多维表格，新建一个空 Base。
 2. 选择「导入 Excel/CSV」。
-3. 优先上传 `seeed_解决方案增长_多维表格导入.xlsx`，它已经包含多张工作表。
-4. 如果飞书没有自动识别多 Sheet，就逐个导入 `01_方案增长总览表.csv` 到 `06_社媒平台表现.csv`。
+3. 优先上传 `seeed_解决方案增长_多维仪表盘主表.xlsx`。这是一张大表，适合直接创建多维仪表盘。
+4. `seeed_解决方案增长_多维表格导入.xlsx` 和 6 张 CSV 是辅助拆分表，可选导入。
 
 本包数据来源：
 
 - GA4 网站真实数据：`{source_path.name}`
+- 注意：`{source_path.name}` 是本地计算用底表；最终导入表只输出 12 个 solution 及其二级/三级相关页面的聚合结果。
 - 本包周口径：过去 4 个完整周；本次包含 `{week_ranges}`。
 - 最近完整周：`{latest_complete_week}`。`2026-07-27` 所在周是未完整周，未纳入本包周报口径。
 - Seeed 解决方案页面：中文入口 `https://www.seeedstudio.com.cn/category/solutions-zh-hans`，英文入口 `https://www.seeed.cc/category/solutions`，以及 Solutions tab 下 12 个 solution 页面。
@@ -743,6 +787,12 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 包含表：
 
 {names}
+
+建议仪表盘基于 `00_多维仪表盘主表` 创建：
+
+- 折线图：按 `周范围` 看 `落地页访问量`、`独立访客数`、`关键事件数_GA_conversions`
+- 柱状图：按 `solution名称` 看 `落地页访问量`、`关键事件转化率`
+- 表格：展示 `主要流量来源`、`参与率`、`跳出率`、`CTA状态`、`表单提交状态`
 
 注意：
 
@@ -764,7 +814,9 @@ def main() -> None:
     if not rows:
         raise SystemExit(f"No rows found in {source_path}")
 
+    main_table = build_dashboard_main_table(rows)
     sheets: List[Tuple[str, Sequence[Dict[str, str]]]] = [
+        ("00_多维仪表盘主表", main_table),
         ("01_方案增长总览表", build_growth_overview(rows)),
         ("02_单方案流量明细表", build_single_solution_detail(rows)),
         ("03_转化漏斗表", build_solution_funnel(rows)),
@@ -781,9 +833,11 @@ def main() -> None:
         write_csv_file(OUT_DIR / f"{name}.csv", table_rows)
 
     xlsx_path = OUT_DIR / "seeed_解决方案增长_多维表格导入.xlsx"
+    main_xlsx_path = OUT_DIR / "seeed_解决方案增长_多维仪表盘主表.xlsx"
     zip_path = OUT_DIR / "seeed_解决方案增长_飞书多维表格导入包.zip"
     readme_path = OUT_DIR / "README_导入说明.md"
     write_xlsx(xlsx_path, sheets)
+    write_xlsx(main_xlsx_path, [("00_多维仪表盘主表", main_table)])
     write_readme(readme_path, source_path, sheets)
 
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
@@ -797,6 +851,7 @@ def main() -> None:
         "source": str(source_path),
         "out_dir": str(OUT_DIR),
         "xlsx": str(xlsx_path),
+        "main_xlsx": str(main_xlsx_path),
         "zip": str(zip_path),
         "tables": {name: len(table_rows) for name, table_rows in sheets},
     }, ensure_ascii=False, indent=2))
