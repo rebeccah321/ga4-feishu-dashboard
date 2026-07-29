@@ -17,14 +17,26 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_JSON = ROOT / "dashboard/data/latest.json"
 DATA_CSV = ROOT / "dashboard/data/latest.csv"
 OUT_DIR = ROOT / "exports/feishu-base-import"
+EVENTS_DIR = ROOT / "data/events"
 PLATFORMS = ["LinkedIn", "X", "FB", "小红书", "抖音"]
 SOLUTION_CATEGORY_PATHS = ["/category/solutions-zh-hans", "/category/solutions"]
+GA_EVENT_NAMES = ["page_view", "scroll", "first_visit", "session_start", "user_engagement"]
 def solution_item(name: str, slug: str, english: str, extras: Sequence[str] | None = None) -> Dict[str, Any]:
     bare = "/" + slug.removeprefix("/solutions/")
     aliases = [slug, bare]
     if extras:
         aliases.extend(extras)
-    return {"name": name, "slug": slug, "aliases": aliases, "english": english}
+    return {
+        "name": name,
+        "slug": slug,
+        "aliases": aliases,
+        "english": english,
+        "urls": [
+            f"https://www.seeedstudio.com.cn{slug}",
+            f"https://www.seeed.cc{slug}",
+            f"https://www.seeed.co.jp{slug}",
+        ],
+    }
 
 
 SOLUTIONS = [
@@ -125,16 +137,41 @@ def latest_week_rows(rows: Sequence[Dict[str, str]]) -> Tuple[str, List[Dict[str
     return week, rows_for_week(rows, week)
 
 
+def week_end_date(week: str) -> str:
+    return (dt.date.fromisoformat(week) + dt.timedelta(days=6)).isoformat()
+
+
+def reporting_weeks(rows: Sequence[Dict[str, str]], count: int = 4) -> List[str]:
+    weeks = week_list(rows)
+    if not weeks:
+        return []
+    latest = weeks[-1]
+    latest_dates = {row.get("Date", "") for row in rows_for_week(rows, latest) if row.get("Date")}
+    if len(latest_dates) < 7 and len(weeks) > 1:
+        weeks = weeks[:-1]
+    return weeks[-count:]
+
+
+def week_range_label(week: str) -> str:
+    return f"{week} 至 {week_end_date(week)}"
+
+
+def data_coverage_label(rows: Sequence[Dict[str, str]], week: str) -> str:
+    week_rows = rows_for_week(rows, week)
+    start, end = date_bounds(week_rows)
+    return f"{start} 至 {end}"
+
+
 def week_list(rows: Sequence[Dict[str, str]]) -> List[str]:
     return sorted({row.get("Week Start", "") for row in rows if row.get("Week Start")})
 
 
 def solution_rows(rows: Sequence[Dict[str, str]], item: Dict[str, Any]) -> List[Dict[str, str]]:
-    return rows_for_paths(rows, [item["slug"]])
+    return rows_for_paths(rows, item["aliases"])
 
 
 def solution_week_rows(rows: Sequence[Dict[str, str]], week: str, item: Dict[str, Any]) -> List[Dict[str, str]]:
-    return rows_for_paths(rows_for_week(rows, week), [item["slug"]])
+    return rows_for_paths(rows_for_week(rows, week), item["aliases"])
 
 
 def is_solution_related_path(path: str) -> bool:
@@ -143,6 +180,9 @@ def is_solution_related_path(path: str) -> bool:
         return True
     if path in SOLUTION_CATEGORY_PATHS:
         return True
+    for item in SOLUTIONS:
+        if any(path == alias.lower() or path.startswith(f"{alias.lower()}/") for alias in item["aliases"]):
+            return True
     return False
 
 
@@ -164,12 +204,35 @@ def source_csv_path(payload: Dict[str, Any]) -> Path:
         candidate = ROOT / "data/normalized" / source_name
         if candidate.exists():
             return candidate
+    merged = sorted((ROOT / "data/normalized").glob("ga4_normalized_with_solutions_*.csv"))
+    if merged:
+        return merged[-1]
     return DATA_CSV
 
 
 def read_rows(path: Path) -> List[Dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
+
+
+def latest_event_csv() -> Path | None:
+    files = sorted(EVENTS_DIR.glob("ga4_solution_events_*.csv"))
+    return files[-1] if files else None
+
+
+def event_rows_for_week(rows: Sequence[Dict[str, str]], week: str) -> List[Dict[str, str]]:
+    return [row for row in rows if row.get("周次") == week]
+
+
+def event_counts(rows: Sequence[Dict[str, str]], item: Dict[str, Any]) -> Dict[str, float]:
+    counts = defaultdict(float)
+    for row in rows:
+        if row.get("solution名称") != item["name"] and row.get("solution路径") != item["slug"]:
+            continue
+        event_name = row.get("eventName") or ""
+        counts[event_name] += num(row.get("eventCount"))
+        counts["keyEvents"] += num(row.get("keyEvents"))
+    return dict(counts)
 
 
 def date_bounds(rows: Sequence[Dict[str, str]]) -> Tuple[str, str]:
@@ -262,7 +325,7 @@ def judgement(metric: str, value: float) -> str:
         return "跳出率中等，继续观察不同渠道和页面差异"
     if metric == "conversion":
         if value <= 0.01:
-            return "转化偏弱，需检查表单、咨询入口和购买链路"
+            return "关键事件偏弱，需检查页面承接和已配置转化事件"
         if value >= 0.05:
             return "转化表现较强，可继续放大有效渠道"
         return "转化处于可优化区间，建议做渠道和页面拆解"
@@ -295,6 +358,10 @@ def growth_status(views: float, users: float, conversions: float, matched_rows: 
     return "有可观察流量"
 
 
+def solution_supported_metrics() -> str:
+    return "page_view / scroll / first_visit / session_start / user_engagement / keyEvents"
+
+
 def latest_solution_growth(rows: Sequence[Dict[str, str]]) -> str:
     weeks = week_list(rows)
     current_week = reporting_week(rows)
@@ -315,80 +382,172 @@ def latest_solution_growth(rows: Sequence[Dict[str, str]]) -> str:
     return best_name if best_delta > 0 else f"{best_name}(无正增长)"
 
 
-def build_growth_overview(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    week, week_rows = latest_week_rows(rows)
-    if not week_rows:
-        return []
-    total = totals(week_rows)
-    solution_rows_in_week = solution_related_rows(week_rows)
-    solution_total = totals(solution_rows_in_week)
-    cta_total = 0.0
-    social_total = 0.0
-    cta_click_rate = cta_total / total["views"] if total["views"] else 0.0
-    form_rate = total["conversions"] / total["views"] if total["views"] else 0.0
-    return [{
-        "周次": week,
-        "官网总访问量": fmt_number(total["views"]),
-        "独立访客数": fmt_number(total["users"]),
-        "solution页面总访问量": fmt_number(solution_total["views"]),
-        "CTA总点击量": fmt_number(cta_total),
-        "表单提交总数": fmt_number(total["conversions"]),
-        "社媒总曝光量": fmt_number(social_total),
-        "增长最快solution": latest_solution_growth(rows),
-        "表单转化率": fmt_pct(form_rate),
-        "CTA点击率": fmt_pct(cta_click_rate),
-    }]
-
-
-def build_solution_funnel(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    week, week_rows = latest_week_rows(rows)
-    output = []
+def solution_growth_for_week(rows: Sequence[Dict[str, str]], week: str) -> str:
+    weeks = week_list(rows)
+    if week not in weeks or weeks.index(week) == 0:
+        return "待观察"
+    previous_week = weeks[weeks.index(week) - 1]
+    best_name = ""
+    best_delta = float("-inf")
     for item in SOLUTIONS:
-        matched = solution_rows(week_rows, item)
-        total = totals(matched)
-        page_views = total.get("views", 0.0)
-        cta_clicks = 0.0
-        leads = total.get("conversions", 0.0)
-        add_to_cart = 0.0
-        sales_follow_up = 0.0
+        current_views = totals(solution_week_rows(rows, week, item)).get("views", 0.0)
+        previous_views = totals(solution_week_rows(rows, previous_week, item)).get("views", 0.0)
+        delta = current_views - previous_views
+        if delta > best_delta:
+            best_delta = delta
+            best_name = item["name"]
+    if not best_name:
+        return "待观察"
+    return best_name if best_delta > 0 else f"{best_name}(无正增长)"
+
+
+def build_growth_overview(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    output = []
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        if not week_rows:
+            continue
+        total = totals(week_rows)
+        solution_rows_in_week = solution_related_rows(week_rows)
+        solution_total = totals(solution_rows_in_week)
+        key_events = solution_total.get("conversions", 0.0)
+        key_event_rate = key_events / solution_total["views"] if solution_total["views"] else 0.0
         output.append({
-            "最新周次": week,
-            "solution名称": item["name"],
-            "页面访问量": fmt_number(page_views),
-            "CTA点击量": fmt_number(cta_clicks),
-            "表单提交(leads)": fmt_number(leads),
-            "一键加购": fmt_number(add_to_cart),
-            "销售跟进数": fmt_number(sales_follow_up),
-            "页面->CTA转化率": fmt_pct(cta_clicks / page_views if page_views else 0.0),
-            "CTA->表单转化率": fmt_pct(leads / cta_clicks if cta_clicks else 0.0),
-            "数据状态": "CTA/加购/销售跟进待接入",
+            "周次": week,
+            "周范围": week_range_label(week),
+            "数据覆盖": data_coverage_label(rows, week),
+            "官网总访问量": fmt_number(total["views"]),
+            "独立访客数": fmt_number(total["users"]),
+            "solution页面总访问量": fmt_number(solution_total["views"]),
+            "CTA总点击量": "GA4未发现可验证CTA事件",
+            "表单提交总数": "GA4未发现可验证表单事件",
+            "社媒总曝光量": "未接入平台后台数据",
+            "增长最快solution": solution_growth_for_week(rows, week),
+            "表单转化率": "GA4未发现可验证表单事件",
+            "CTA点击率": "GA4未发现可验证CTA事件",
+            "解决方案独立访客数": fmt_number(solution_total["users"]),
+            "解决方案会话数": fmt_number(solution_total["sessions"]),
+            "GA关键事件总数": fmt_number(key_events),
+            "GA关键事件转化率": fmt_pct(key_event_rate),
+            "已接入事件口径": solution_supported_metrics(),
+            "数据说明": "CTA、表单提交、加购、销售跟进当前没有可验证GA事件字段，未作为真实指标填入",
         })
     return output
 
 
-def build_channels(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    week, week_rows = latest_week_rows(rows)
-    start, end = date_bounds(week_rows)
-    items = aggregate(solution_related_rows(week_rows), ["Channel Group"])
-    items.sort(key=lambda item: item.get("Views", 0), reverse=True)
+def solution_event_context(rows: Sequence[Dict[str, str]], week: str) -> Tuple[Path | None, List[Dict[str, str]]]:
+    event_path = latest_event_csv()
+    event_week_rows: List[Dict[str, str]] = read_rows(event_path) if event_path and event_path.exists() else []
+    return event_path, event_rows_for_week(event_week_rows, week)
+
+
+def build_single_solution_detail(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
     output = []
-    for index, item in enumerate(items[:5], start=1):
-        conversion_rate = item.get("Conversion Rate", 0.0)
-        output.append({
-            "周期开始": start,
-            "周期结束": end,
-            "渠道": item.get("Channel Group") or "Unassigned",
-            "用户数": fmt_number(item.get("Active Users", 0.0)),
-            "会话数": fmt_number(item.get("Sessions", 0.0)),
-            "浏览量": fmt_number(item.get("Views", 0.0)),
-            "转化数": fmt_number(item.get("Conversions", 0.0)),
-            "转化率": fmt_pct(conversion_rate),
-            "跳出率": fmt_pct(item.get("Bounce Rate", 0.0)),
-            "平均会话时长秒": fmt_number(item.get("Avg Engagement Seconds", 0.0), 2),
-            "渠道排序": str(index),
-            "业务判断": judgement("conversion", conversion_rate),
-            "建议动作": "高转化渠道继续放大；高流量低转化渠道优先优化落地页和CTA",
-        })
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        _, event_week_rows = solution_event_context(rows, week)
+        for item in SOLUTIONS:
+            matched = solution_rows(week_rows, item)
+            total = totals(matched)
+            event_counts_by_name = event_counts(event_week_rows, item)
+            output.append({
+                "最新周次": week,
+                "周范围": week_range_label(week),
+                "数据覆盖": data_coverage_label(rows, week),
+                "solution名称": item["name"],
+                "solution路径": item["slug"],
+                "英文名称": item["english"],
+                "中英日URL": " | ".join(item["urls"]),
+                "匹配路径别名": " | ".join(item["aliases"]),
+                "落地页访问量": fmt_number(total.get("views", 0.0)),
+                "独立访客数": fmt_number(total.get("users", 0.0)),
+                "会话数": fmt_number(total.get("sessions", 0.0)),
+                "平均停留时长秒": fmt_number(total.get("avg_engagement_seconds", 0.0), 2),
+                "参与率": fmt_pct(total.get("engagement_rate", 0.0)),
+                "跳出率": fmt_pct(total.get("bounce_rate", 0.0)),
+                "关键事件数(GA conversions)": fmt_number(total.get("conversions", 0.0)),
+                "关键事件转化率": fmt_pct(total.get("conversion_rate", 0.0)),
+                "主要流量来源": dominant_channel(matched) if matched else "GA4本周未命中",
+                "页面浏览事件(page_view)": fmt_number(event_counts_by_name.get("page_view", 0.0)),
+                "滚动事件(scroll)": fmt_number(event_counts_by_name.get("scroll", 0.0)),
+                "首次访问(first_visit)": fmt_number(event_counts_by_name.get("first_visit", 0.0)),
+                "会话开始(session_start)": fmt_number(event_counts_by_name.get("session_start", 0.0)),
+                "用户互动(user_engagement)": fmt_number(event_counts_by_name.get("user_engagement", 0.0)),
+                "关键事件(keyEvents)": fmt_number(event_counts_by_name.get("keyEvents", 0.0)),
+                "数据状态": "有GA页面数据" if matched else "GA4本周未命中该方案页",
+            })
+    return output
+
+
+def build_solution_funnel(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    output = []
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        _, event_week_rows = solution_event_context(rows, week)
+        for item in SOLUTIONS:
+            matched = solution_rows(week_rows, item)
+            total = totals(matched)
+            event_counts_by_name = event_counts(event_week_rows, item)
+            page_views = event_counts_by_name.get("page_view", 0.0) or total.get("views", 0.0)
+            scrolls = event_counts_by_name.get("scroll", 0.0)
+            engagements = event_counts_by_name.get("user_engagement", 0.0)
+            key_events = event_counts_by_name.get("keyEvents", 0.0) or total.get("conversions", 0.0)
+            sessions = event_counts_by_name.get("session_start", 0.0) or total.get("sessions", 0.0)
+            output.append({
+                "最新周次": week,
+                "周范围": week_range_label(week),
+                "数据覆盖": data_coverage_label(rows, week),
+                "solution名称": item["name"],
+                "solution路径": item["slug"],
+                "页面访问量": fmt_number(total.get("views", 0.0)),
+                "CTA": "GA4未发现可验证CTA事件",
+                "表单提交(leads)": "GA4未发现可验证表单事件",
+                "一键加购": "GA4未发现可验证加购事件",
+                "销售跟进数": "未接入CRM/销售跟进数据",
+                "页面->CTA转化率": "GA4未发现可验证CTA事件",
+                "CTA->表单转化率": "GA4未发现可验证表单事件",
+                "访问层_page_view": fmt_number(page_views),
+                "滚动层_scroll": fmt_number(scrolls),
+                "互动层_user_engagement": fmt_number(engagements),
+                "关键事件_keyEvents": fmt_number(key_events),
+                "GA会话数": fmt_number(sessions),
+                "滚动率_scroll/page_view": fmt_pct(scrolls / page_views if page_views else 0.0),
+                "互动率_user_engagement/page_view": fmt_pct(engagements / page_views if page_views else 0.0),
+                "关键事件转化率_keyEvents/page_view": fmt_pct(key_events / page_views if page_views else 0.0),
+                "会话关键事件率_keyEvents/session_start": fmt_pct(key_events / sessions if sessions else 0.0),
+                "GA已接入漏斗事件": solution_supported_metrics(),
+                "缺失埋点说明": "未发现可验证的CTA点击、表单提交、加购、销售跟进事件；这些不能作为真实漏斗字段填数",
+                "数据状态": "有GA事件数据" if any(event_counts_by_name.get(name, 0.0) for name in GA_EVENT_NAMES) else "GA4本周未命中该方案页事件",
+            })
+    return output
+
+
+def build_channels(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
+    output = []
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        start, end = date_bounds(week_rows)
+        items = aggregate(solution_related_rows(week_rows), ["Channel Group"])
+        items.sort(key=lambda item: item.get("Views", 0), reverse=True)
+        for index, item in enumerate(items[:5], start=1):
+            conversion_rate = item.get("Conversion Rate", 0.0)
+            output.append({
+                "周次": week,
+                "周范围": week_range_label(week),
+                "周期开始": start,
+                "周期结束": end,
+                "渠道": item.get("Channel Group") or "Unassigned",
+                "用户数": fmt_number(item.get("Active Users", 0.0)),
+                "会话数": fmt_number(item.get("Sessions", 0.0)),
+                "浏览量": fmt_number(item.get("Views", 0.0)),
+                "转化数": fmt_number(item.get("Conversions", 0.0)),
+                "转化率": fmt_pct(conversion_rate),
+                "跳出率": fmt_pct(item.get("Bounce Rate", 0.0)),
+                "平均会话时长秒": fmt_number(item.get("Avg Engagement Seconds", 0.0), 2),
+                "渠道排序": str(index),
+                "业务判断": judgement("conversion", conversion_rate),
+                "建议动作": "高转化渠道继续放大；高流量低关键事件渠道优先检查落地页承接和事件配置",
+            })
     return output
 
 
@@ -410,60 +569,41 @@ def infer_topic(path: str, title: str) -> str:
 
 
 def build_solution_pages(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    _, week_rows = latest_week_rows(rows)
-    start, end = date_bounds(week_rows)
-    items = aggregate(solution_related_rows(week_rows), ["Page Path", "Page Title"])
-    items.sort(key=lambda item: item.get("Views", 0), reverse=True)
     output = []
-    for item in items[:20]:
-        conversion_rate = item.get("Conversion Rate", 0.0)
-        path = item.get("Page Path") or "/"
-        title = item.get("Page Title") or ""
-        output.append({
-            "周期开始": start,
-            "周期结束": end,
-            "页面路径": path,
-            "页面标题": title,
-            "浏览量": fmt_number(item.get("Views", 0.0)),
-            "用户数": fmt_number(item.get("Active Users", 0.0)),
-            "会话数": fmt_number(item.get("Sessions", 0.0)),
-            "参与率": fmt_pct(item.get("Engagement Rate", 0.0)),
-            "跳出率": fmt_pct(item.get("Bounce Rate", 0.0)),
-            "平均互动秒": fmt_number(item.get("Avg Engagement Seconds", 0.0), 2),
-            "关键事件触发次数": fmt_number(item.get("Conversions", 0.0)),
-            "转化数": fmt_number(item.get("Conversions", 0.0)),
-            "页面类型/内容主题": infer_topic(path, title),
-            "业务判断": judgement("conversion", conversion_rate),
-            "建议动作": "保留高浏览页面；对高跳出或低转化页面优化首屏价值、CTA和内部链接",
-        })
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        start, end = date_bounds(week_rows)
+        items = aggregate(solution_related_rows(week_rows), ["Page Path", "Page Title"])
+        items.sort(key=lambda item: item.get("Views", 0), reverse=True)
+        for item in items[:20]:
+            conversion_rate = item.get("Conversion Rate", 0.0)
+            path = item.get("Page Path") or "/"
+            title = item.get("Page Title") or ""
+            output.append({
+                "周次": week,
+                "周范围": week_range_label(week),
+                "周期开始": start,
+                "周期结束": end,
+                "页面路径": path,
+                "页面标题": title,
+                "浏览量": fmt_number(item.get("Views", 0.0)),
+                "用户数": fmt_number(item.get("Active Users", 0.0)),
+                "会话数": fmt_number(item.get("Sessions", 0.0)),
+                "参与率": fmt_pct(item.get("Engagement Rate", 0.0)),
+                "跳出率": fmt_pct(item.get("Bounce Rate", 0.0)),
+                "平均互动秒": fmt_number(item.get("Avg Engagement Seconds", 0.0), 2),
+                "关键事件触发次数": fmt_number(item.get("Conversions", 0.0)),
+                "转化数": fmt_number(item.get("Conversions", 0.0)),
+                "主要事件": solution_supported_metrics(),
+                "页面类型/内容主题": infer_topic(path, title),
+                "业务判断": judgement("conversion", conversion_rate),
+                "建议动作": "保留高浏览页面；对高跳出或低关键事件页面优化首屏价值、内容结构和内部链接",
+            })
     return output
 
 
 def build_social_platforms(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    _, week_rows = latest_week_rows(rows)
-    start, end = date_bounds(week_rows)
-    social_rows = [row for row in week_rows if row.get("Channel Group") == "Organic Social" and is_solution_related_path(row.get("Page Path", ""))]
-    social_total = totals(social_rows)
-    output = [{
-        "周期开始": start,
-        "周期结束": end,
-        "平台": "GA4 Organic Social 合计",
-        "粉丝数": "",
-        "发帖数": "",
-        "曝光/播放": "",
-        "互动数": "",
-        "互动率": "",
-        "点击数": "",
-        "网站会话数": fmt_number(social_total.get("sessions", 0.0)),
-        "网站用户数": fmt_number(social_total.get("users", 0.0)),
-        "转化数": fmt_number(social_total.get("conversions", 0.0)),
-        "转化率": fmt_pct(social_total.get("conversion_rate", 0.0)),
-        "最佳内容类型": "待接入平台后台数据后判断",
-        "适合继续投入": "待判断",
-        "建议UTM渠道参数": "utm_medium=social",
-        "数据状态": "GA4仅有社媒合计，未拆平台",
-        "备注": "平台拆分需后续内容链接统一添加 UTM",
-    }]
+    output = []
     utm_map = {
         "LinkedIn": "utm_source=linkedin&utm_medium=social",
         "X": "utm_source=x&utm_medium=social",
@@ -471,27 +611,56 @@ def build_social_platforms(rows: Sequence[Dict[str, str]]) -> List[Dict[str, str
         "小红书": "utm_source=xiaohongshu&utm_medium=social",
         "抖音": "utm_source=douyin&utm_medium=social",
     }
-    for platform in PLATFORMS:
+    for week in reporting_weeks(rows):
+        week_rows = rows_for_week(rows, week)
+        start, end = date_bounds(week_rows)
+        social_rows = [row for row in week_rows if row.get("Channel Group") == "Organic Social" and is_solution_related_path(row.get("Page Path", ""))]
+        social_total = totals(social_rows)
         output.append({
+            "周次": week,
+            "周范围": week_range_label(week),
             "周期开始": start,
             "周期结束": end,
-            "平台": platform,
+            "平台": "GA4 Organic Social 合计",
             "粉丝数": "",
             "发帖数": "",
-            "曝光/播放": "",
-            "互动数": "",
-            "互动率": "",
-            "点击数": "",
-            "网站会话数": "",
-            "网站用户数": "",
-            "转化数": "",
-            "转化率": "",
-            "最佳内容类型": "",
-            "适合继续投入": "",
-            "建议UTM渠道参数": utm_map[platform],
-            "数据状态": "待手动导入平台后台数据",
-            "备注": "用于判断内容应该发什么、发到哪里",
+            "曝光/播放": "未接入平台后台数据",
+            "互动数": "未接入平台后台数据",
+            "互动率": "未接入平台后台数据",
+            "点击数": "GA4仅能观察网站会话，未拆平台点击",
+            "网站会话数": fmt_number(social_total.get("sessions", 0.0)),
+            "网站用户数": fmt_number(social_total.get("users", 0.0)),
+            "转化数": fmt_number(social_total.get("conversions", 0.0)),
+            "转化率": fmt_pct(social_total.get("conversion_rate", 0.0)),
+            "最佳内容类型": "待接入平台后台数据后判断",
+            "适合继续投入": "待判断",
+            "建议UTM渠道参数": "utm_medium=social",
+            "数据状态": "GA4仅有社媒合计，未拆平台",
+            "备注": "平台拆分需后续内容链接统一添加 UTM",
         })
+        for platform in PLATFORMS:
+            output.append({
+                "周次": week,
+                "周范围": week_range_label(week),
+                "周期开始": start,
+                "周期结束": end,
+                "平台": platform,
+                "粉丝数": "",
+                "发帖数": "",
+                "曝光/播放": "",
+                "互动数": "",
+                "互动率": "",
+                "点击数": "",
+                "网站会话数": "",
+                "网站用户数": "",
+                "转化数": "",
+                "转化率": "",
+                "最佳内容类型": "",
+                "适合继续投入": "",
+                "建议UTM渠道参数": utm_map[platform],
+                "数据状态": "待手动导入平台后台数据",
+                "备注": "用于判断内容应该发什么、发到哪里",
+            })
     return output
 
 
@@ -550,6 +719,9 @@ def write_xlsx(path: Path, sheets: Sequence[Tuple[str, Sequence[Dict[str, str]]]
 
 def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequence[Dict[str, str]]]]) -> None:
     names = "\n".join(f"- {name}: {len(rows)} rows" for name, rows in sheets)
+    overview_rows = sheets[0][1] if sheets else []
+    week_ranges = "; ".join(row.get("周范围", row.get("周次", "")) for row in overview_rows)
+    latest_complete_week = overview_rows[-1].get("周范围", "") if overview_rows else ""
     path.write_text(f"""# 飞书多维表格导入包
 
 最快导入方式：
@@ -557,12 +729,15 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 1. 打开飞书多维表格，新建一个空 Base。
 2. 选择「导入 Excel/CSV」。
 3. 优先上传 `seeed_解决方案增长_多维表格导入.xlsx`，它已经包含多张工作表。
-4. 如果飞书没有自动识别多 Sheet，就逐个导入 `01_方案增长总览表.csv` 到 `05_社媒平台表现.csv`。
+4. 如果飞书没有自动识别多 Sheet，就逐个导入 `01_方案增长总览表.csv` 到 `06_社媒平台表现.csv`。
 
 本包数据来源：
 
 - GA4 网站真实数据：`{source_path.name}`
+- 本包周口径：过去 4 个完整周；本次包含 `{week_ranges}`。
+- 最近完整周：`{latest_complete_week}`。`2026-07-27` 所在周是未完整周，未纳入本包周报口径。
 - Seeed 解决方案页面：中文入口 `https://www.seeedstudio.com.cn/category/solutions-zh-hans`，英文入口 `https://www.seeed.cc/category/solutions`，以及 Solutions tab 下 12 个 solution 页面。
+- 12 个 solution 的中文 / 英文 / 日文 URL 使用同一 slug 聚合；GA4 底表里出现任一 host 的同一路径都会计入该 solution。
 - 社媒平台原生数据：LinkedIn / X / FB / 小红书 / 抖音字段保留，当前等待平台后台或API补录。
 
 包含表：
@@ -571,10 +746,13 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 注意：
 
-- `CTA总点击量`、`一键加购`、`销售跟进数` 目前先保留结构，数值暂为 0，等 CTA 事件或 CRM 数据接入后自动替换。
-- `社媒总曝光量` 目前没有接入平台后台数据，暂填 0。
+- 本版按用户要求只围绕「解决方案」及其二级/三级页面，不输出全站热门页面。
+- `单方案流量明细表` 使用 GA4 页面维度真实字段：浏览量、独立访客、会话、平均互动秒、参与率、跳出率、关键事件等。
+- `转化漏斗表` 仅使用 GA4 当前实际能查到的事件：`page_view / scroll / first_visit / session_start / user_engagement / keyEvents`。
+- 未发现可验证的 `CTA点击`、`表单提交`、`一键加购`、`销售跟进` 事件，因此没有把这些字段作为真实转化数据填入。
+- `社媒总曝光量` 目前没有接入平台后台数据，标记为未接入。
 - 如果当前周数据未满 7 天，导出会自动使用最近完整周，避免周报被不完整数据拉低。
-- `增长最快solution` 按最新周对比上周的 solution 页面访问量自动计算。
+- `增长最快solution` 按每个周次对比上一周的 solution 页面访问量自动计算。
 - 如果 12 个 solution 页面显示 `GA4未命中`，优先确认 seeed.cc / 中文站是否接入当前 GA4 Property `258704823`，或在下一次拉数中使用 `/solutions` 过滤专项拉取。
 """, encoding="utf-8")
 
@@ -588,10 +766,11 @@ def main() -> None:
 
     sheets: List[Tuple[str, Sequence[Dict[str, str]]]] = [
         ("01_方案增长总览表", build_growth_overview(rows)),
-        ("02_转化漏斗表", build_solution_funnel(rows)),
-        ("03_流量来源渠道", build_channels(rows)),
-        ("04_解决方案页面与行为", build_solution_pages(rows)),
-        ("05_社媒平台表现", build_social_platforms(rows)),
+        ("02_单方案流量明细表", build_single_solution_detail(rows)),
+        ("03_转化漏斗表", build_solution_funnel(rows)),
+        ("04_流量来源渠道", build_channels(rows)),
+        ("05_解决方案页面与行为", build_solution_pages(rows)),
+        ("06_社媒平台表现", build_social_platforms(rows)),
     ]
 
     if OUT_DIR.exists():
