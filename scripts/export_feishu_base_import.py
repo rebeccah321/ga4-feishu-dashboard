@@ -716,6 +716,29 @@ def write_csv_file(path: Path, rows: Sequence[Dict[str, str]]) -> None:
         writer.writerows(rows)
 
 
+def build_single_base_import_table(sheets: Sequence[Tuple[str, Sequence[Dict[str, str]]]]) -> List[Dict[str, str]]:
+    meta_fields = ["资源表", "资源排序", "是否仪表盘主记录"]
+    union_fields: List[str] = []
+    for _, rows in sheets:
+        for row in rows:
+            for field in row.keys():
+                if field not in union_fields and field not in meta_fields:
+                    union_fields.append(field)
+
+    fields = meta_fields + union_fields
+    output: List[Dict[str, str]] = []
+    for sheet_index, (name, rows) in enumerate(sheets, start=0):
+        for row_index, row in enumerate(rows, start=1):
+            item = {field: "" for field in fields}
+            item["资源表"] = name
+            item["资源排序"] = f"{sheet_index:02d}-{row_index:04d}"
+            item["是否仪表盘主记录"] = "是" if name == "00_多维仪表盘主表" else "否"
+            for field, value in row.items():
+                item[field] = str(value)
+            output.append(item)
+    return output
+
+
 def column_name(index: int) -> str:
     name = ""
     while index:
@@ -763,7 +786,7 @@ def write_xlsx(path: Path, sheets: Sequence[Tuple[str, Sequence[Dict[str, str]]]
 def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequence[Dict[str, str]]]]) -> None:
     names = "\n".join(f"- {name}: {len(rows)} rows" for name, rows in sheets)
     overview_rows = sheets[0][1] if sheets else []
-    week_ranges = "; ".join(row.get("周范围", row.get("周次", "")) for row in overview_rows)
+    week_ranges = "; ".join(dict.fromkeys(row.get("周范围", row.get("周次", "")) for row in overview_rows))
     latest_complete_week = overview_rows[-1].get("周范围", "") if overview_rows else ""
     path.write_text(f"""# 飞书多维表格导入包
 
@@ -771,8 +794,9 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 1. 打开飞书多维表格，新建一个空 Base。
 2. 选择「导入 Excel/CSV」。
-3. 优先上传 `seeed_解决方案增长_多维仪表盘主表.xlsx`。这是一张大表，适合直接创建多维仪表盘。
-4. `seeed_解决方案增长_多维表格导入.xlsx` 和 6 张 CSV 是辅助拆分表，可选导入。
+3. 优先上传 `seeed_解决方案增长_飞书单表导入.xlsx`。这是 1 张 Base 表，包含仪表盘主记录和 6 类资源明细，不会在左侧拆成多张表。
+4. 导入后用字段 `资源表` / `是否仪表盘主记录` 建视图或仪表盘筛选。
+5. `seeed_解决方案增长_资源合集.xlsx` 是同一文件多 sheet 版本，适合当普通表格文档查看；如果导入 Base，飞书可能会拆成多张表。
 
 本包数据来源：
 
@@ -788,7 +812,7 @@ def write_readme(path: Path, source_path: Path, sheets: Sequence[Tuple[str, Sequ
 
 {names}
 
-建议仪表盘基于 `00_多维仪表盘主表` 创建：
+建议仪表盘基于单表导入后的筛选 `是否仪表盘主记录 = 是` 创建：
 
 - 折线图：按 `周范围` 看 `落地页访问量`、`独立访客数`、`关键事件数_GA_conversions`
 - 柱状图：按 `solution名称` 看 `落地页访问量`、`关键事件转化率`
@@ -832,11 +856,16 @@ def main() -> None:
     for name, table_rows in sheets:
         write_csv_file(OUT_DIR / f"{name}.csv", table_rows)
 
-    xlsx_path = OUT_DIR / "seeed_解决方案增长_多维表格导入.xlsx"
+    xlsx_path = OUT_DIR / "seeed_解决方案增长_资源合集.xlsx"
+    single_base_xlsx_path = OUT_DIR / "seeed_解决方案增长_飞书单表导入.xlsx"
+    single_base_csv_path = OUT_DIR / "seeed_解决方案增长_飞书单表导入.csv"
     main_xlsx_path = OUT_DIR / "seeed_解决方案增长_多维仪表盘主表.xlsx"
     zip_path = OUT_DIR / "seeed_解决方案增长_飞书多维表格导入包.zip"
     readme_path = OUT_DIR / "README_导入说明.md"
+    single_base_table = build_single_base_import_table(sheets)
     write_xlsx(xlsx_path, sheets)
+    write_xlsx(single_base_xlsx_path, [("解决方案增长数据池", single_base_table)])
+    write_csv_file(single_base_csv_path, single_base_table)
     write_xlsx(main_xlsx_path, [("00_多维仪表盘主表", main_table)])
     write_readme(readme_path, source_path, sheets)
 
@@ -851,8 +880,11 @@ def main() -> None:
         "source": str(source_path),
         "out_dir": str(OUT_DIR),
         "xlsx": str(xlsx_path),
+        "single_base_xlsx": str(single_base_xlsx_path),
+        "single_base_csv": str(single_base_csv_path),
         "main_xlsx": str(main_xlsx_path),
         "zip": str(zip_path),
+        "single_base_rows": len(single_base_table),
         "tables": {name: len(table_rows) for name, table_rows in sheets},
     }, ensure_ascii=False, indent=2))
 
