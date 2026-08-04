@@ -1,0 +1,52 @@
+name: Weekly GA4 Tables
+
+on:
+  schedule:
+    # 每周一北京时间 9:00 = UTC 周一 1:00
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Write service account credentials
+        env:
+          GA4_SA_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT }}
+        run: |
+          echo "$GA4_SA_JSON" > /tmp/sa.json
+          echo "GA4_AUTH_MODE=service_account" >> $GITHUB_ENV
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json" >> $GITHUB_ENV
+          echo "CLOUDSDK_PYTHON=python3" >> $GITHUB_ENV
+
+      - name: Fetch GA4 data (42 days)
+        run: python3 scripts/ga4_fetch.py --days 42
+
+      - name: Generate weekly tables
+        run: python3 scripts/generate_tables.py
+
+      - name: Copy tables to Pages directory
+        run: |
+          mkdir -p dashboard/data/weekly
+          cp data/analysis/方案增长总览.csv dashboard/data/weekly/
+          cp data/analysis/单方案流量明细.csv dashboard/data/weekly/
+          cp data/analysis/转换漏斗.csv dashboard/data/weekly/
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ dashboard/data/weekly/
+          git commit -m "Weekly GA4 tables update $(date -u +%Y-%m-%d)" || echo "No changes"
+          git push
