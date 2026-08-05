@@ -1,8 +1,8 @@
-week_ending,total_site_pv,total_users,solution_pv,cta_clicks,cta_click_rate,key_events,key_event_conv_rate,fastest_growing_solution,social_impressions,solution_wow_pct
-2026-06-28,9534,7908,712,未接入,未接入,1,0.0014,,未接入,
-2026-07-05,10703,9066,767,未接入,未接入,5,0.0062,hazard-response (+100.0%),未接入,7.7
-2026-07-12,11793,9930,804,未接入,未接入,2,0.0025,smart-warehouse-management (+164.2%),未接入,4.8
-2026-07-19,11891,10136,766,未接入,未接入,1,0.0013,building-energy-retrofit (+95.2%),未接入,-4.7
-2026-07-26,11405,9440,849,未接入,未接入,7,0.008,hazard-response (+83.3%),未接入,10.8
-2026-08-02,11760,9970,1150,未接入,未接入,1,0.0009,smart-warehouse-management (+103.7%),未接入,35.5
-2026-08-09,1863,1551,175,未接入,未接入,0,0.0,building-energy-retrofit (+-61.1%),未接入,-84.8
+﻿周次,方案页独立访客,Solution页面总访问量,CTA总点击量,CTA点击率,关键事件,关键事件转化率,增长最快的solution,流量最高方案,社媒总曝光量,Solution页面周环比
+2026-06-28,595,712,未接入,未接入,1,0.0014,,voicecollectionanalysis (151 PV),未接入,
+2026-07-05,685,767,未接入,未接入,5,0.0062,hazard-response (+100.0%),voicecollectionanalysis (172 PV),未接入,7.7
+2026-07-12,676,804,未接入,未接入,2,0.0025,smart-warehouse-management (+164.2%),voicecollectionanalysis (165 PV),未接入,4.8
+2026-07-19,685,766,未接入,未接入,1,0.0013,building-energy-retrofit (+95.2%),voicecollectionanalysis (123 PV),未接入,-4.7
+2026-07-26,737,849,未接入,未接入,7,0.008,hazard-response (+83.3%),smart-warehouse-management (161 PV),未接入,10.8
+2026-08-02,940,1150,未接入,未接入,1,0.0009,smart-warehouse-management (+103.7%),smart-warehouse-management (328 PV),未接入,35.5
+2026-08-09,155,175,未接入,未接入,0,0.0,building-energy-retrofit (-61.1%),intelligent-video-analytics (30 PV),未接入,-84.8

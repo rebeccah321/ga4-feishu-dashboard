@@ -1,4 +1,4 @@
-week_ending,slug,landing_pv,users,sessions,avg_eng_s,engagement_rate,top_channel,cta_clicks,form_submits,key_events,data_status,wow_pct
+﻿周次,方案名称,落地访问量,独立访客数,session,平均停留时长(秒),参与率,主要流量来源,CTA点击量,表单提交,event,数据状态,周环比(%)
 2026-06-28,building-energy-management,24,26,29,32.8,0.7931,Direct,未接入,未接入,0,GA4已接入,
 2026-07-05,building-energy-management,43,42,44,25.6,0.6364,Direct,未接入,未接入,0,GA4已接入,79.2
 2026-07-12,building-energy-management,39,40,43,19.8,0.814,Unassigned,未接入,未接入,0,GA4已接入,-9.3

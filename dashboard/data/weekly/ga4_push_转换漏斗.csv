@@ -1,4 +1,4 @@
-week_ending,slug,page_pv,cta_clicks,form_submits,add_to_cart,pv_to_cta_rate,cta_to_form_rate,data_status,engaged_sessions
+﻿最新周次,方案名称,页面访问量,CTA点击量,表单提交,一键加购,页面到CTA转化率,CTA到表单转化率,数据状态,参与会话数
 2026-08-02,building-energy-management,48,未接入,未接入,未接入,未接入,未接入,GA4部分·CRM未接入,39
 2026-08-02,building-energy-retrofit,36,未接入,未接入,未接入,未接入,未接入,GA4部分·CRM未接入,30
 2026-08-02,campus-safety-management,43,未接入,未接入,未接入,未接入,未接入,GA4部分·CRM未接入,29
