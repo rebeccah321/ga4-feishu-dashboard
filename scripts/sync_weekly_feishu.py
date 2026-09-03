@@ -140,6 +140,34 @@ def list_records(token, app_token, table_id):
         page_token = data.get("page_token", "")
 
 
+def list_fields(token, app_token, table_id):
+    url = (f"{FEISHU_BASE}/bitable/v1/apps/{app_token}/tables/{table_id}/fields?"
+           + urllib.parse.urlencode({"page_size": "100"}))
+    payload = request_json("GET", url, token=token)
+    return {
+        item.get("field_name"): item.get("type")
+        for item in payload.get("data", {}).get("items", [])
+    }
+
+
+def datetime_to_ms(value):
+    text = str(value or "").strip()
+    try:
+        parsed = dt.datetime.fromisoformat(text)
+    except ValueError:
+        return value
+    return int(parsed.timestamp() * 1000)
+
+
+def coerce_field_value(field_name, value, field_types):
+    if value is None:
+        return None
+    # Feishu Bitfield field type: 5 = Date / DateTime
+    if field_name in field_types and field_types[field_name] == 5:
+        return datetime_to_ms(value)
+    return value
+
+
 def upsert_record(token, app_token, table_id, record_id, fields):
     fields = {key: value for key, value in fields.items() if value is not None}
     if record_id:
@@ -293,6 +321,8 @@ def main():
         table_name = TABLES[table_key]
         table_id = available[table_name]
         rows = table_data[table_key]
+        field_types = list_fields(token, app_token, table_id)
+        print(f"Step 3: {table_name} field types: {field_types}", flush=True)
         existing_records = list_records(token, app_token, table_id)
         existing = {
             key_for(table_key, item.get("fields", {})): item.get("record_id")
@@ -302,7 +332,11 @@ def main():
         created = updated = 0
         for row in rows:
             key = key_for(table_key, row)
-            result = upsert_record(token, app_token, table_id, existing.get(key), row)
+            fields = {
+                name: coerce_field_value(name, value, field_types)
+                for name, value in row.items()
+            }
+            result = upsert_record(token, app_token, table_id, existing.get(key), fields)
             if result == "created":
                 created += 1
             else:
