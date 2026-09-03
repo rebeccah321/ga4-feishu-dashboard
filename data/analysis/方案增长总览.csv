@@ -1,8 +1,8 @@
 week_ending,solution_users,solution_pv,total_site_pv,cta_clicks,cta_click_rate,key_events,key_event_conv_rate,fastest_growing_solution,top_traffic_solution,social_impressions,solution_wow_pct
-2026-07-26,429,501,5691,2,0.04,2,0.0039,,smart-warehouse-management (128 PV),未接入,
-2026-08-02,940,1150,11760,1,0.01,1,0.0009,intelligent-video-analytics (+450.0%),smart-warehouse-management (328 PV),未接入,129.5
-2026-08-09,820,939,11667,0,0.0,0,0.0,building-energy-retrofit (+91.7%),intelligent-video-analytics (134 PV),未接入,-18.3
-2026-08-16,735,904,10239,3,0.03,3,0.0033,indoor-outdoor-positioning (+159.5%),intelligent-video-analytics (136 PV),未接入,-3.7
-2026-08-23,720,822,11568,3,0.03,3,0.0036,hazard-response (+76.0%),conversational-voice-ai (168 PV),未接入,-9.1
-2026-08-30,762,882,12970,0,0.0,0,0.0,intelligent-video-analytics (+70.0%),voicecollectionanalysis (179 PV),未接入,7.3
-2026-09-06,496,479,12092,1,0.01,1,0.0018,conversational-voice-ai (+2.9%),conversational-voice-ai (108 PV),未接入,-45.7
+2026-07-26,779,936,11680,7,0.06,7,0.0075,,smart-warehouse-management (168 PV),未接入,
+2026-08-02,1026,1259,12082,1,0.01,1,0.0008,intelligent-video-analytics (+102.0%),smart-warehouse-management (332 PV),未接入,34.5
+2026-08-09,922,1046,11997,0,0.0,0,0.0,building-energy-retrofit (+81.6%),voicecollectionanalysis (141 PV),未接入,-16.9
+2026-08-16,764,971,10559,3,0.03,3,0.0032,indoor-outdoor-positioning (+140.0%),intelligent-video-analytics (154 PV),未接入,-7.2
+2026-08-23,766,883,11896,3,0.03,3,0.0034,hazard-response (+76.0%),conversational-voice-ai (171 PV),未接入,-9.1
+2026-08-30,800,934,13245,0,0.0,0,0.0,smart-warehouse-management (+70.0%),voicecollectionanalysis (188 PV),未接入,5.8
+2026-09-06,528,580,12372,1,0.01,1,0.0017,building-energy-retrofit (+3.1%),conversational-voice-ai (108 PV),未接入,-37.9

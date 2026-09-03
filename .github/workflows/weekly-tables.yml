@@ -37,7 +37,7 @@ jobs:
         run: python3 scripts/ga4_fetch.py --days 42
 
       - name: Generate weekly tables
-        run: python3 scripts/generate_tables.py
+        run: python3 scripts/generate_tables_correct.py
 
       - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |
