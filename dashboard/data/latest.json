@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-09-03T03:06:00",
+  "generated_at": "2026-09-03T04:48:11",
   "date_range": {
     "start": "2026-07-23",
     "end": "2026-09-02"
   },
   "property": "502086217",
   "summary": {
-    "total_views": 75987,
-    "active_users": 66503,
-    "sessions": 73687,
+    "total_views": 75988,
+    "active_users": 66505,
+    "sessions": 73689,
     "by_day": {
       "2026-07-23": 1728,
       "2026-07-24": 1911,
@@ -51,12 +51,12 @@
       "2026-08-30": 1702,
       "2026-08-31": 3685,
       "2026-09-01": 3699,
-      "2026-09-02": 4708
+      "2026-09-02": 4709
     },
     "by_channel": {
       "Organic Search": 31645,
       "Direct": 18396,
-      "Unassigned": 14833,
+      "Unassigned": 14834,
       "Referral": 6783,
       "Paid Search": 2068,
       "AI Assistant": 1335,
@@ -67,14 +67,14 @@
     },
     "by_lang": {
       "CN": {
-        "pv": 32351,
-        "users": 29304,
-        "sessions": 32024
+        "pv": 32352,
+        "users": 29305,
+        "sessions": 32025
       },
       "EN": {
         "pv": 37620,
-        "users": 32408,
-        "sessions": 36160
+        "users": 32409,
+        "sessions": 36161
       },
       "JP": {
         "pv": 6016,
@@ -379,7 +379,7 @@
     {
       "slug": "intelligent-video-analytics",
       "lang": "CN",
-      "screen_page_views": 203,
+      "screen_page_views": 204,
       "active_users": 142,
       "sessions": 200,
       "avg_engagement_seconds": 48.4,
@@ -517,7 +517,7 @@
       "screen_page_views": 104,
       "active_users": 93,
       "sessions": 104,
-      "avg_engagement_seconds": 42.4,
+      "avg_engagement_seconds": 42.6,
       "key_events": 0
     },
     {
@@ -749,10 +749,10 @@
     {
       "layer": "solutions",
       "lang": "CN",
-      "screen_page_views": 1385,
+      "screen_page_views": 1386,
       "active_users": 1192,
       "sessions": 1431,
-      "avg_engagement_seconds": 42.8
+      "avg_engagement_seconds": 42.9
     },
     {
       "layer": "solutions",
@@ -772,8 +772,8 @@
     },
     {
       "lang": "CN",
-      "solution_pv": 2506,
-      "total_pv": 32351,
+      "solution_pv": 2507,
+      "total_pv": 32352,
       "solution_share_pct": 7.75
     },
     {

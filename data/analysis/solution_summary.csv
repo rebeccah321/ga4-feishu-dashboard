@@ -29,7 +29,7 @@ indoor-outdoor-positioning,JP,11,9,9,27.9,0
 indoor_positioning_ble_lorawan,EN,1,1,1,77.0,0
 industrial_security_jetson,EN,2,1,1,5.0,0
 intelligent-video,CN,1,1,1,5.0,0
-intelligent-video-analytics,CN,203,142,200,48.4,0
+intelligent-video-analytics,CN,204,142,200,48.4,0
 intelligent-video-analytics,EN,428,373,448,45.2,1
 intelligent-video-analytics,JP,12,8,11,41.9,0
 mailto:iot@seeed.cc,CN,1,1,1,2.0,0
@@ -44,7 +44,7 @@ smart-agriculture,CN,2,1,1,5.0,0
 smart-agriculture-sensing,CN,95,79,90,39.1,0
 smart-agriculture-sensing,EN,388,327,388,32.8,1
 smart-agriculture-sensing,JP,26,20,21,39.5,0
-smart-livestock-farming,CN,104,93,104,42.4,0
+smart-livestock-farming,CN,104,93,104,42.6,0
 smart-livestock-farming,EN,397,287,390,32.0,0
 smart-livestock-farming,JP,25,22,23,63.5,0
 smart-poultry-farm-in-canada-enhancing-production-efficiency-and-animal-welfare-with-aiot-technologies,CN,1,1,1,11.0,0
