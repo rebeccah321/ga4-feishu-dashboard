@@ -76,6 +76,15 @@ def env(name: str) -> str:
     return value
 
 
+def validate_app_token(value: str) -> str:
+    if value.startswith("http") or "?" in value or "/" in value:
+        raise SystemExit(
+            "FEISHU_BITABLE_APP_TOKEN must be the base token only, "
+            "e.g. bascn_xxx, not the full Feishu URL."
+        )
+    return value
+
+
 def request_json(method, url, token=None, body=None, retries=3):
     data = None if body is None else json.dumps(body).encode("utf-8")
     headers = {"Content-Type": "application/json; charset=utf-8"}
@@ -270,8 +279,10 @@ def main():
 
     app_id = env("FEISHU_APP_ID")
     app_secret = env("FEISHU_APP_SECRET")
-    app_token = env("FEISHU_BITABLE_APP_TOKEN")
+    app_token = validate_app_token(env("FEISHU_BITABLE_APP_TOKEN"))
+    print("Step 1: requesting tenant_access_token", flush=True)
     token = tenant_access_token(app_id, app_secret)
+    print("Step 2: listing tables in Base", flush=True)
 
     available = list_tables(token, app_token)
     missing = [TABLES[k] for k in ("01", "02", "03") if TABLES[k] not in available]
