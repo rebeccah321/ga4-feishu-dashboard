@@ -7,11 +7,10 @@ sync_weekly_feishu.py — 把周度三表同步到飞书已有的多维表格。
   - 02_单方案流量明细
   - 03_转化漏斗
 
-字段名与 exports/feishu-import/*.csv、飞书现有表保持一致。
 upsert key：
   - 01：周次
   - 02：最新周次 + solution名称
-  - 03：最新周次 + 方案名称
+  - 03：最新周次 + solution名称
 
 环境变量：
   FEISHU_APP_ID
@@ -41,20 +40,46 @@ TABLES = {
     "03": "03_转化漏斗",
 }
 
-# 与飞书现有表方案名称一致的中文名
+# 与飞书现有表最新周方案名称保持一致的中文名
 SLUG_CN = {
     "smart-warehouse-management": "智能仓储管理",
-    "voicecollectionanalysis": "语音采集分析",
+    "voicecollectionanalysis": "语音采集与分析",
     "conversational-voice-ai": "对话式语音AI",
-    "smart-agriculture-sensing": "智慧农业感知",
-    "smart-livestock-farming": "智慧畜牧",
+    "smart-agriculture-sensing": "智慧农业传感",
+    "smart-livestock-farming": "智能畜牧养殖",
     "intelligent-video-analytics": "智能视频分析",
     "indoor-outdoor-positioning": "室内外定位",
     "environment-monitoring": "环境监测",
     "building-energy-management": "楼宇能源管理",
     "campus-safety-management": "校园安全管理",
-    "building-energy-retrofit": "楼宇节能改造",
+    "building-energy-retrofit": "楼宇能源改造",
     "hazard-response": "应急响应",
+}
+
+# 历史记录里出现过、但已统一为 SLUG_CN 主名称的旧别名；仅在 upsert 匹配时使用。
+SLUG_ALIASES = {
+    "voicecollectionanalysis": ["语音采集分析"],
+    "smart-agriculture-sensing": ["智慧农业感知"],
+    "smart-livestock-farming": ["智慧畜牧"],
+    "building-energy-retrofit": ["楼宇节能改造"],
+}
+
+NAME_TO_SLUG = {name: slug for slug, name in SLUG_CN.items()}
+for _slug, _names in SLUG_ALIASES.items():
+    for _name in _names:
+        NAME_TO_SLUG[_name] = _slug
+
+
+REQUIRED_FIELDS = {
+    "01": ["周次", "截止日期", "方案页独立访客数", "solution页面总访问量",
+           "关键事件(CTA)", "CTA转化率", "Solution 页面周环比",
+           "流量最高方案", "增长最快solution"],
+    "02": ["最新周次", "截止日期", "solution名称", "落地页访问量", "独立访客数",
+           "session", "平均停留时长（秒）", "参与率", "主要流量来源",
+           "CTA点击量（key event）", "表单提交", "数据状态"],
+    "03": ["最新周次", "截止日期", "solution名称", "页面访问量（PV）",
+           "参与会话数", "CTA点击量", "表单提交", "页面->CTA转化率",
+           "CTA->表单转化率", "数据状态"],
 }
 
 
@@ -67,6 +92,19 @@ def week_label(value):
         return f"W{day.isocalendar()[1]}"
     except ValueError:
         return text
+
+
+def parse_week_ending(value):
+    text = str(value or "").strip()
+    try:
+        return dt.date.fromisoformat(text)
+    except ValueError:
+        return None
+
+
+def is_current_week(value):
+    day = parse_week_ending(value)
+    return day is not None and day.isocalendar()[:2] == dt.date.today().isocalendar()[:2]
 
 
 def env(name: str) -> str:
@@ -162,7 +200,7 @@ def datetime_to_ms(value):
 def coerce_field_value(field_name, value, field_types):
     if value is None:
         return None
-    # Feishu Bitfield field type: 5 = Date / DateTime
+    # Feishu Bitable field type: 5 = Date / DateTime
     if field_name in field_types and field_types[field_name] == 5:
         return datetime_to_ms(value)
     return value
@@ -195,6 +233,17 @@ def to_text(value, fallback="未接入"):
     return fallback if text in {"", "NA", "N/A", "-"} else text
 
 
+def rounded_ratio(numerator, denominator, digits=6):
+    try:
+        num = float(numerator or 0)
+        den = float(denominator or 0)
+    except (TypeError, ValueError):
+        return None
+    if den == 0:
+        return 0.0
+    return round(num / den, digits)
+
+
 def display_slug(value):
     text = to_text(value, "")
     return SLUG_CN.get(text, text)
@@ -205,6 +254,26 @@ def localize_overview_text(value):
     for slug, name in SLUG_CN.items():
         text = text.replace(slug, name)
     return text
+
+
+def annotated_slug(value):
+    """从 “slug (123 PV)” / “slug (+12.3%)” 这类文本中提取 slug。"""
+    text = to_text(value, "")
+    if not text:
+        return ""
+    match = re.match(r"^([A-Za-z0-9_-]+)(?:\s*\(.*\))?$", text)
+    return match.group(1) if match else text
+
+
+def best_growth_text(value):
+    """输出 “中文名(+70.0%)”，去掉 slug 与括号之间的多余空格。"""
+    text = to_text(value, "")
+    if not text:
+        return ""
+    match = re.match(r"^([A-Za-z0-9_-]+)\s*\((.+)\)\s*$", text)
+    if match:
+        return f"{display_slug(match.group(1))}({match.group(2)})"
+    return localize_overview_text(text).replace(" (", "(")
 
 
 def read_csv(name):
@@ -219,24 +288,32 @@ def build_overview(rows):
     output = []
     for row in rows:
         week = row.get("week_ending", "").strip()
+        solution_pv = to_number(row.get("solution_pv"))
+        key_events = to_number(row.get("key_events"), 0)
+        wow_pct = to_number(row.get("solution_wow_pct"))
         output.append({
             "周次": week_label(week),
             "截止日期": week,
-            "方案页独立访客": to_number(row.get("solution_users"), 0),
-            "Solution页面总访问量": to_number(row.get("solution_pv"), 0),
-            "关键事件(CTA)": to_number(row.get("key_events"), 0),
-            "CTA转化率": to_number(row.get("cta_click_rate")),
-            "Solution 页面周环比": to_number(row.get("solution_wow_pct")),
-            "流量最高方案": localize_overview_text(row.get("top_traffic_solution")),
-            "增长最快solution": localize_overview_text(row.get("fastest_growing_solution")),
+            "方案页独立访客数": to_number(row.get("solution_users"), 0),
+            "solution页面总访问量": solution_pv,
+            "关键事件(CTA)": key_events,
+            "CTA转化率": rounded_ratio(key_events, solution_pv),
+            "Solution 页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
+            "流量最高方案": display_slug(annotated_slug(row.get("top_traffic_solution"))),
+            "增长最快solution": best_growth_text(row.get("fastest_growing_solution")),
         })
     return output
+
+
+def data_status_for_detail(week):
+    return ["本周（未完整）"] if is_current_week(week) else ["已确认"]
 
 
 def build_detail(rows):
     output = []
     for row in rows:
         week = row.get("week_ending", "").strip()
+        key_events = to_number(row.get("key_events"), 0)
         output.append({
             "最新周次": week_label(week),
             "截止日期": week,
@@ -244,12 +321,12 @@ def build_detail(rows):
             "落地页访问量": to_number(row.get("landing_pv"), 0),
             "独立访客数": to_number(row.get("users"), 0),
             "session": to_number(row.get("sessions"), 0),
-            "平均停留时长(秒)": to_number(row.get("avg_eng_s")),
+            "平均停留时长（秒）": to_number(row.get("avg_eng_s")),
             "参与率": to_number(row.get("engagement_rate")),
             "主要流量来源": to_text(row.get("top_channel"), ""),
-            "CTA点击量（key event）": to_number(row.get("key_events"), 0),
+            "CTA点击量（key event）": str(key_events),
             "表单提交": "未接入",
-            "数据状态": to_text(row.get("data_status")),
+            "数据状态": data_status_for_detail(week),
         })
     return output
 
@@ -258,17 +335,19 @@ def build_funnel(rows):
     output = []
     for row in rows:
         week = row.get("week_ending", "").strip()
+        page_pv = to_number(row.get("page_pv"), 0)
+        cta_clicks = to_number(row.get("cta_clicks"), 0)
         output.append({
             "最新周次": week_label(week),
             "截止日期": week,
-            "方案名称": display_slug(row.get("slug")),
-            "页面访问量（PV）": to_number(row.get("page_pv"), 0),
+            "solution名称": display_slug(row.get("slug")),
+            "页面访问量（PV）": page_pv,
             "参与会话数": to_number(row.get("engaged_sessions"), 0),
-            "CTA点击量": to_number(row.get("cta_clicks"), 0),
-            "表单提交": "未接入",
-            "页面->CTA转化率": to_number(row.get("pv_to_cta_rate")),
-            "CTA->表单转化率": to_text(row.get("cta_to_form_rate")),
-            "数据状态": to_text(row.get("data_status")),
+            "CTA点击量": cta_clicks,
+            "表单提交": "未接入CRM",
+            "页面->CTA转化率": rounded_ratio(cta_clicks, page_pv),
+            "CTA->表单转化率": None,
+            "数据状态": "未接入CRM",
         })
     return output
 
@@ -284,16 +363,30 @@ def build_data():
 def key_for(table_key, row):
     if table_key == "01":
         return str(row.get("周次", "")).strip()
-    if table_key == "02":
-        return f"{str(row.get('最新周次', '')).strip()}|{str(row.get('solution名称', '')).strip()}"
-    if table_key == "03":
-        return f"{str(row.get('最新周次', '')).strip()}|{str(row.get('方案名称', '')).strip()}"
+    if table_key in {"02", "03"}:
+        week = str(row.get("最新周次", "")).strip()
+        name = str(row.get("solution名称", "")).strip()
+        slug = NAME_TO_SLUG.get(name, name)
+        return f"{week}|{slug}"
     return ""
+
+
+def validate_rows(table_key, rows, field_types):
+    if not rows:
+        return
+    sample = rows[0]
+    unknown = [name for name in sample if name not in field_types]
+    if unknown:
+        raise SystemExit(
+            f"{TABLES[table_key]} has unexpected field(s) {unknown}; "
+            f"actual fields are {sorted(field_types)}"
+        )
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--inspect-only", action="store_true")
     args = parser.parse_args()
 
     table_data = build_data()
@@ -317,12 +410,22 @@ def main():
     if missing:
         raise SystemExit("Existing Feishu tables not found: " + ", ".join(missing))
 
+    schemas = {}
     for table_key in ("01", "02", "03"):
         table_name = TABLES[table_key]
         table_id = available[table_name]
-        rows = table_data[table_key]
         field_types = list_fields(token, app_token, table_id)
+        schemas[table_key] = (table_name, table_id, field_types)
         print(f"Step 3: {table_name} field types: {field_types}", flush=True)
+        validate_rows(table_key, table_data[table_key], field_types)
+
+    if args.inspect_only:
+        print("inspect-only: field checks passed, no records written.")
+        return
+
+    for table_key in ("01", "02", "03"):
+        table_name, table_id, field_types = schemas[table_key]
+        rows = table_data[table_key]
         existing_records = list_records(token, app_token, table_id)
         existing = {
             key_for(table_key, item.get("fields", {})): item.get("record_id")
