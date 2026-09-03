@@ -1,0 +1,13 @@
+layer,lang,screen_page_views,active_users,sessions,avg_engagement_seconds
+category,EN,1484,1279,1444,16.0
+category,CN,653,601,657,24.8
+category,JP,55,50,51,25.4
+list,EN,115,90,102,43.5
+list,CN,83,68,75,24.6
+list,JP,1,1,1,15.0
+lora,EN,118,108,124,16.5
+lora,CN,70,69,78,21.4
+lora,JP,30,24,27,31.3
+solutions,EN,4331,3732,4461,33.6
+solutions,CN,1385,1192,1431,42.8
+solutions,JP,139,123,132,35.3

@@ -1,102 +1,122 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GA4 Weekly Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg: #f6f7f9;
-      --panel: #ffffff;
-      --ink: #17202a;
-      --muted: #667085;
-      --line: #d9dee7;
-      --blue: #2f6fed;
-      --green: #0f9f6e;
-      --red: #cf423b;
-      --gold: #b7791f;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-    }
-    header {
-      padding: 24px 28px 12px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel);
-    }
-    h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: 0; }
-    .sub { color: var(--muted); font-size: 13px; }
-    main { padding: 20px 28px 32px; display: grid; gap: 16px; }
-    .kpis { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 12px; }
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 16px;
-    }
-    .label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
-    .value { font-size: 24px; font-weight: 700; }
-    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
-    canvas { width: 100%; min-height: 280px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
-    th { color: var(--muted); font-weight: 600; }
-    @media (max-width: 900px) {
-      header, main { padding-left: 16px; padding-right: 16px; }
-      .kpis, .grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seeed 官网流量 Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root { --bg:#f6f7f9; --panel:#fff; --ink:#17202a; --muted:#667085; --line:#d9dee7; --blue:#2f6fed; --green:#0f9f6e; --red:#cf423b; --gold:#b7791f; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--ink); }
+header { padding:24px 28px 12px; border-bottom:1px solid var(--line); background:var(--panel); }
+h1 { margin:0 0 4px; font-size:22px; }
+.sub { color:var(--muted); font-size:13px; }
+main { padding:20px 28px 40px; display:grid; gap:16px; }
+.kpis { display:grid; grid-template-columns:repeat(5,minmax(140px,1fr)); gap:12px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; }
+.label { color:var(--muted); font-size:12px; margin-bottom:6px; }
+.value { font-size:22px; font-weight:700; }
+.grid2 { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+canvas { width:100%; min-height:260px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; }
+th { color:var(--muted); font-weight:600; }
+td b { color:var(--blue); }
+@media(max-width:900px) { header,main { padding-left:16px; padding-right:16px; } .kpis,.grid2,.grid3 { grid-template-columns:1fr; } }
+</style>
 </head>
 <body>
-  <header>
-    <h1>GA4 Weekly Dashboard</h1>
-    <div class="sub">Last loaded: 2026-07-28 08:59:06</div>
-  </header>
-  <main>
-    <section class="kpis">
-      <div class="card"><div class="label">Views</div><div class="value" id="views"></div></div>
-      <div class="card"><div class="label">Active Users</div><div class="value" id="users"></div></div>
-      <div class="card"><div class="label">Sessions</div><div class="value" id="sessions"></div></div>
-      <div class="card"><div class="label">Conversions</div><div class="value" id="conversions"></div></div>
-      <div class="card"><div class="label">Revenue</div><div class="value" id="revenue"></div></div>
-    </section>
-    <section class="grid">
-      <div class="card"><div class="label">Views by Day</div><canvas id="dayChart"></canvas></div>
-      <div class="card"><div class="label">Views by Channel</div><canvas id="channelChart"></canvas></div>
-    </section>
-    <section class="card">
-      <div class="label">Top Pages</div>
-      <table>
-        <thead><tr><th>Page Path</th><th>Views</th></tr></thead>
-        <tbody id="topPages"></tbody>
-      </table>
-    </section>
-  </main>
-  <script>
-    const data = {"total_views": 2680048, "active_users": 1087293, "sessions": 1162076, "conversions": 59943, "revenue": 2189868.1600000006, "by_day": {"2026-06-30": 107231, "2026-07-01": 102400, "2026-07-02": 106501, "2026-07-03": 106744, "2026-07-04": 78379, "2026-07-05": 76438, "2026-07-06": 100576, "2026-07-07": 102354, "2026-07-08": 98356, "2026-07-09": 97141, "2026-07-10": 105191, "2026-07-11": 85488, "2026-07-12": 77565, "2026-07-13": 96450, "2026-07-14": 107493, "2026-07-15": 109236, "2026-07-16": 104669, "2026-07-17": 95741, "2026-07-18": 84811, "2026-07-19": 81170, "2026-07-20": 90553, "2026-07-21": 102019, "2026-07-22": 109006, "2026-07-23": 101653, "2026-07-24": 104653, "2026-07-25": 84880, "2026-07-26": 75066, "2026-07-27": 88284}, "by_channel": {"Direct": 845154, "Organic Search": 700379, "Unassigned": 249623, "Referral": 248116, "Paid Search": 212557, "Cross-network": 142994, "Email": 105350, "Organic Video": 60710, "Paid Shopping": 45104, "Organic Social": 34738, "AI Assistant": 14517, "Display": 12032, "Organic Shopping": 8774}, "top_pages": {"/": 110049, "/checkout/cart/": 78809, "/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html": 59314, "/XIAO-nRF52840-Wio-SX1262-Kit-for-Meshtastic-p-6400.html": 39530, "/Wio-Tracker-L1-Pro-p-6454.html": 33626, "/SenseCAP-Solar-Node-P1-Pro-for-Meshtastic-LoRa-p-6412.html": 33353, "/reTerminal-E1002-p-6533.html": 32601, "/XIAO-ESP32S3-Sense-p-5639.html": 32571, "/reTerminal-E1001-p-6534.html": 31275, "/us_warehouse": 30999}};
-    const fmt = new Intl.NumberFormat("en-US");
-    document.getElementById("views").textContent = fmt.format(data.total_views);
-    document.getElementById("users").textContent = fmt.format(data.active_users);
-    document.getElementById("sessions").textContent = fmt.format(data.sessions);
-    document.getElementById("conversions").textContent = fmt.format(data.conversions);
-    document.getElementById("revenue").textContent = "$" + fmt.format(Math.round(data.revenue));
-    new Chart(document.getElementById("dayChart"), {
-      type: "line",
-      data: { labels: Object.keys(data.by_day), datasets: [{ label: "Views", data: Object.values(data.by_day), borderColor: "#2f6fed", backgroundColor: "rgba(47,111,237,.12)", tension: .25, fill: true }] },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-    new Chart(document.getElementById("channelChart"), {
-      type: "bar",
-      data: { labels: Object.keys(data.by_channel), datasets: [{ label: "Views", data: Object.values(data.by_channel), backgroundColor: "#0f9f6e" }] },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-    document.getElementById("topPages").innerHTML = Object.entries(data.top_pages)
-      .map(([path, views]) => `<tr><td>${path}</td><td>${fmt.format(views)}</td></tr>`).join("");
-  </script>
+<header>
+<h1>Seeed 官网流量 Dashboard</h1>
+<div class="sub">区间：2026-07-23 → 2026-09-02 · 属性 502086217 · 生成于 2026-09-03T03:06:00</div>
+</header>
+<main>
+<section class="kpis">
+<div class="card"><div class="label">总浏览量</div><div class="value" id="views"></div></div>
+<div class="card"><div class="label">活跃用户</div><div class="value" id="users"></div></div>
+<div class="card"><div class="label">会话数</div><div class="value" id="sessions"></div></div>
+<div class="card"><div class="label">关键事件</div><div class="value" id="events"></div></div>
+<div class="card"><div class="label">方案占比</div><div class="value" id="share"></div></div>
+</section>
+<section class="grid2">
+<div class="card"><div class="label">日浏览趋势</div><canvas id="dayChart"></canvas></div>
+<div class="card"><div class="label">渠道分布</div><canvas id="channelChart"></canvas></div>
+</section>
+<section class="grid3">
+<div class="card"><div class="label">方案区占全站比例</div><table><thead><tr><th>语言</th><th>方案PV</th><th>全站PV</th><th>占比</th></tr></thead><tbody><tr><td>EN</td><td>6,618</td><td>37,620</td><td><b>17.59%</b></td></tr>
+<tr><td>CN</td><td>2,506</td><td>32,351</td><td><b>7.75%</b></td></tr>
+<tr><td>JP</td><td>243</td><td>6,016</td><td><b>4.04%</b></td></tr>
+</tbody></table></div>
+<div class="card"><div class="label">漏斗分层 PV</div><table><thead><tr><th>层级</th><th>EN</th><th>CN</th><th>JP</th></tr></thead><tbody><tr><td>category</td><td>1,484</td><td>653</td><td>55</td></tr>
+<tr><td>list</td><td>115</td><td>83</td><td>1</td></tr>
+<tr><td>lora</td><td>118</td><td>70</td><td>30</td></tr>
+<tr><td>solutions</td><td>4,331</td><td>1,385</td><td>139</td></tr>
+</tbody></table></div>
+<div class="card"><div class="label">方案页流量来源</div><table><thead><tr><th>语言</th><th>渠道</th><th>会话</th><th>占比</th></tr></thead><tbody><tr><td>EN</td><td>Direct</td><td>2,765</td><td>41.2%</td></tr>
+<tr><td>EN</td><td>Unassigned</td><td>1,636</td><td>24.4%</td></tr>
+<tr><td>EN</td><td>Referral</td><td>1,247</td><td>18.6%</td></tr>
+<tr><td>EN</td><td>Organic Social</td><td>481</td><td>7.2%</td></tr>
+<tr><td>EN</td><td>Organic Search</td><td>400</td><td>6.0%</td></tr>
+<tr><td>EN</td><td>Paid Search</td><td>83</td><td>1.2%</td></tr>
+<tr><td>EN</td><td>AI Assistant</td><td>66</td><td>1.0%</td></tr>
+<tr><td>EN</td><td>Organic Video</td><td>35</td><td>0.5%</td></tr>
+<tr><td>EN</td><td>Cross-network</td><td>5</td><td>0.1%</td></tr>
+<tr><td>CN</td><td>Organic Search</td><td>971</td><td>37.9%</td></tr>
+<tr><td>CN</td><td>Direct</td><td>656</td><td>25.6%</td></tr>
+<tr><td>CN</td><td>Referral</td><td>649</td><td>25.3%</td></tr>
+<tr><td>CN</td><td>Unassigned</td><td>253</td><td>9.9%</td></tr>
+<tr><td>CN</td><td>Organic Social</td><td>17</td><td>0.7%</td></tr>
+<tr><td>CN</td><td>AI Assistant</td><td>16</td><td>0.6%</td></tr>
+<tr><td>CN</td><td>Cross-network</td><td>1</td><td>0.0%</td></tr>
+<tr><td>JP</td><td>Organic Search</td><td>156</td><td>67.5%</td></tr>
+<tr><td>JP</td><td>Direct</td><td>42</td><td>18.2%</td></tr>
+<tr><td>JP</td><td>Referral</td><td>18</td><td>7.8%</td></tr>
+<tr><td>JP</td><td>AI Assistant</td><td>10</td><td>4.3%</td></tr>
+</tbody></table></div>
+</section>
+<section class="card">
+<div class="label">方案页 CN/EN/JP 对比（按总PV降序）</div>
+<table><thead><tr><th>方案 Slug</th><th>EN PV</th><th>CN PV</th><th>JP PV</th><th>合计</th></tr></thead><tbody><tr><td>voicecollectionanalysis</td><td>683</td><td>145</td><td>12</td><td><b>840</b></td></tr>
+<tr><td>conversational-voice-ai</td><td>533</td><td>289</td><td>10</td><td><b>832</b></td></tr>
+<tr><td>smart-warehouse-management</td><td>568</td><td>181</td><td>7</td><td><b>756</b></td></tr>
+<tr><td>intelligent-video-analytics</td><td>428</td><td>203</td><td>12</td><td><b>643</b></td></tr>
+<tr><td>smart-livestock-farming</td><td>397</td><td>104</td><td>25</td><td><b>526</b></td></tr>
+<tr><td>smart-agriculture-sensing</td><td>388</td><td>95</td><td>26</td><td><b>509</b></td></tr>
+<tr><td>indoor-outdoor-positioning</td><td>269</td><td>44</td><td>11</td><td><b>324</b></td></tr>
+<tr><td>environment-monitoring</td><td>219</td><td>53</td><td>9</td><td><b>281</b></td></tr>
+<tr><td>building-energy-management</td><td>188</td><td>66</td><td>9</td><td><b>263</b></td></tr>
+<tr><td>building-energy-retrofit</td><td>174</td><td>75</td><td>2</td><td><b>251</b></td></tr>
+<tr><td>hazard-response</td><td>182</td><td>51</td><td>8</td><td><b>241</b></td></tr>
+<tr><td>campus-safety-management</td><td>161</td><td>43</td><td>7</td><td><b>211</b></td></tr>
+<tr><td>off-grid-mesh-communication</td><td>95</td><td>16</td><td>1</td><td><b>112</b></td></tr>
+<tr><td>smart-spatial-interaction</td><td>22</td><td>2</td><td>0</td><td><b>24</b></td></tr>
+<tr><td>fall_detection</td><td>7</td><td>2</td><td>0</td><td><b>9</b></td></tr>
+</tbody></table>
+</section>
+</main>
+<script>
+const data = {"generated_at": "2026-09-03T03:06:00", "date_range": {"start": "2026-07-23", "end": "2026-09-02"}, "property": "502086217", "summary": {"total_views": 75987, "active_users": 66503, "sessions": 73687, "by_day": {"2026-07-23": 1728, "2026-07-24": 1911, "2026-07-25": 973, "2026-07-26": 1079, "2026-07-27": 2083, "2026-07-28": 2063, "2026-07-29": 2520, "2026-07-30": 1844, "2026-07-31": 1588, "2026-08-01": 864, "2026-08-02": 798, "2026-08-03": 1863, "2026-08-04": 1965, "2026-08-05": 2012, "2026-08-06": 1753, "2026-08-07": 1878, "2026-08-08": 1260, "2026-08-09": 936, "2026-08-10": 1644, "2026-08-11": 1940, "2026-08-12": 1724, "2026-08-13": 1792, "2026-08-14": 1432, "2026-08-15": 865, "2026-08-16": 842, "2026-08-17": 1701, "2026-08-18": 2154, "2026-08-19": 1945, "2026-08-20": 2020, "2026-08-21": 1708, "2026-08-22": 1079, "2026-08-23": 961, "2026-08-24": 1686, "2026-08-25": 2098, "2026-08-26": 2066, "2026-08-27": 1870, "2026-08-28": 2071, "2026-08-29": 1477, "2026-08-30": 1702, "2026-08-31": 3685, "2026-09-01": 3699, "2026-09-02": 4708}, "by_channel": {"Organic Search": 31645, "Direct": 18396, "Unassigned": 14833, "Referral": 6783, "Paid Search": 2068, "AI Assistant": 1335, "Organic Social": 739, "Cross-network": 103, "Organic Video": 84, "Email": 1}, "by_lang": {"CN": {"pv": 32351, "users": 29304, "sessions": 32024}, "EN": {"pv": 37620, "users": 32408, "sessions": 36160}, "JP": {"pv": 6016, "users": 4791, "sessions": 5503}}, "top_pages": {"/": 13549, "/about-us": 3369, "/customization": 2844, "/product-category/products-zh-hans": 2575, "/purchase": 2514, "/product-category/products": 2205, "/xiao-series-page": 1953, "/category/solutions": 1479, "/jetson-odm": 1478, "/contacts": 1307, "/product-category/hmi-zh-hans": 981, "/product-category/ipc-zh-hans": 977, "/product-category/sensor-zh-hans": 932, "/product/respeaker-mic-array-v2-0": 918, "/solutions/voicecollectionanalysis": 840, "/solutions/conversational-voice-ai": 832, "/selection/jetson": 789, "/product-category/sensor": 758, "/solutions/smart-warehouse-management": 756, "/product-category/ipc": 753}}, "solution_summary": [{"slug": "building-energy-management", "lang": "CN", "screen_page_views": 66, "active_users": 68, "sessions": 74, "avg_engagement_seconds": 30.8, "key_events": 0}, {"slug": "building-energy-management", "lang": "EN", "screen_page_views": 188, "active_users": 175, "sessions": 194, "avg_engagement_seconds": 36.7, "key_events": 1}, {"slug": "building-energy-management", "lang": "JP", "screen_page_views": 9, "active_users": 9, "sessions": 9, "avg_engagement_seconds": 27.8, "key_events": 0}, {"slug": "building-energy-retrofit", "lang": "CN", "screen_page_views": 75, "active_users": 56, "sessions": 71, "avg_engagement_seconds": 54.8, "key_events": 0}, {"slug": "building-energy-retrofit", "lang": "EN", "screen_page_views": 174, "active_users": 158, "sessions": 184, "avg_engagement_seconds": 30.1, "key_events": 0}, {"slug": "building-energy-retrofit", "lang": "JP", "screen_page_views": 2, "active_users": 3, "sessions": 3, "avg_engagement_seconds": 9.0, "key_events": 0}, {"slug": "campus-safety-management", "lang": "CN", "screen_page_views": 43, "active_users": 34, "sessions": 34, "avg_engagement_seconds": 51.0, "key_events": 0}, {"slug": "campus-safety-management", "lang": "EN", "screen_page_views": 161, "active_users": 131, "sessions": 155, "avg_engagement_seconds": 24.3, "key_events": 0}, {"slug": "campus-safety-management", "lang": "JP", "screen_page_views": 7, "active_users": 5, "sessions": 5, "avg_engagement_seconds": 34.0, "key_events": 0}, {"slug": "casino-gaming", "lang": "EN", "screen_page_views": 2, "active_users": 2, "sessions": 2, "avg_engagement_seconds": 1.0, "key_events": 0}, {"slug": "conversational-voice-ai", "lang": "CN", "screen_page_views": 289, "active_users": 253, "sessions": 307, "avg_engagement_seconds": 40.5, "key_events": 1}, {"slug": "conversational-voice-ai", "lang": "EN", "screen_page_views": 533, "active_users": 478, "sessions": 562, "avg_engagement_seconds": 42.0, "key_events": 0}, {"slug": "conversational-voice-ai", "lang": "JP", "screen_page_views": 10, "active_users": 9, "sessions": 9, "avg_engagement_seconds": 16.7, "key_events": 0}, {"slug": "conversational_voice_ai", "lang": "EN", "screen_page_views": 5, "active_users": 2, "sessions": 3, "avg_engagement_seconds": 9.0, "key_events": 0}, {"slug": "device-automation-control", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 0.0, "key_events": 0}, {"slug": "edge-ai", "lang": "EN", "screen_page_views": 2, "active_users": 2, "sessions": 2, "avg_engagement_seconds": 4.0, "key_events": 0}, {"slug": "environment-monitoring", "lang": "CN", "screen_page_views": 53, "active_users": 59, "sessions": 65, "avg_engagement_seconds": 48.1, "key_events": 3}, {"slug": "environment-monitoring", "lang": "EN", "screen_page_views": 219, "active_users": 200, "sessions": 230, "avg_engagement_seconds": 41.0, "key_events": 0}, {"slug": "environment-monitoring", "lang": "JP", "screen_page_views": 9, "active_users": 8, "sessions": 9, "avg_engagement_seconds": 23.1, "key_events": 0}, {"slug": "fall_detection", "lang": "CN", "screen_page_views": 2, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 16.0, "key_events": 0}, {"slug": "fall_detection", "lang": "EN", "screen_page_views": 7, "active_users": 3, "sessions": 3, "avg_engagement_seconds": 5.0, "key_events": 0}, {"slug": "hazard-response", "lang": "CN", "screen_page_views": 51, "active_users": 50, "sessions": 55, "avg_engagement_seconds": 44.2, "key_events": 0}, {"slug": "hazard-response", "lang": "EN", "screen_page_views": 182, "active_users": 168, "sessions": 184, "avg_engagement_seconds": 34.4, "key_events": 0}, {"slug": "hazard-response", "lang": "JP", "screen_page_views": 8, "active_users": 7, "sessions": 10, "avg_engagement_seconds": 6.7, "key_events": 0}, {"slug": "indoor-outdoor-positioning", "lang": "CN", "screen_page_views": 44, "active_users": 48, "sessions": 52, "avg_engagement_seconds": 31.1, "key_events": 0}, {"slug": "indoor-outdoor-positioning", "lang": "EN", "screen_page_views": 269, "active_users": 237, "sessions": 289, "avg_engagement_seconds": 33.7, "key_events": 0}, {"slug": "indoor-outdoor-positioning", "lang": "JP", "screen_page_views": 11, "active_users": 9, "sessions": 9, "avg_engagement_seconds": 27.9, "key_events": 0}, {"slug": "indoor_positioning_ble_lorawan", "lang": "EN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 77.0, "key_events": 0}, {"slug": "industrial_security_jetson", "lang": "EN", "screen_page_views": 2, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 5.0, "key_events": 0}, {"slug": "intelligent-video", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 5.0, "key_events": 0}, {"slug": "intelligent-video-analytics", "lang": "CN", "screen_page_views": 203, "active_users": 142, "sessions": 200, "avg_engagement_seconds": 48.4, "key_events": 0}, {"slug": "intelligent-video-analytics", "lang": "EN", "screen_page_views": 428, "active_users": 373, "sessions": 448, "avg_engagement_seconds": 45.2, "key_events": 1}, {"slug": "intelligent-video-analytics", "lang": "JP", "screen_page_views": 12, "active_users": 8, "sessions": 11, "avg_engagement_seconds": 41.9, "key_events": 0}, {"slug": "mailto:iot@seeed.cc", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 2.0, "key_events": 0}, {"slug": "off-grid-long-range-communication", "lang": "CN", "screen_page_views": 6, "active_users": 2, "sessions": 2, "avg_engagement_seconds": 4.0, "key_events": 0}, {"slug": "off-grid-mesh-communication", "lang": "CN", "screen_page_views": 16, "active_users": 15, "sessions": 16, "avg_engagement_seconds": 21.7, "key_events": 0}, {"slug": "off-grid-mesh-communication", "lang": "EN", "screen_page_views": 95, "active_users": 79, "sessions": 89, "avg_engagement_seconds": 36.4, "key_events": 0}, {"slug": "off-grid-mesh-communication", "lang": "JP", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 1.0, "key_events": 0}, {"slug": "reachy_claw_voice_robot", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 37.0, "key_events": 0}, {"slug": "recamera_heatmap_grafana", "lang": "EN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 100.0, "key_events": 0}, {"slug": "retail-kiosk", "lang": "EN", "screen_page_views": 2, "active_users": 2, "sessions": 2, "avg_engagement_seconds": 1.5, "key_events": 0}, {"slug": "smart-agriculture", "lang": "CN", "screen_page_views": 2, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 5.0, "key_events": 0}, {"slug": "smart-agriculture-sensing", "lang": "CN", "screen_page_views": 95, "active_users": 79, "sessions": 90, "avg_engagement_seconds": 39.1, "key_events": 0}, {"slug": "smart-agriculture-sensing", "lang": "EN", "screen_page_views": 388, "active_users": 327, "sessions": 388, "avg_engagement_seconds": 32.8, "key_events": 1}, {"slug": "smart-agriculture-sensing", "lang": "JP", "screen_page_views": 26, "active_users": 20, "sessions": 21, "avg_engagement_seconds": 39.5, "key_events": 0}, {"slug": "smart-livestock-farming", "lang": "CN", "screen_page_views": 104, "active_users": 93, "sessions": 104, "avg_engagement_seconds": 42.4, "key_events": 0}, {"slug": "smart-livestock-farming", "lang": "EN", "screen_page_views": 397, "active_users": 287, "sessions": 390, "avg_engagement_seconds": 32.0, "key_events": 0}, {"slug": "smart-livestock-farming", "lang": "JP", "screen_page_views": 25, "active_users": 22, "sessions": 23, "avg_engagement_seconds": 63.5, "key_events": 0}, {"slug": "smart-poultry-farm-in-canada-enhancing-production-efficiency-and-animal-welfare-with-aiot-technologies", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 11.0, "key_events": 0}, {"slug": "smart-spatial-interaction", "lang": "CN", "screen_page_views": 2, "active_users": 2, "sessions": 2, "avg_engagement_seconds": 0.5, "key_events": 0}, {"slug": "smart-spatial-interaction", "lang": "EN", "screen_page_views": 22, "active_users": 20, "sessions": 20, "avg_engagement_seconds": 1.6, "key_events": 0}, {"slug": "smart-warehouse-management", "lang": "CN", "screen_page_views": 181, "active_users": 149, "sessions": 190, "avg_engagement_seconds": 51.1, "key_events": 1}, {"slug": "smart-warehouse-management", "lang": "EN", "screen_page_views": 568, "active_users": 480, "sessions": 593, "avg_engagement_seconds": 24.7, "key_events": 0}, {"slug": "smart-warehouse-management", "lang": "JP", "screen_page_views": 7, "active_users": 7, "sessions": 7, "avg_engagement_seconds": 28.7, "key_events": 0}, {"slug": "smart_warehouse", "lang": "EN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 33.0, "key_events": 0}, {"slug": "surface-crack-detection-and-localization-with-seeeds-raspberry-pi-powered-reterminal", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 77.0, "key_events": 0}, {"slug": "tel:0755-86095676", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 2.0, "key_events": 0}, {"slug": "tel:0755-86163976", "lang": "CN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 2.0, "key_events": 0}, {"slug": "voice_rebot_arm", "lang": "EN", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 29.0, "key_events": 0}, {"slug": "voicecollectionanalysis", "lang": "CN", "screen_page_views": 145, "active_users": 132, "sessions": 159, "avg_engagement_seconds": 37.6, "key_events": 1}, {"slug": "voicecollectionanalysis", "lang": "EN", "screen_page_views": 683, "active_users": 603, "sessions": 718, "avg_engagement_seconds": 28.9, "key_events": 1}, {"slug": "voicecollectionanalysis", "lang": "JP", "screen_page_views": 12, "active_users": 15, "sessions": 15, "avg_engagement_seconds": 38.5, "key_events": 0}], "funnel_summary": [{"layer": "category", "lang": "EN", "screen_page_views": 1484, "active_users": 1279, "sessions": 1444, "avg_engagement_seconds": 16.0}, {"layer": "category", "lang": "CN", "screen_page_views": 653, "active_users": 601, "sessions": 657, "avg_engagement_seconds": 24.8}, {"layer": "category", "lang": "JP", "screen_page_views": 55, "active_users": 50, "sessions": 51, "avg_engagement_seconds": 25.4}, {"layer": "list", "lang": "EN", "screen_page_views": 115, "active_users": 90, "sessions": 102, "avg_engagement_seconds": 43.5}, {"layer": "list", "lang": "CN", "screen_page_views": 83, "active_users": 68, "sessions": 75, "avg_engagement_seconds": 24.6}, {"layer": "list", "lang": "JP", "screen_page_views": 1, "active_users": 1, "sessions": 1, "avg_engagement_seconds": 15.0}, {"layer": "lora", "lang": "EN", "screen_page_views": 118, "active_users": 108, "sessions": 124, "avg_engagement_seconds": 16.5}, {"layer": "lora", "lang": "CN", "screen_page_views": 70, "active_users": 69, "sessions": 78, "avg_engagement_seconds": 21.4}, {"layer": "lora", "lang": "JP", "screen_page_views": 30, "active_users": 24, "sessions": 27, "avg_engagement_seconds": 31.3}, {"layer": "solutions", "lang": "EN", "screen_page_views": 4331, "active_users": 3732, "sessions": 4461, "avg_engagement_seconds": 33.6}, {"layer": "solutions", "lang": "CN", "screen_page_views": 1385, "active_users": 1192, "sessions": 1431, "avg_engagement_seconds": 42.8}, {"layer": "solutions", "lang": "JP", "screen_page_views": 139, "active_users": 123, "sessions": 132, "avg_engagement_seconds": 35.3}], "ratio_summary": [{"lang": "EN", "solution_pv": 6618, "total_pv": 37620, "solution_share_pct": 17.59}, {"lang": "CN", "solution_pv": 2506, "total_pv": 32351, "solution_share_pct": 7.75}, {"lang": "JP", "solution_pv": 243, "total_pv": 6016, "solution_share_pct": 4.04}], "channel_summary": [{"lang": "EN", "channel_group": "Direct", "sessions": 2765, "share_pct": 41.2}, {"lang": "EN", "channel_group": "Unassigned", "sessions": 1636, "share_pct": 24.4}, {"lang": "EN", "channel_group": "Referral", "sessions": 1247, "share_pct": 18.6}, {"lang": "EN", "channel_group": "Organic Social", "sessions": 481, "share_pct": 7.2}, {"lang": "EN", "channel_group": "Organic Search", "sessions": 400, "share_pct": 6.0}, {"lang": "EN", "channel_group": "Paid Search", "sessions": 83, "share_pct": 1.2}, {"lang": "EN", "channel_group": "AI Assistant", "sessions": 66, "share_pct": 1.0}, {"lang": "EN", "channel_group": "Organic Video", "sessions": 35, "share_pct": 0.5}, {"lang": "EN", "channel_group": "Cross-network", "sessions": 5, "share_pct": 0.1}, {"lang": "CN", "channel_group": "Organic Search", "sessions": 971, "share_pct": 37.9}, {"lang": "CN", "channel_group": "Direct", "sessions": 656, "share_pct": 25.6}, {"lang": "CN", "channel_group": "Referral", "sessions": 649, "share_pct": 25.3}, {"lang": "CN", "channel_group": "Unassigned", "sessions": 253, "share_pct": 9.9}, {"lang": "CN", "channel_group": "Organic Social", "sessions": 17, "share_pct": 0.7}, {"lang": "CN", "channel_group": "AI Assistant", "sessions": 16, "share_pct": 0.6}, {"lang": "CN", "channel_group": "Cross-network", "sessions": 1, "share_pct": 0.0}, {"lang": "JP", "channel_group": "Organic Search", "sessions": 156, "share_pct": 67.5}, {"lang": "JP", "channel_group": "Direct", "sessions": 42, "share_pct": 18.2}, {"lang": "JP", "channel_group": "Referral", "sessions": 18, "share_pct": 7.8}, {"lang": "JP", "channel_group": "AI Assistant", "sessions": 10, "share_pct": 4.3}, {"lang": "JP", "channel_group": "Unassigned", "sessions": 5, "share_pct": 2.2}]};
+const fmt = new Intl.NumberFormat("en-US");
+const s = data.summary;
+document.getElementById("views").textContent = fmt.format(s.total_views);
+document.getElementById("users").textContent = fmt.format(s.active_users);
+document.getElementById("sessions").textContent = fmt.format(s.sessions);
+document.getElementById("events").textContent = fmt.format((data.solution_summary||[]).reduce((a,b)=>a+(b.key_events||0),0));
+const ratio = data.ratio_summary||[];
+const avgShare = ratio.length ? (ratio.reduce((a,b)=>a+b.solution_share_pct,0)/ratio.length).toFixed(1)+"%" : "—";
+document.getElementById("share").textContent = avgShare;
+new Chart(document.getElementById("dayChart"), {
+type:"line",
+data:{labels:Object.keys(s.by_day),datasets:[{label:"Views",data:Object.values(s.by_day),borderColor:"#2f6fed",backgroundColor:"rgba(47,111,237,.12)",tension:.25,fill:true}]},
+options:{responsive:true,plugins:{legend:{display:false}}}
+});
+new Chart(document.getElementById("channelChart"), {
+type:"bar",
+data:{labels:Object.keys(s.by_channel).slice(0,10),datasets:[{label:"Views",data:Object.values(s.by_channel).slice(0,10),backgroundColor:"#0f9f6e"}]},
+options:{responsive:true,plugins:{legend:{display:false}},indexAxis:"y"}
+});
+</script>
 </body>
 </html>
