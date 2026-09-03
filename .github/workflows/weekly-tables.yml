@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Write service account credentials
         env:
           GA4_SA_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT }}
@@ -36,17 +39,21 @@ jobs:
       - name: Generate weekly tables
         run: python3 scripts/generate_tables.py
 
-      - name: Copy tables to Pages directory
+      - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |
           mkdir -p dashboard/data/weekly
           cp data/analysis/方案增长总览.csv dashboard/data/weekly/
           cp data/analysis/单方案流量明细.csv dashboard/data/weekly/
           cp data/analysis/转换漏斗.csv dashboard/data/weekly/
+          python3 scripts/export_weekly_json.py
+
+      - name: Render dashboard from latest data
+        run: python3 scripts/render_dashboard.py
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ dashboard/data/weekly/
+          git add data/ dashboard/data/latest.json dashboard/data/latest.csv dashboard/data/weekly/ dashboard/index.html
           git commit -m "Weekly GA4 tables update $(date -u +%Y-%m-%d)" || echo "No changes"
           git push

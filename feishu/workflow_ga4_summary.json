@@ -1,0 +1,129 @@
+{
+  "client_token": "ga4_weekly_overview_pull_v1",
+  "title": "GA4 周度数据自动拉取（写入 01_方案增长总览）",
+  "steps": [
+    {
+      "id": "step_timer",
+      "type": "TimerTrigger",
+      "title": "每周一 09:10 触发",
+      "next": "step_fetch",
+      "data": {
+        "rule": "WEEKLY",
+        "start_time": "2026-09-07 09:10",
+        "sub_unit": [
+          1
+        ],
+        "is_never_end": true
+      }
+    },
+    {
+      "id": "step_fetch",
+      "type": "HTTPClientAction",
+      "title": "拉取 GitHub Pages weekly_summary.json",
+      "next": "step_add_record",
+      "data": {
+        "method": "GET",
+        "url": [
+          {
+            "value_type": "text",
+            "value": "https://rebeccah321.github.io/ga4-feishu-dashboard/data/weekly/weekly_summary.json"
+          }
+        ],
+        "response_type": "json",
+        "response_value": "{\"generated_at\":\"\",\"week_ending\":\"\",\"solution_users\":0,\"solution_pv\":0,\"key_events\":0,\"solution_wow_pct\":0,\"fastest_growing_solution\":\"\",\"top_traffic_solution\":\"\"}"
+      }
+    },
+    {
+      "id": "step_add_record",
+      "type": "AddRecordAction",
+      "title": "写入 01_方案增长总览",
+      "next": null,
+      "data": {
+        "table_name": "01_方案增长总览",
+        "field_values": [
+          {
+            "field_name": "周次",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.week_number"
+              }
+            ]
+          },
+          {
+            "field_name": "截止日期",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.week_ending"
+              }
+            ]
+          },
+          {
+            "field_name": "方案页独立访客",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.solution_users"
+              }
+            ]
+          },
+          {
+            "field_name": "Solution页面总访问量",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.solution_pv"
+              }
+            ]
+          },
+          {
+            "field_name": "关键事件(CTA)",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.key_events"
+              }
+            ]
+          },
+          {
+            "field_name": "CTA转化率",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.cta_click_rate"
+              }
+            ]
+          },
+          {
+            "field_name": "Solution 页面周环比",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.solution_wow_pct"
+              }
+            ]
+          },
+          {
+            "field_name": "流量最高方案",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.top_traffic_solution"
+              }
+            ]
+          },
+          {
+            "field_name": "增长最快solution",
+            "value": [
+              {
+                "value_type": "ref",
+                "value": "$.step_fetch.body.fastest_growing_solution"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

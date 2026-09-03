@@ -1,126 +1,99 @@
-# GA4 GitHub Dashboard
+# Seeed 官网流量分析管道
 
-This repo is the GitHub-first GA4 analytics pipeline.
+基于 [traffic-analytics skill](../Desktop/traffic-analytics/SKILL.md) 规范搭建的 GA4 流量数据管道。
 
-It pulls GA4 weekly, normalizes the data, renders a static dashboard, and publishes
-everything to GitHub Pages. Feishu can consume the published URL or data files
-without needing Feishu Base permissions.
+## 架构
 
-## Output
-
-After each run:
-
-- `dashboard/index.html` is the static dashboard.
-- `dashboard/data/latest.json` is the stable JSON feed for Feishu or other tools.
-- `dashboard/data/latest.csv` is the stable CSV feed.
-- `data/raw/` stores raw GA4 API responses.
-- `data/normalized/` stores normalized report CSV snapshots.
-
-When GitHub Pages is enabled, the public URLs are:
-
-```text
-https://<github-user-or-org>.github.io/<repo-name>/
-https://<github-user-or-org>.github.io/<repo-name>/data/latest.json
-https://<github-user-or-org>.github.io/<repo-name>/data/latest.csv
+```
+GA4 API (property 502086217)
+    ↓ 每日拉取
+GitHub (CSV/JSON 数据 + GitHub Pages dashboard)
+    ↓ 每周同步
+飞书多维表格 (Bitable) → 可视化呈现
 ```
 
-## GitHub Setup
+## 核心修正（vs 之前 ga4-feishu-dashboard 项目）
 
-Push this folder as the root of a GitHub repo.
+| 问题 | 之前 | 现在 |
+|------|------|------|
+| GA4 属性 | 258704823（商城站） | **502086217**（企业官网三语言站） |
+| CN 双路径 | 未合并 | `/slug` + `/slug-zh-hans` 自动相加 |
+| 垃圾 URL | 未过滤 | 剔除含 `{`/`}` 的路径 |
+| 语言映射 | 无 | hostName → EN/CN/JP |
+| 更新频率 | 周更 | **日更**（GitHub）+ 周更（飞书） |
+| 飞书同步 | 手动 | GitHub Actions 自动推送 |
 
-Add these repository secrets:
+## 标准化字段格式
 
-```text
-GA4_PROPERTY_ID=258704823
-GA4_SERVICE_ACCOUNT_JSON=<full service account json>
+### 日级明细 fact table（`data/normalized/`）
+```
+date, week_start, host_name, lang, page_path, page_title,
+channel_group, device_category, screen_page_views, active_users,
+sessions, engagement_rate, bounce_rate, avg_engagement_seconds,
+key_events, total_revenue, pulled_at
 ```
 
-Then enable GitHub Pages:
+### 衍生分析表（`data/analysis/`）
+- `solution_summary.csv` — 方案 × 语言（PV、用户、人均时长）
+- `funnel_summary.csv` — category → list → lora → solutions 各层 × 语言
+- `ratio_summary.csv` — 方案区占全站比例 × 语言
+- `channel_summary.csv` — 方案页流量来源渠道 × 语言
 
-1. Open repo `Settings`.
-2. Open `Pages`.
-3. Set source to `GitHub Actions`.
-4. Run `Weekly GA4 Dashboard` manually once from the `Actions` tab.
-
-The workflow also runs every Monday at 07:00 Asia/Shanghai.
-
-## Local Run
+## 本地运行
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-./scripts/weekly_update.sh --mock --fetch-only
+# Mock 测试（无需网络）
+./scripts/run_pipeline.sh --mock 7
+
+# 真实数据（需 gcloud ADC 已登录）
+./scripts/run_pipeline.sh 28
+
+# 仅拉取
+python3 scripts/ga4_fetch.py --days 28
+
+# 仅渲染
+python3 scripts/render_dashboard.py
 ```
 
-Open:
+## GitHub Actions
 
-```text
-dashboard/index.html
-```
+### 日更（`daily-sync.yml`）
+- 每天 02:00 Asia/Shanghai 自动拉取 GA4 数据
+- 提交 CSV/JSON 到仓库
+- 部署 dashboard 到 GitHub Pages
 
-## Real GA4 Run
+### 飞书周更（`weekly-feishu-sync.yml`）
+- `Weekly GA4 Tables` 成功后自动触发（或每周一 09:30 兜底）
+- 自动识别并写入已有的 `01_方案增长总览`、`02_单方案流量明细`、`03_转化漏斗`
+- 不创建、不重命名表；按 `周次`/`周次+方案名称` upsert
 
-Fill `.env`:
+### 周报表与飞书拉取（`weekly-tables.yml`）
+- 每周一 09:00 Asia/Shanghai 拉取 42 天数据并生成三张周度 CSV
+- 导出 `dashboard/data/weekly/weekly_tables.json`（完整三表）和 `weekly_summary.json`（单条方案增长汇总）
+- 提交到 GitHub Pages，供飞书多维表格自动化每周一 09:10 拉取
 
-```text
-GA4_PROPERTY_ID=258704823
-GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/service-account.json
-GA4_API_TRANSPORT=rest
-```
+## 需要配置的 GitHub Secrets
 
-Then run:
+| Secret | 用途 |
+|--------|------|
+| `GA4_SERVICE_ACCOUNT_JSON` | 服务账号 JSON（CI 认证） |
+| `GA4_SERVICE_ACCOUNT` | 服务账号 JSON（`weekly-tables.yml` 使用） |
+| `FEISHU_APP_ID` | 飞书应用 ID |
+| `FEISHU_APP_SECRET` | 飞书应用密钥 |
+| `FEISHU_BITABLE_APP_TOKEN` | 飞书 Base token（新版按表名自动发现） |
+| `FEISHU_BITABLE_TABLE_ID` | 旧版 `scripts/sync_feishu.py` 使用，可留空 |
 
-```bash
-./scripts/weekly_update.sh --fetch-only
-```
+## 飞书现有表字段对齐
 
-## Feishu Consumption
+| 飞书表 | upsert key | 数据来源 |
+|--------|-----------|---------|
+| `01_方案增长总览` | `周次` | `数据/analysis/方案增长总览.csv` |
+| `02_单方案流量明细` | `最新周次 + solution名称` | `数据/analysis/单方案流量明细.csv` |
+| `03_转化漏斗` | `最新周次 + 方案名称` | `数据/analysis/转换漏斗.csv` |
 
-Use Feishu only as the display/notification layer:
+## 认证双模式
 
-- Embed the GitHub Pages dashboard URL in a Feishu document.
-- Paste the `latest.json` or `latest.csv` URL into a Feishu automation or import flow.
-- Later, if Feishu Base permissions are approved, run the optional Base sync scripts.
+- **本地**：`gcloud auth application-default print-access-token`（ADC，已配置）
+- **CI**：服务账号 JSON（`GOOGLE_APPLICATION_CREDENTIALS`）
 
-The Feishu Base scripts remain in `scripts/setup_base.py` and `push-base`, but they
-are no longer on the critical path.
-
-## Feishu Base Import Package
-
-To generate a package that can be imported directly into Feishu Base:
-
-```bash
-python3 scripts/export_feishu_base_import.py
-```
-
-The package is written to:
-
-```text
-exports/feishu-base-import/
-```
-
-Main files:
-
-- `seeed_解决方案增长_多维表格导入.xlsx`: import this first. It contains eight sheets for Base tables.
-- `seeed_解决方案增长_飞书多维表格导入包.zip`: the same Excel, CSV tables, and README bundled for upload.
-- `01_落地页官网增长看板.csv` to `08_字段说明.csv`: import these one by one if Feishu does not split the Excel sheets automatically.
-
-The generated tables cover:
-
-- `01_落地页官网增长看板`: Seeed solutions landing page growth summary for the Chinese entry page, English fallback page, and 12 solution pages.
-- `02_单方案流量明细`: one row per requested solution with latest week, solution name, landing page views, unique visitors, average engagement time, engagement rate, CTA clicks, form submissions, and main traffic source.
-- `03_流量来源渠道`: top 5 GA4 channel groups by views.
-- `04_热门页面与行为`: top pages and behavior metrics.
-- `05_看板指标总览`: GA4 traffic overview, traffic quality, source, behavior, and conversion metrics.
-- `06_社媒平台表现`: retained platform-level social media fields for LinkedIn, X, FB, 小红书, and 抖音.
-- `07_社媒内容表现`: retained post-level social media fields for deciding what to publish and where.
-- `08_字段说明`: field definitions and maintenance notes for Feishu Base.
-
-Current solution URL coverage:
-
-- Chinese entry: `https://www.seeedstudio.com.cn/category/solutions-zh-hans`
-- English fallback entry: `https://www.seeed.cc/category/solutions`
-- The 12 requested solution pages are matched by their `/solutions/...` slugs.
-- If the current GA4 export has no matching solution rows, the generated tables explicitly mark those rows as `GA4未命中` instead of inventing traffic data. In that case, confirm whether GA4 property `258704823` covers `seeed.cc` and `seeedstudio.com.cn`, then run a `/solutions` filtered pull.
+属性 `502086217`，配额项目 `my-project-1579296929285`，必须带 `x-goog-user-project` header。
