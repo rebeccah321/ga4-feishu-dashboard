@@ -1,19 +1,15 @@
 {
-  "generated_at": "2026-09-03T04:48:11",
+  "generated_at": "2026-09-07T05:47:01",
   "date_range": {
-    "start": "2026-07-23",
-    "end": "2026-09-02"
+    "start": "2026-07-27",
+    "end": "2026-09-06"
   },
   "property": "502086217",
   "summary": {
-    "total_views": 75988,
-    "active_users": 66505,
-    "sessions": 73689,
+    "total_views": 79779,
+    "active_users": 69075,
+    "sessions": 76474,
     "by_day": {
-      "2026-07-23": 1728,
-      "2026-07-24": 1911,
-      "2026-07-25": 973,
-      "2026-07-26": 1079,
       "2026-07-27": 2083,
       "2026-07-28": 2063,
       "2026-07-29": 2520,
@@ -51,58 +47,62 @@
       "2026-08-30": 1702,
       "2026-08-31": 3685,
       "2026-09-01": 3699,
-      "2026-09-02": 4709
+      "2026-09-02": 4966,
+      "2026-09-03": 3398,
+      "2026-09-04": 3126,
+      "2026-09-05": 1613,
+      "2026-09-06": 1088
     },
     "by_channel": {
-      "Organic Search": 31645,
-      "Direct": 18396,
-      "Unassigned": 14834,
-      "Referral": 6783,
-      "Paid Search": 2068,
-      "AI Assistant": 1335,
-      "Organic Social": 739,
-      "Cross-network": 103,
-      "Organic Video": 84,
+      "Organic Search": 35030,
+      "Direct": 19546,
+      "Unassigned": 13801,
+      "Referral": 6949,
+      "Paid Search": 2270,
+      "AI Assistant": 1376,
+      "Organic Social": 646,
+      "Organic Video": 85,
+      "Cross-network": 75,
       "Email": 1
     },
     "by_lang": {
       "CN": {
-        "pv": 32352,
-        "users": 29305,
-        "sessions": 32025
+        "pv": 35119,
+        "users": 30997,
+        "sessions": 33890
       },
       "EN": {
-        "pv": 37620,
-        "users": 32409,
-        "sessions": 36161
+        "pv": 38586,
+        "users": 33249,
+        "sessions": 37030
       },
       "JP": {
-        "pv": 6016,
-        "users": 4791,
-        "sessions": 5503
+        "pv": 6074,
+        "users": 4829,
+        "sessions": 5554
       }
     },
     "top_pages": {
-      "/": 13549,
-      "/about-us": 3369,
-      "/customization": 2844,
-      "/product-category/products-zh-hans": 2575,
-      "/purchase": 2514,
-      "/product-category/products": 2205,
-      "/xiao-series-page": 1953,
-      "/category/solutions": 1479,
-      "/jetson-odm": 1478,
-      "/contacts": 1307,
-      "/product-category/hmi-zh-hans": 981,
-      "/product-category/ipc-zh-hans": 977,
-      "/product-category/sensor-zh-hans": 932,
-      "/product/respeaker-mic-array-v2-0": 918,
-      "/solutions/voicecollectionanalysis": 840,
-      "/solutions/conversational-voice-ai": 832,
-      "/selection/jetson": 789,
-      "/product-category/sensor": 758,
-      "/solutions/smart-warehouse-management": 756,
-      "/product-category/ipc": 753
+      "/": 14440,
+      "/about-us": 3684,
+      "/customization": 2984,
+      "/product-category/products-zh-hans": 2812,
+      "/purchase": 2615,
+      "/product-category/products": 2252,
+      "/xiao-series-page": 1974,
+      "/jetson-odm": 1560,
+      "/category/solutions": 1527,
+      "/contacts": 1389,
+      "/product-category/hmi-zh-hans": 1078,
+      "/product-category/ipc-zh-hans": 1044,
+      "/product-category/sensor-zh-hans": 996,
+      "/product/respeaker-mic-array-v2-0": 967,
+      "/solutions/voicecollectionanalysis": 868,
+      "/solutions/conversational-voice-ai": 866,
+      "/product-category/ipc": 802,
+      "/selection/jetson": 799,
+      "/product-category/sensor": 766,
+      "/product-category/hmi": 746
     }
   },
   "solution_summary": [
@@ -110,45 +110,45 @@
       "slug": "building-energy-management",
       "lang": "CN",
       "screen_page_views": 66,
-      "active_users": 68,
-      "sessions": 74,
-      "avg_engagement_seconds": 30.8,
+      "active_users": 65,
+      "sessions": 72,
+      "avg_engagement_seconds": 30.0,
       "key_events": 0
     },
     {
       "slug": "building-energy-management",
       "lang": "EN",
-      "screen_page_views": 188,
-      "active_users": 175,
-      "sessions": 194,
-      "avg_engagement_seconds": 36.7,
+      "screen_page_views": 181,
+      "active_users": 168,
+      "sessions": 186,
+      "avg_engagement_seconds": 37.8,
       "key_events": 1
     },
     {
       "slug": "building-energy-management",
       "lang": "JP",
-      "screen_page_views": 9,
-      "active_users": 9,
-      "sessions": 9,
-      "avg_engagement_seconds": 27.8,
+      "screen_page_views": 8,
+      "active_users": 8,
+      "sessions": 8,
+      "avg_engagement_seconds": 16.8,
       "key_events": 0
     },
     {
       "slug": "building-energy-retrofit",
       "lang": "CN",
-      "screen_page_views": 75,
-      "active_users": 56,
-      "sessions": 71,
-      "avg_engagement_seconds": 54.8,
+      "screen_page_views": 74,
+      "active_users": 57,
+      "sessions": 72,
+      "avg_engagement_seconds": 49.4,
       "key_events": 0
     },
     {
       "slug": "building-energy-retrofit",
       "lang": "EN",
-      "screen_page_views": 174,
-      "active_users": 158,
-      "sessions": 184,
-      "avg_engagement_seconds": 30.1,
+      "screen_page_views": 171,
+      "active_users": 155,
+      "sessions": 178,
+      "avg_engagement_seconds": 31.4,
       "key_events": 0
     },
     {
@@ -163,19 +163,19 @@
     {
       "slug": "campus-safety-management",
       "lang": "CN",
-      "screen_page_views": 43,
-      "active_users": 34,
-      "sessions": 34,
-      "avg_engagement_seconds": 51.0,
+      "screen_page_views": 51,
+      "active_users": 40,
+      "sessions": 40,
+      "avg_engagement_seconds": 43.2,
       "key_events": 0
     },
     {
       "slug": "campus-safety-management",
       "lang": "EN",
-      "screen_page_views": 161,
+      "screen_page_views": 158,
       "active_users": 131,
       "sessions": 155,
-      "avg_engagement_seconds": 24.3,
+      "avg_engagement_seconds": 25.1,
       "key_events": 0
     },
     {
@@ -199,19 +199,19 @@
     {
       "slug": "conversational-voice-ai",
       "lang": "CN",
-      "screen_page_views": 289,
-      "active_users": 253,
-      "sessions": 307,
-      "avg_engagement_seconds": 40.5,
-      "key_events": 1
+      "screen_page_views": 315,
+      "active_users": 265,
+      "sessions": 316,
+      "avg_engagement_seconds": 42.8,
+      "key_events": 0
     },
     {
       "slug": "conversational-voice-ai",
       "lang": "EN",
-      "screen_page_views": 533,
-      "active_users": 478,
-      "sessions": 562,
-      "avg_engagement_seconds": 42.0,
+      "screen_page_views": 541,
+      "active_users": 484,
+      "sessions": 566,
+      "avg_engagement_seconds": 42.2,
       "key_events": 0
     },
     {
@@ -220,7 +220,7 @@
       "screen_page_views": 10,
       "active_users": 9,
       "sessions": 9,
-      "avg_engagement_seconds": 16.7,
+      "avg_engagement_seconds": 15.2,
       "key_events": 0
     },
     {
@@ -253,20 +253,20 @@
     {
       "slug": "environment-monitoring",
       "lang": "CN",
-      "screen_page_views": 53,
-      "active_users": 59,
-      "sessions": 65,
-      "avg_engagement_seconds": 48.1,
+      "screen_page_views": 57,
+      "active_users": 60,
+      "sessions": 67,
+      "avg_engagement_seconds": 54.6,
       "key_events": 3
     },
     {
       "slug": "environment-monitoring",
       "lang": "EN",
-      "screen_page_views": 219,
-      "active_users": 200,
-      "sessions": 230,
-      "avg_engagement_seconds": 41.0,
-      "key_events": 0
+      "screen_page_views": 229,
+      "active_users": 208,
+      "sessions": 241,
+      "avg_engagement_seconds": 39.8,
+      "key_events": 1
     },
     {
       "slug": "environment-monitoring",
@@ -274,7 +274,7 @@
       "screen_page_views": 9,
       "active_users": 8,
       "sessions": 9,
-      "avg_engagement_seconds": 23.1,
+      "avg_engagement_seconds": 21.2,
       "key_events": 0
     },
     {
@@ -298,55 +298,55 @@
     {
       "slug": "hazard-response",
       "lang": "CN",
-      "screen_page_views": 51,
-      "active_users": 50,
-      "sessions": 55,
-      "avg_engagement_seconds": 44.2,
+      "screen_page_views": 55,
+      "active_users": 56,
+      "sessions": 58,
+      "avg_engagement_seconds": 54.5,
       "key_events": 0
     },
     {
       "slug": "hazard-response",
       "lang": "EN",
-      "screen_page_views": 182,
-      "active_users": 168,
-      "sessions": 184,
-      "avg_engagement_seconds": 34.4,
+      "screen_page_views": 175,
+      "active_users": 162,
+      "sessions": 176,
+      "avg_engagement_seconds": 36.7,
       "key_events": 0
     },
     {
       "slug": "hazard-response",
       "lang": "JP",
-      "screen_page_views": 8,
-      "active_users": 7,
-      "sessions": 10,
-      "avg_engagement_seconds": 6.7,
+      "screen_page_views": 7,
+      "active_users": 6,
+      "sessions": 8,
+      "avg_engagement_seconds": 5.4,
       "key_events": 0
     },
     {
       "slug": "indoor-outdoor-positioning",
       "lang": "CN",
-      "screen_page_views": 44,
+      "screen_page_views": 49,
       "active_users": 48,
-      "sessions": 52,
-      "avg_engagement_seconds": 31.1,
+      "sessions": 53,
+      "avg_engagement_seconds": 35.3,
       "key_events": 0
     },
     {
       "slug": "indoor-outdoor-positioning",
       "lang": "EN",
-      "screen_page_views": 269,
-      "active_users": 237,
-      "sessions": 289,
-      "avg_engagement_seconds": 33.7,
+      "screen_page_views": 262,
+      "active_users": 230,
+      "sessions": 279,
+      "avg_engagement_seconds": 30.0,
       "key_events": 0
     },
     {
       "slug": "indoor-outdoor-positioning",
       "lang": "JP",
-      "screen_page_views": 11,
-      "active_users": 9,
-      "sessions": 9,
-      "avg_engagement_seconds": 27.9,
+      "screen_page_views": 13,
+      "active_users": 11,
+      "sessions": 11,
+      "avg_engagement_seconds": 23.5,
       "key_events": 0
     },
     {
@@ -379,19 +379,19 @@
     {
       "slug": "intelligent-video-analytics",
       "lang": "CN",
-      "screen_page_views": 204,
-      "active_users": 142,
-      "sessions": 200,
-      "avg_engagement_seconds": 48.4,
-      "key_events": 0
+      "screen_page_views": 209,
+      "active_users": 144,
+      "sessions": 207,
+      "avg_engagement_seconds": 50.5,
+      "key_events": 1
     },
     {
       "slug": "intelligent-video-analytics",
       "lang": "EN",
-      "screen_page_views": 428,
-      "active_users": 373,
-      "sessions": 448,
-      "avg_engagement_seconds": 45.2,
+      "screen_page_views": 441,
+      "active_users": 382,
+      "sessions": 453,
+      "avg_engagement_seconds": 45.7,
       "key_events": 1
     },
     {
@@ -400,7 +400,7 @@
       "screen_page_views": 12,
       "active_users": 8,
       "sessions": 11,
-      "avg_engagement_seconds": 41.9,
+      "avg_engagement_seconds": 43.6,
       "key_events": 0
     },
     {
@@ -424,19 +424,19 @@
     {
       "slug": "off-grid-mesh-communication",
       "lang": "CN",
-      "screen_page_views": 16,
-      "active_users": 15,
-      "sessions": 16,
-      "avg_engagement_seconds": 21.7,
+      "screen_page_views": 23,
+      "active_users": 21,
+      "sessions": 23,
+      "avg_engagement_seconds": 25.9,
       "key_events": 0
     },
     {
       "slug": "off-grid-mesh-communication",
       "lang": "EN",
-      "screen_page_views": 95,
-      "active_users": 79,
-      "sessions": 89,
-      "avg_engagement_seconds": 36.4,
+      "screen_page_views": 133,
+      "active_users": 117,
+      "sessions": 127,
+      "avg_engagement_seconds": 34.8,
       "key_events": 0
     },
     {
@@ -487,55 +487,55 @@
     {
       "slug": "smart-agriculture-sensing",
       "lang": "CN",
-      "screen_page_views": 95,
-      "active_users": 79,
-      "sessions": 90,
-      "avg_engagement_seconds": 39.1,
+      "screen_page_views": 93,
+      "active_users": 81,
+      "sessions": 89,
+      "avg_engagement_seconds": 42.4,
       "key_events": 0
     },
     {
       "slug": "smart-agriculture-sensing",
       "lang": "EN",
-      "screen_page_views": 388,
-      "active_users": 327,
-      "sessions": 388,
-      "avg_engagement_seconds": 32.8,
+      "screen_page_views": 372,
+      "active_users": 310,
+      "sessions": 370,
+      "avg_engagement_seconds": 33.7,
       "key_events": 1
     },
     {
       "slug": "smart-agriculture-sensing",
       "lang": "JP",
-      "screen_page_views": 26,
-      "active_users": 20,
-      "sessions": 21,
-      "avg_engagement_seconds": 39.5,
+      "screen_page_views": 20,
+      "active_users": 17,
+      "sessions": 18,
+      "avg_engagement_seconds": 36.7,
       "key_events": 0
     },
     {
       "slug": "smart-livestock-farming",
       "lang": "CN",
-      "screen_page_views": 104,
-      "active_users": 93,
-      "sessions": 104,
-      "avg_engagement_seconds": 42.6,
+      "screen_page_views": 116,
+      "active_users": 97,
+      "sessions": 109,
+      "avg_engagement_seconds": 43.7,
       "key_events": 0
     },
     {
       "slug": "smart-livestock-farming",
       "lang": "EN",
-      "screen_page_views": 397,
-      "active_users": 287,
-      "sessions": 390,
-      "avg_engagement_seconds": 32.0,
+      "screen_page_views": 390,
+      "active_users": 277,
+      "sessions": 383,
+      "avg_engagement_seconds": 31.3,
       "key_events": 0
     },
     {
       "slug": "smart-livestock-farming",
       "lang": "JP",
-      "screen_page_views": 25,
-      "active_users": 22,
-      "sessions": 23,
-      "avg_engagement_seconds": 63.5,
+      "screen_page_views": 27,
+      "active_users": 23,
+      "sessions": 25,
+      "avg_engagement_seconds": 43.6,
       "key_events": 0
     },
     {
@@ -559,37 +559,37 @@
     {
       "slug": "smart-spatial-interaction",
       "lang": "EN",
-      "screen_page_views": 22,
-      "active_users": 20,
-      "sessions": 20,
-      "avg_engagement_seconds": 1.6,
+      "screen_page_views": 12,
+      "active_users": 10,
+      "sessions": 10,
+      "avg_engagement_seconds": 1.7,
       "key_events": 0
     },
     {
       "slug": "smart-warehouse-management",
       "lang": "CN",
-      "screen_page_views": 181,
-      "active_users": 149,
-      "sessions": 190,
-      "avg_engagement_seconds": 51.1,
+      "screen_page_views": 182,
+      "active_users": 155,
+      "sessions": 195,
+      "avg_engagement_seconds": 46.8,
       "key_events": 1
     },
     {
       "slug": "smart-warehouse-management",
       "lang": "EN",
-      "screen_page_views": 568,
-      "active_users": 480,
-      "sessions": 593,
-      "avg_engagement_seconds": 24.7,
-      "key_events": 0
+      "screen_page_views": 483,
+      "active_users": 404,
+      "sessions": 506,
+      "avg_engagement_seconds": 26.9,
+      "key_events": 1
     },
     {
       "slug": "smart-warehouse-management",
       "lang": "JP",
-      "screen_page_views": 7,
-      "active_users": 7,
-      "sessions": 7,
-      "avg_engagement_seconds": 28.7,
+      "screen_page_views": 9,
+      "active_users": 8,
+      "sessions": 8,
+      "avg_engagement_seconds": 33.0,
       "key_events": 0
     },
     {
@@ -630,6 +630,15 @@
     },
     {
       "slug": "voice_rebot_arm",
+      "lang": "CN",
+      "screen_page_views": 1,
+      "active_users": 1,
+      "sessions": 1,
+      "avg_engagement_seconds": 32.0,
+      "key_events": 0
+    },
+    {
+      "slug": "voice_rebot_arm",
       "lang": "EN",
       "screen_page_views": 1,
       "active_users": 1,
@@ -640,28 +649,28 @@
     {
       "slug": "voicecollectionanalysis",
       "lang": "CN",
-      "screen_page_views": 145,
-      "active_users": 132,
-      "sessions": 159,
-      "avg_engagement_seconds": 37.6,
-      "key_events": 1
+      "screen_page_views": 146,
+      "active_users": 129,
+      "sessions": 152,
+      "avg_engagement_seconds": 39.7,
+      "key_events": 0
     },
     {
       "slug": "voicecollectionanalysis",
       "lang": "EN",
-      "screen_page_views": 683,
-      "active_users": 603,
-      "sessions": 718,
-      "avg_engagement_seconds": 28.9,
+      "screen_page_views": 710,
+      "active_users": 628,
+      "sessions": 744,
+      "avg_engagement_seconds": 27.3,
       "key_events": 1
     },
     {
       "slug": "voicecollectionanalysis",
       "lang": "JP",
       "screen_page_views": 12,
-      "active_users": 15,
-      "sessions": 15,
-      "avg_engagement_seconds": 38.5,
+      "active_users": 13,
+      "sessions": 13,
+      "avg_engagement_seconds": 44.5,
       "key_events": 0
     }
   ],
@@ -669,162 +678,162 @@
     {
       "layer": "category",
       "lang": "EN",
-      "screen_page_views": 1484,
-      "active_users": 1279,
-      "sessions": 1444,
-      "avg_engagement_seconds": 16.0
+      "screen_page_views": 1533,
+      "active_users": 1316,
+      "sessions": 1489,
+      "avg_engagement_seconds": 15.1
     },
     {
       "layer": "category",
       "lang": "CN",
-      "screen_page_views": 653,
-      "active_users": 601,
-      "sessions": 657,
-      "avg_engagement_seconds": 24.8
+      "screen_page_views": 741,
+      "active_users": 661,
+      "sessions": 721,
+      "avg_engagement_seconds": 24.7
     },
     {
       "layer": "category",
       "lang": "JP",
-      "screen_page_views": 55,
-      "active_users": 50,
-      "sessions": 51,
-      "avg_engagement_seconds": 25.4
+      "screen_page_views": 59,
+      "active_users": 52,
+      "sessions": 53,
+      "avg_engagement_seconds": 28.0
     },
     {
       "layer": "list",
       "lang": "EN",
-      "screen_page_views": 115,
-      "active_users": 90,
-      "sessions": 102,
-      "avg_engagement_seconds": 43.5
+      "screen_page_views": 119,
+      "active_users": 95,
+      "sessions": 108,
+      "avg_engagement_seconds": 41.2
     },
     {
       "layer": "list",
       "lang": "CN",
-      "screen_page_views": 83,
+      "screen_page_views": 86,
       "active_users": 68,
-      "sessions": 75,
-      "avg_engagement_seconds": 24.6
+      "sessions": 76,
+      "avg_engagement_seconds": 22.9
     },
     {
       "layer": "list",
       "lang": "JP",
-      "screen_page_views": 1,
-      "active_users": 1,
-      "sessions": 1,
-      "avg_engagement_seconds": 15.0
+      "screen_page_views": 6,
+      "active_users": 2,
+      "sessions": 2,
+      "avg_engagement_seconds": 24.5
     },
     {
       "layer": "lora",
       "lang": "EN",
-      "screen_page_views": 118,
+      "screen_page_views": 121,
       "active_users": 108,
       "sessions": 124,
-      "avg_engagement_seconds": 16.5
+      "avg_engagement_seconds": 15.9
     },
     {
       "layer": "lora",
       "lang": "CN",
       "screen_page_views": 70,
-      "active_users": 69,
+      "active_users": 68,
       "sessions": 78,
-      "avg_engagement_seconds": 21.4
+      "avg_engagement_seconds": 22.5
     },
     {
       "layer": "lora",
       "lang": "JP",
-      "screen_page_views": 30,
-      "active_users": 24,
+      "screen_page_views": 29,
+      "active_users": 23,
       "sessions": 27,
-      "avg_engagement_seconds": 31.3
+      "avg_engagement_seconds": 27.9
     },
     {
       "layer": "solutions",
       "lang": "EN",
-      "screen_page_views": 4331,
-      "active_users": 3732,
-      "sessions": 4461,
-      "avg_engagement_seconds": 33.6
+      "screen_page_views": 4282,
+      "active_users": 3682,
+      "sessions": 4391,
+      "avg_engagement_seconds": 33.9
     },
     {
       "layer": "solutions",
       "lang": "CN",
-      "screen_page_views": 1386,
-      "active_users": 1192,
-      "sessions": 1431,
-      "avg_engagement_seconds": 42.9
+      "screen_page_views": 1457,
+      "active_users": 1233,
+      "sessions": 1468,
+      "avg_engagement_seconds": 44.0
     },
     {
       "layer": "solutions",
       "lang": "JP",
-      "screen_page_views": 139,
-      "active_users": 123,
-      "sessions": 132,
-      "avg_engagement_seconds": 35.3
+      "screen_page_views": 137,
+      "active_users": 120,
+      "sessions": 129,
+      "avg_engagement_seconds": 31.3
     }
   ],
   "ratio_summary": [
     {
       "lang": "EN",
-      "solution_pv": 6618,
-      "total_pv": 37620,
-      "solution_share_pct": 17.59
+      "solution_pv": 6641,
+      "total_pv": 38586,
+      "solution_share_pct": 17.21
     },
     {
       "lang": "CN",
-      "solution_pv": 2507,
-      "total_pv": 32352,
-      "solution_share_pct": 7.75
+      "solution_pv": 2678,
+      "total_pv": 35119,
+      "solution_share_pct": 7.63
     },
     {
       "lang": "JP",
-      "solution_pv": 243,
-      "total_pv": 6016,
-      "solution_share_pct": 4.04
+      "solution_pv": 237,
+      "total_pv": 6074,
+      "solution_share_pct": 3.9
     }
   ],
   "channel_summary": [
     {
       "lang": "EN",
       "channel_group": "Direct",
-      "sessions": 2765,
-      "share_pct": 41.2
+      "sessions": 2804,
+      "share_pct": 41.8
     },
     {
       "lang": "EN",
       "channel_group": "Unassigned",
-      "sessions": 1636,
-      "share_pct": 24.4
+      "sessions": 1631,
+      "share_pct": 24.3
     },
     {
       "lang": "EN",
       "channel_group": "Referral",
-      "sessions": 1247,
-      "share_pct": 18.6
+      "sessions": 1233,
+      "share_pct": 18.4
     },
     {
       "lang": "EN",
       "channel_group": "Organic Social",
-      "sessions": 481,
-      "share_pct": 7.2
+      "sessions": 421,
+      "share_pct": 6.3
     },
     {
       "lang": "EN",
       "channel_group": "Organic Search",
-      "sessions": 400,
-      "share_pct": 6.0
+      "sessions": 410,
+      "share_pct": 6.1
     },
     {
       "lang": "EN",
       "channel_group": "Paid Search",
-      "sessions": 83,
-      "share_pct": 1.2
+      "sessions": 107,
+      "share_pct": 1.6
     },
     {
       "lang": "EN",
       "channel_group": "AI Assistant",
-      "sessions": 66,
-      "share_pct": 1.0
+      "sessions": 63,
+      "share_pct": 0.9
     },
     {
       "lang": "EN",
@@ -835,80 +844,80 @@
     {
       "lang": "EN",
       "channel_group": "Cross-network",
-      "sessions": 5,
+      "sessions": 8,
       "share_pct": 0.1
     },
     {
       "lang": "CN",
       "channel_group": "Organic Search",
-      "sessions": 971,
-      "share_pct": 37.9
+      "sessions": 1166,
+      "share_pct": 43.5
     },
     {
       "lang": "CN",
       "channel_group": "Direct",
-      "sessions": 656,
-      "share_pct": 25.6
+      "sessions": 667,
+      "share_pct": 24.9
     },
     {
       "lang": "CN",
       "channel_group": "Referral",
-      "sessions": 649,
-      "share_pct": 25.3
+      "sessions": 635,
+      "share_pct": 23.7
     },
     {
       "lang": "CN",
       "channel_group": "Unassigned",
-      "sessions": 253,
-      "share_pct": 9.9
+      "sessions": 175,
+      "share_pct": 6.5
     },
     {
       "lang": "CN",
       "channel_group": "Organic Social",
       "sessions": 17,
-      "share_pct": 0.7
+      "share_pct": 0.6
     },
     {
       "lang": "CN",
       "channel_group": "AI Assistant",
-      "sessions": 16,
+      "sessions": 17,
       "share_pct": 0.6
     },
     {
       "lang": "CN",
       "channel_group": "Cross-network",
-      "sessions": 1,
-      "share_pct": 0.0
+      "sessions": 2,
+      "share_pct": 0.1
     },
     {
       "lang": "JP",
       "channel_group": "Organic Search",
-      "sessions": 156,
-      "share_pct": 67.5
+      "sessions": 161,
+      "share_pct": 72.2
     },
     {
       "lang": "JP",
       "channel_group": "Direct",
-      "sessions": 42,
-      "share_pct": 18.2
+      "sessions": 33,
+      "share_pct": 14.8
     },
     {
       "lang": "JP",
       "channel_group": "Referral",
-      "sessions": 18,
-      "share_pct": 7.8
+      "sessions": 17,
+      "share_pct": 7.6
     },
     {
       "lang": "JP",
       "channel_group": "AI Assistant",
       "sessions": 10,
-      "share_pct": 4.3
+      "share_pct": 4.5
     },
     {
       "lang": "JP",
       "channel_group": "Unassigned",
-      "sessions": 5,
-      "share_pct": 2.2
+      "sessions": 2,
+      "share_pct": 0.9
     }
   ]
 }
