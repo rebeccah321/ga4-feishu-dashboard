@@ -1,6 +1,10 @@
 name: Weekly Feishu Sync
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/weekly-feishu-sync.yml"
   workflow_dispatch:
   schedule:
     # 每周一 09:30 Asia/Shanghai 兜底（在周报 workflow 之后）
