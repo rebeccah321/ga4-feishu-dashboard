@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/weekly-feishu-sync.yml"
+      - "scripts/sync_weekly_feishu.py"
   workflow_dispatch:
   schedule:
     # 每周一 09:30 Asia/Shanghai 兜底（在周报 workflow 之后）

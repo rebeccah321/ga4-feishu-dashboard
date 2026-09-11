@@ -72,14 +72,38 @@ for _slug, _names in SLUG_ALIASES.items():
 
 REQUIRED_FIELDS = {
     "01": ["周次", "截止日期", "方案页独立访客数", "Solution页面总访问量",
-           "CTA点击量", "CTA点击率", "Solution页面周环比",
+           "CTA点击量", "CTA点击率(%)", "Solution页面周环比",
            "流量最高方案", "增长最快方案"],
     "02": ["最新周次", "截止日期", "方案名称", "落地页访问量", "独立访客数",
            "Session", "平均停留时长（秒）", "参与率", "主要流量来源",
            "CTA点击量", "leads", "周环比", "数据状态"],
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
-           "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率", "表单转化率",
+           "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率(%)", "表单转化率(%)",
            "数据状态"],
+}
+
+# 当飞书表的旧字段名尚未迁移时，按优先级回退；新名优先。
+FIELD_ALIASES = {
+    "01": {
+        "Solution页面总访问量": ["solution页面总访问量"],
+        "CTA点击量": ["关键事件(CTA)"],
+        "CTA点击率(%)": ["CTA点击率", "CTA转化率"],
+        "Solution页面周环比": ["Solution 页面周环比"],
+        "增长最快方案": ["增长最快solution"],
+    },
+    "02": {
+        "方案名称": ["solution名称"],
+        "Session": ["session"],
+        "CTA点击量": ["CTA点击量（key event）"],
+        "leads": ["表单提交"],
+    },
+    "03": {
+        "方案名称": ["solution名称"],
+        "Session": ["参与会话数"],
+        "表单提交（Leads）": ["表单提交"],
+        "CTA点击率(%)": ["CTA点击率", "页面->CTA转化率"],
+        "表单转化率(%)": ["表单转化率", "CTA->表单转化率"],
+    },
 }
 
 
@@ -297,7 +321,7 @@ def build_overview(rows):
             "方案页独立访客数": to_number(row.get("solution_users"), 0),
             "Solution页面总访问量": solution_pv,
             "CTA点击量": cta_clicks,
-            "CTA点击率": to_number(row.get("cta_click_rate")),
+            "CTA点击率(%)": to_number(row.get("cta_click_rate")),
             "Solution页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
             "流量最高方案": display_slug(annotated_slug(row.get("top_traffic_solution"))),
             "增长最快方案": best_growth_text(row.get("fastest_growing_solution")),
@@ -348,8 +372,8 @@ def build_funnel(rows):
             "Session": to_number(row.get("sessions"), 0),
             "CTA点击量": cta_clicks,
             "表单提交（Leads）": form_submits,
-            "CTA点击率": to_number(row.get("pv_to_cta_rate")),
-            "表单转化率": round(100 * form_submits / page_pv, 2) if page_pv else 0,
+            "CTA点击率(%)": to_number(row.get("pv_to_cta_rate")),
+            "表单转化率(%)": round(100 * form_submits / page_pv, 2) if page_pv else 0,
             "数据状态": to_text(row.get("data_status"), "未接入CRM"),
         })
     return output
@@ -378,13 +402,23 @@ def validate_rows(table_key, rows, field_types):
     if not rows:
         return
     sample = rows[0]
-    unknown = [name for name in sample if name not in field_types]
+    unknown = [name for name in sample if resolve_field(table_key, name, field_types) is None]
     if unknown:
         print(
             f"WARNING: {TABLES[table_key]} will skip field(s) not present "
             f"in Feishu table: {unknown}",
             flush=True,
         )
+
+
+def resolve_field(table_key, desired, field_types):
+    """返回飞书表里实际存在的字段名；新名优先，旧名回退。"""
+    if desired in field_types:
+        return desired
+    for alias in FIELD_ALIASES.get(table_key, {}).get(desired, []):
+        if alias in field_types:
+            return alias
+    return None
 
 
 def main():
@@ -439,11 +473,11 @@ def main():
         created = updated = 0
         for row in rows:
             key = key_for(table_key, row)
-            fields = {
-                name: coerce_field_value(name, value, field_types)
-                for name, value in row.items()
-                if name in field_types
-            }
+            fields = {}
+            for name, value in row.items():
+                actual = resolve_field(table_key, name, field_types)
+                if actual:
+                    fields[actual] = coerce_field_value(actual, value, field_types)
             result = upsert_record(token, app_token, table_id, existing.get(key), fields)
             if result == "created":
                 created += 1
