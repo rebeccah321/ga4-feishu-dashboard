@@ -1,7 +1,0 @@
-[01_方案增长总览] rename skip (old missing): 方案独立访客数 -> 方案页独立访客数
-[01_方案增长总览] rename skip (old missing): solution页面总访问量 -> Solution页面总访问量
-[01_方案增长总览] rename skip (old missing): CTA转化率 -> CTA点击率(%)
-[01_方案增长总览] rename skip (old missing): Solution 页面周环比 -> Solution页面周环比
-[01_方案增长总览] rename skip (old missing): 增长最快solution -> 增长最快方案
-[02_单方案流量明细] rename skip (old missing): session -> Session
-update field `None` failed: Feishu request failed: {"code":99992402,"msg":"field validation failed","error":{"field_violations":[{"field":"field_name","description":"field_name is required"}],"log_id":"20260911104726F40945812BF239152EA8","troubleshooter":"排查建议查看(Troubleshooting suggestions): https://open.feishu.cn/search?from=openapi&log_id=20260911104726F40945812BF239152EA8&code=99992402&method_id=6965347212289425410"}}
