@@ -30,6 +30,13 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Migrate Feishu table fields
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_BITABLE_APP_TOKEN: ${{ secrets.FEISHU_BITABLE_APP_TOKEN }}
+        run: python3 scripts/migrate_feishu_fields.py
+
       - name: Sync weekly tables to existing Feishu tables
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
