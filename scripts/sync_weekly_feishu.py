@@ -318,6 +318,7 @@ def build_overview(rows):
         week = row.get("week_ending", "").strip()
         solution_pv = to_number(row.get("solution_pv"))
         cta_clicks = to_number(row.get("cta_clicks"), 0)
+        cta_rate = to_number(row.get("cta_click_rate"))
         wow_pct = to_number(row.get("solution_wow_pct"))
         output.append({
             "周次": week_label(week),
@@ -325,7 +326,7 @@ def build_overview(rows):
             "方案页独立访客数": to_number(row.get("solution_users"), 0),
             "Solution页面总访问量": solution_pv,
             "CTA点击量": cta_clicks,
-            "CTA点击率(%)": to_number(row.get("cta_click_rate")),
+            "CTA点击率(%)": (round(cta_rate / 100, 6) if cta_rate is not None else None),
             "Solution页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
             "流量最高方案": display_slug(annotated_slug(row.get("top_traffic_solution"))),
             "增长最快方案": best_growth_text(row.get("fastest_growing_solution")),
@@ -367,6 +368,7 @@ def build_funnel(rows):
         week = row.get("week_ending", "").strip()
         page_pv = to_number(row.get("page_pv"), 0)
         cta_clicks = to_number(row.get("cta_clicks"), 0)
+        cta_rate_pct = to_number(row.get("pv_to_cta_rate"))
         form_submits = to_number(row.get("form_submits"), 0)
         output.append({
             "最新周次": week_label(week),
@@ -376,8 +378,8 @@ def build_funnel(rows):
             "Session": to_number(row.get("sessions"), 0),
             "CTA点击量": cta_clicks,
             "表单提交（Leads）": form_submits,
-            "CTA点击率(%)": to_number(row.get("pv_to_cta_rate")),
-            "表单转化率(%)": round(100 * form_submits / page_pv, 2) if page_pv else 0,
+            "CTA点击率(%)": (round(cta_rate_pct / 100, 6) if cta_rate_pct is not None else 0.0),
+            "表单转化率(%)": (round(form_submits / page_pv, 6) if page_pv else 0.0),
             "数据状态": to_text(row.get("data_status"), "未接入CRM"),
         })
     return output
