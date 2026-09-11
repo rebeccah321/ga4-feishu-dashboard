@@ -224,9 +224,13 @@ def datetime_to_ms(value):
 def coerce_field_value(field_name, value, field_types):
     if value is None:
         return None
+    ftype = field_types.get(field_name)
     # Feishu Bitable field type: 5 = Date / DateTime
-    if field_name in field_types and field_types[field_name] == 5:
+    if ftype == 5:
         return datetime_to_ms(value)
+    # 文本字段必须给字符串，防止 TextFieldConvFail
+    if ftype == 1 and not isinstance(value, str):
+        return "" if value == "" else str(value)
     return value
 
 
