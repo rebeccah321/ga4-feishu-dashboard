@@ -19,6 +19,7 @@ upsert key：
 """
 import argparse
 import csv
+import subprocess
 import datetime as dt
 import json
 import os
@@ -148,25 +149,40 @@ def validate_app_token(value: str) -> str:
 
 
 def request_json(method, url, token=None, body=None, retries=3):
-    data = None if body is None else json.dumps(body).encode("utf-8")
-    headers = {"Content-Type": "application/json; charset=utf-8"}
+    data_text = None if body is None else json.dumps(body, ensure_ascii=False)
+    cmd = ["curl", "-sS", "-m", "15", "-X", method, url,
+           "-H", "Content-Type: application/json; charset=utf-8"]
     if token:
-        headers["Authorization"] = f"Bearer {token}"
+        cmd += ["-H", f"Authorization: Bearer {token}"]
+    if data_text is not None:
+        cmd += ["--data-binary", "@-"]
     last_error = ""
     for attempt in range(1, retries + 1):
-        req = urllib.request.Request(url, data=data, method=method, headers=headers)
         try:
-            raw = urllib.request.urlopen(req, timeout=45).read().decode("utf-8")
+            proc = subprocess.run(
+                cmd, input=data_text, capture_output=True, text=True, timeout=20,
+            )
+        except subprocess.TimeoutExpired:
+            last_error = "curl subprocess timed out"
+            if attempt < retries:
+                time.sleep(1.5 * attempt)
+            continue
+        raw = proc.stdout.strip()
+        if proc.returncode != 0 or not raw:
+            last_error = (proc.stderr or proc.stdout or "empty curl response").strip()[:400]
+            if attempt < retries:
+                time.sleep(1.5 * attempt)
+            continue
+        try:
             payload = json.loads(raw)
-            if payload.get("code") != 0:
-                raise RuntimeError(f"Feishu code={payload.get('code')}: {payload.get('msg')}")
-            return payload
-        except urllib.error.HTTPError as err:
-            last_error = err.read().decode("utf-8", errors="replace")
-        except Exception as err:
-            last_error = str(err)
-        if attempt < retries:
-            time.sleep(1.5 * attempt)
+        except json.JSONDecodeError:
+            last_error = f"non-JSON response: {raw[:400]}"
+            if attempt < retries:
+                time.sleep(1.5 * attempt)
+            continue
+        if payload.get("code") != 0:
+            raise SystemExit(f"Feishu code={payload.get('code')}: {payload.get('msg')}")
+        return payload
     raise SystemExit(f"Feishu request failed: {last_error}")
 
 
@@ -477,8 +493,9 @@ def main():
             if item.get("fields")
         }
         created = updated = 0
-        for row in rows:
+        for idx, row in enumerate(rows, 1):
             key = key_for(table_key, row)
+            print(f"    {table_name} [{idx}/{len(rows)}] {key}", flush=True)
             fields = {}
             for name, value in row.items():
                 actual = resolve_field(table_key, name, field_types)
