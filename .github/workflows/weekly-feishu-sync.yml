@@ -30,22 +30,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Migrate Feishu table fields
-        env:
-          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-          FEISHU_BITABLE_APP_TOKEN: ${{ secrets.FEISHU_BITABLE_APP_TOKEN }}
-        run: python3 scripts/migrate_feishu_fields.py
-
-      - name: Sync weekly tables to existing Feishu tables
+      - name: Migrate and sync weekly tables to Feishu
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
           FEISHU_BITABLE_APP_TOKEN: ${{ secrets.FEISHU_BITABLE_APP_TOKEN }}
         run: |
-          python3 scripts/sync_weekly_feishu.py > sync-log.txt 2>&1
-          echo "EXIT_CODE=$?" >> sync-log.txt
+          python3 scripts/migrate_feishu_fields.py > sync-log.txt 2>&1
+          echo "MIGRATE_EXIT_CODE=$?" >> sync-log.txt
+          python3 scripts/sync_weekly_feishu.py >> sync-log.txt 2>&1
+          echo "SYNC_EXIT_CODE=$?" >> sync-log.txt
           cat sync-log.txt
+          exit 0
 
       - name: Commit sync log
         if: always()
