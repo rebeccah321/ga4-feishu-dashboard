@@ -1,0 +1,11 @@
+Prepared rows: 01=15, 02=180, 03=180
+Step 1: requesting tenant_access_token
+Step 2: listing tables in Base
+Step 3: 01_方案增长总览 field types: {'周次': 1, '截止日期': 5, '方案独立访客数': 2, 'solution页面总访问量': 2, 'CTA点击量': 2, 'CTA转化率': 2, 'Solution 页面周环比': 2, '流量最高方案': 1, '增长最快solution': 1, '社媒总曝光量': 20}
+WARNING: 01_方案增长总览 will skip field(s) not present in Feishu table: ['方案页独立访客数']
+Step 3: 02_单方案流量明细 field types: {'最新周次': 1, '截止日期': 5, '方案名称': 1, '落地页访问量': 2, '独立访客数': 2, 'session': 2, '平均停留时长（秒）': 2, '参与率': 2, '主要流量来源': 3, 'key event': 1, '表单提交': 3, '数据状态': 4}
+WARNING: 02_单方案流量明细 will skip field(s) not present in Feishu table: ['CTA点击量', '周环比']
+Step 3: 03_转化漏斗 field types: {'最新周次': 1, '截止日期': 5, '方案名称': 1, '页面访问量（PV）': 2, 'session': 2, 'CTA点击量': 2, '表单提交(Leads)': 2, 'CTA点击率(%)': 2, '表单转化率(%)': 2, '数据状态': 1}
+WARNING: 03_转化漏斗 will skip field(s) not present in Feishu table: ['Session', '表单提交（Leads）']
+01_方案增长总览: 0 created, 15 updated
+Feishu request failed: Feishu code=1254063: MultiSelectFieldConvFail
