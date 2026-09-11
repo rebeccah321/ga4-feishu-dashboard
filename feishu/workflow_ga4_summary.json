@@ -30,7 +30,7 @@
           }
         ],
         "response_type": "json",
-        "response_value": "{\"generated_at\":\"\",\"week_ending\":\"\",\"solution_users\":0,\"solution_pv\":0,\"key_events\":0,\"solution_wow_pct\":0,\"fastest_growing_solution\":\"\",\"top_traffic_solution\":\"\"}"
+        "response_value": "{\"generated_at\":\"\",\"week_number\":\"\",\"week_ending\":\"\",\"solution_users\":0,\"solution_pv\":0,\"cta_clicks\":0,\"cta_click_rate\":0,\"solution_wow_pct\":0,\"fastest_growing_solution\":\"\",\"top_traffic_solution\":\"\"}"
       }
     },
     {
@@ -60,7 +60,7 @@
             ]
           },
           {
-            "field_name": "方案页独立访客",
+            "field_name": "方案页独立访客数",
             "value": [
               {
                 "value_type": "ref",
@@ -78,16 +78,16 @@
             ]
           },
           {
-            "field_name": "关键事件(CTA)",
+            "field_name": "CTA点击量",
             "value": [
               {
                 "value_type": "ref",
-                "value": "$.step_fetch.body.key_events"
+                "value": "$.step_fetch.body.cta_clicks"
               }
             ]
           },
           {
-            "field_name": "CTA转化率",
+            "field_name": "CTA点击率",
             "value": [
               {
                 "value_type": "ref",
@@ -96,7 +96,7 @@
             ]
           },
           {
-            "field_name": "Solution 页面周环比",
+            "field_name": "Solution页面周环比",
             "value": [
               {
                 "value_type": "ref",
@@ -114,7 +114,7 @@
             ]
           },
           {
-            "field_name": "增长最快solution",
+            "field_name": "增长最快方案",
             "value": [
               {
                 "value_type": "ref",

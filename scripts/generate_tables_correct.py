@@ -53,6 +53,8 @@ METS = [
     "bounceRate", "userEngagementDuration", "keyEvents",
 ]
 
+CTA_EVENTS = ["click_solution_link", "click_contact_expert"]
+
 NA = "未接入"
 
 
@@ -123,6 +125,50 @@ def query_solution(token: str, slug: str, start: str, end: str) -> list[dict]:
     return rows
 
 
+def query_events(token: str, slug: str, start: str, end: str) -> list[dict]:
+    """返回该 solution 页面上的 CTA 点击事件（按 date 聚合）。"""
+    body = {
+        "dateRanges": [{"startDate": start, "endDate": end}],
+        "dimensions": [{"name": "date"}],
+        "metrics": [{"name": "eventCount"}],
+        "limit": 100000,
+        "dimensionFilter": {
+            "andGroup": {
+                "expressions": [
+                    {
+                        "filter": {
+                            "fieldName": "pagePath",
+                            "stringFilter": {
+                                "matchType": "CONTAINS",
+                                "value": f"/solutions/{slug}",
+                            },
+                        }
+                    },
+                    {
+                        "filter": {
+                            "fieldName": "eventName",
+                            "inListFilter": {"values": CTA_EVENTS},
+                        }
+                    },
+                ]
+            }
+        },
+    }
+    report = run_report(body, token)
+    rows = []
+    for row in report.get("rows", []):
+        dims = row.get("dimensionValues", [])
+        mets = row.get("metricValues", [])
+        if not dims:
+            continue
+        date_raw = dims[0]["value"]
+        rows.append({
+            "date": f"{date_raw[:4]}-{date_raw[4:6]}-{date_raw[6:8]}" if len(date_raw) == 8 else date_raw,
+            "eventCount": float(mets[0]["value"]) if mets else 0.0,
+        })
+    return rows
+
+
 def query_site_pv(token: str, start: str, end: str) -> dict:
     """返回 {week_ending: total_site_pv}。只用于 overview 的非重要列。"""
     body = {
@@ -171,7 +217,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", default=None, help="YYYY-MM-DD，含起止日")
     parser.add_argument("--end", default=None, help="YYYY-MM-DD，含起止日")
-    parser.add_argument("--weeks", type=int, default=7, help="未显式指定 start/end 时使用")
+    parser.add_argument("--weeks", type=int, default=14, help="未显式指定 start/end 时使用（默认滚取 14 周，当前为 W23~W36）")
     parser.add_argument("--include-current", action="store_true", help="未显式指定 start/end 时，包含当前未完整周")
     args = parser.parse_args()
 
@@ -184,7 +230,7 @@ def main() -> None:
 
     stats = defaultdict(lambda: {
         "pv": 0.0, "users": 0.0, "sessions": 0.0,
-        "eng_num": 0.0, "bounce_num": 0.0, "dur": 0.0, "key": 0.0,
+        "eng_num": 0.0, "bounce_num": 0.0, "dur": 0.0, "key": 0.0, "cta": 0.0,
         "channels": defaultdict(float),
     })
     for slug in SOLUTIONS:
@@ -202,7 +248,11 @@ def main() -> None:
             stat["bounce_num"] += row["bounceRate"] * sessions
             stat["key"] += row["keyEvents"]
             stat["channels"][row["channel"]] += sessions
-        print(f"  queried {slug}", flush=True)
+        event_rows = query_events(token, slug, start, end)
+        for row in event_rows:
+            key = (week_ending(row["date"]), slug)
+            stats[key]["cta"] += row["eventCount"]
+        print(f"  queried {slug} (traffic + CTA events)", flush=True)
 
     weeks = sorted({we for (we, _slug) in stats})
     solution_pv_by_week = defaultdict(lambda: defaultdict(float))
@@ -211,7 +261,7 @@ def main() -> None:
 
     # 01 方案增长总览
     overview_fields = [
-        "week_ending", "solution_users", "solution_pv", "total_site_pv",
+        "week_ending", "solution_users", "solution_pv", "solution_sessions", "total_site_pv",
         "cta_clicks", "cta_click_rate",
         "key_events", "key_event_conv_rate",
         "fastest_growing_solution", "top_traffic_solution",
@@ -226,6 +276,7 @@ def main() -> None:
             sol_users = sum(stat["users"] for (_w, slug), stat in stats.items() if _w == we)
             sol_sessions = sum(stat["sessions"] for (_w, slug), stat in stats.items() if _w == we)
             key_events = int(round(sum(stat["key"] for (_w, slug), stat in stats.items() if _w == we)))
+            cta_clicks = int(round(sum(stat["cta"] for (_w, slug), stat in stats.items() if _w == we)))
             site_pv = site_pv_by_week.get(we, 0)
 
             fastest = ""
@@ -240,7 +291,7 @@ def main() -> None:
 
             if solution_pv_by_week[we]:
                 top_slug = max(solution_pv_by_week[we].items(), key=lambda item: item[1])[0]
-                top_text = f"{top_slug} ({int(solution_pv_by_week[we][top_slug])} PV)"
+                top_text = top_slug
             else:
                 top_text = ""
 
@@ -251,9 +302,10 @@ def main() -> None:
                 "week_ending": we,
                 "solution_users": int(round(sol_users)),
                 "solution_pv": int(round(sol_pv)),
+                "solution_sessions": int(round(sol_sessions)),
                 "total_site_pv": int(site_pv),
-                "cta_clicks": key_events,
-                "cta_click_rate": round(100 * key_events / site_pv, 2) if site_pv else 0,
+                "cta_clicks": cta_clicks,
+                "cta_click_rate": round(100 * cta_clicks / sol_pv, 2) if sol_pv else 0,
                 "key_events": key_events,
                 "key_event_conv_rate": round(key_events / sol_sessions, 4) if sol_sessions else 0,
                 "fastest_growing_solution": fastest,
@@ -298,7 +350,7 @@ def main() -> None:
                     "avg_eng_s": round(avg_eng_s, 1),
                     "engagement_rate": round(engagement_rate, 4),
                     "top_channel": top_channel if top_channel else "Unassigned",
-                    "cta_clicks": int(round(stat["key"])),
+                    "cta_clicks": int(round(stat["cta"])),
                     "form_submits": NA,
                     "key_events": int(round(stat["key"])),
                     "data_status": "GA4已接入",
@@ -308,9 +360,9 @@ def main() -> None:
 
     funnel_fields = [
         "week_ending", "slug", "page_pv",
-        "cta_clicks", "form_submits", "add_to_cart",
+        "sessions", "cta_clicks", "form_submits", "add_to_cart",
         "pv_to_cta_rate", "cta_to_form_rate",
-        "data_status", "engaged_sessions",
+        "data_status",
     ]
     with open(ANALYSIS_DIR / "转换漏斗.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=funnel_fields)
@@ -325,13 +377,13 @@ def main() -> None:
                     "week_ending": we,
                     "slug": slug,
                     "page_pv": int(round(pv)),
-                    "cta_clicks": int(round(stat["key"])),
+                    "sessions": int(round(stat["sessions"])),
+                    "cta_clicks": int(round(stat["cta"])),
                     "form_submits": NA,
                     "add_to_cart": NA,
-                    "pv_to_cta_rate": round(100 * stat["key"] / pv, 2) if pv else 0,
+                    "pv_to_cta_rate": round(100 * stat["cta"] / pv, 2) if pv else 0,
                     "cta_to_form_rate": NA,
                     "data_status": "GA4部分·CRM未接入",
-                    "engaged_sessions": round(stat["sessions"] * engagement_rate),
                 })
 
     print(f"Wrote three tables for {len(weeks)} weeks: {weeks[0]} .. {weeks[-1]}")

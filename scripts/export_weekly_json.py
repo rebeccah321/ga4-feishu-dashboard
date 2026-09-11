@@ -78,6 +78,28 @@ def read_csv(path):
         return list(csv.DictReader(fh))
 
 
+
+def sort_overview_newest(rows):
+    return sorted(rows, key=lambda r: (r.get("week_ending") or ""), reverse=True)
+
+
+def sort_detail_newest_by_pv(rows, pv_field):
+    weeks = sorted({(r.get("week_ending") or "") for r in rows}, reverse=True)
+    out = []
+    for week in weeks:
+        grp = [r for r in rows if (r.get("week_ending") or "") == week]
+        grp.sort(key=lambda r: -(float(r.get(pv_field) or 0)))
+        out.extend(grp)
+    return out
+
+
+def write_csv(path, fieldnames, rows):
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def group_overview(rows):
     """兼容两种 overview：有 slug 的按周聚合成方案口径；无 slug 的直接透传。"""
     if not rows:
@@ -165,13 +187,12 @@ def funnel_rows(rows):
             "week_ending": row.get("week_ending"),
             "solution_name": display(slug) if slug else None,
             "page_pv": clean(row.get("page_pv")),
+            "sessions": clean(row.get("sessions")),
             "cta_clicks": clean(row.get("cta_clicks")),
             "form_submits": clean(row.get("form_submits")),
             "add_to_cart": clean(row.get("add_to_cart")),
             "pv_to_cta_rate": clean(row.get("pv_to_cta_rate")),
-            "cta_to_form_rate": clean(row.get("cta_to_form_rate")),
             "data_status": clean(row.get("data_status")),
-            "engaged_sessions": clean(row.get("engaged_sessions")),
         })
     return output
 
@@ -188,14 +209,18 @@ def main():
     detail_path = ANALYSIS_DIR / "单方案流量明细.csv"
     funnel_path = ANALYSIS_DIR / "转换漏斗.csv"
 
-    overview = group_overview(read_csv(overview_path))
-    detail = detail_rows(read_csv(detail_path))
-    funnel = funnel_rows(read_csv(funnel_path))
+    overview_raw = sort_overview_newest(read_csv(overview_path))
+    detail_raw = sort_detail_newest_by_pv(read_csv(detail_path), "landing_pv")
+    funnel_raw = sort_detail_newest_by_pv(read_csv(funnel_path), "page_pv")
+
+    overview = group_overview(overview_raw)
+    detail = detail_rows(detail_raw)
+    funnel = funnel_rows(funnel_raw)
 
     if not overview:
         raise SystemExit(f"Missing overview data: {overview_path}")
 
-    latest_week = overview[-1]["week_ending"]
+    latest_week = max((r["week_ending"] for r in overview), default=None)
     payload = {
         "generated_at": now_iso(),
         "source": "ga4_weekly_tables",
@@ -210,7 +235,7 @@ def main():
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    summary = overview[-1]
+    summary = overview[0]
     summary_payload = {
         "generated_at": payload["generated_at"],
         "week_number": week_label(latest_week),
@@ -232,13 +257,14 @@ def main():
         json.dumps(summary_payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    for source, target in (
-        (overview_path, "overview.csv"),
-        (detail_path, "detail.csv"),
-        (funnel_path, "funnel.csv"),
+    for raw_rows, fieldnames, target in (
+        (overview_raw, overview_raw[0].keys() if overview_raw else [], "overview.csv"),
+        (detail_raw, detail_raw[0].keys() if detail_raw else [], "detail.csv"),
+        (funnel_raw, funnel_raw[0].keys() if funnel_raw else [], "funnel.csv"),
     ):
-        if source.exists():
-            (out_dir / target).write_bytes(source.read_bytes())
+        if raw_rows:
+            write_csv(out_dir / target, list(fieldnames), raw_rows)
+            print(f"  wrote {target} ({len(raw_rows)} rows)")
 
     print(f"Exported weekly JSON to {out_dir}")
     print(f"  latest_week_ending = {latest_week}")

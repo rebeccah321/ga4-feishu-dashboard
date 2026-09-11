@@ -9,8 +9,8 @@ sync_weekly_feishu.py — 把周度三表同步到飞书已有的多维表格。
 
 upsert key：
   - 01：周次
-  - 02：最新周次 + solution名称
-  - 03：最新周次 + solution名称
+  - 02：最新周次 + 方案名称
+  - 03：最新周次 + 方案名称
 
 环境变量：
   FEISHU_APP_ID
@@ -71,15 +71,15 @@ for _slug, _names in SLUG_ALIASES.items():
 
 
 REQUIRED_FIELDS = {
-    "01": ["周次", "截止日期", "方案页独立访客数", "solution页面总访问量",
-           "关键事件(CTA)", "CTA转化率", "Solution 页面周环比",
-           "流量最高方案", "增长最快solution"],
-    "02": ["最新周次", "截止日期", "solution名称", "落地页访问量", "独立访客数",
-           "session", "平均停留时长（秒）", "参与率", "主要流量来源",
-           "CTA点击量（key event）", "表单提交", "数据状态"],
-    "03": ["最新周次", "截止日期", "solution名称", "页面访问量（PV）",
-           "参与会话数", "CTA点击量", "表单提交", "页面->CTA转化率",
-           "CTA->表单转化率", "数据状态"],
+    "01": ["周次", "截止日期", "方案页独立访客数", "Solution页面总访问量",
+           "CTA点击量", "CTA点击率", "Solution页面周环比",
+           "流量最高方案", "增长最快方案"],
+    "02": ["最新周次", "截止日期", "方案名称", "落地页访问量", "独立访客数",
+           "Session", "平均停留时长（秒）", "参与率", "主要流量来源",
+           "CTA点击量", "leads", "周环比", "数据状态"],
+    "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
+           "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率", "表单转化率",
+           "数据状态"],
 }
 
 
@@ -289,18 +289,18 @@ def build_overview(rows):
     for row in rows:
         week = row.get("week_ending", "").strip()
         solution_pv = to_number(row.get("solution_pv"))
-        key_events = to_number(row.get("key_events"), 0)
+        cta_clicks = to_number(row.get("cta_clicks"), 0)
         wow_pct = to_number(row.get("solution_wow_pct"))
         output.append({
             "周次": week_label(week),
             "截止日期": week,
             "方案页独立访客数": to_number(row.get("solution_users"), 0),
-            "solution页面总访问量": solution_pv,
-            "关键事件(CTA)": key_events,
-            "CTA转化率": rounded_ratio(key_events, solution_pv),
-            "Solution 页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
+            "Solution页面总访问量": solution_pv,
+            "CTA点击量": cta_clicks,
+            "CTA点击率": to_number(row.get("cta_click_rate")),
+            "Solution页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
             "流量最高方案": display_slug(annotated_slug(row.get("top_traffic_solution"))),
-            "增长最快solution": best_growth_text(row.get("fastest_growing_solution")),
+            "增长最快方案": best_growth_text(row.get("fastest_growing_solution")),
         })
     return output
 
@@ -313,20 +313,22 @@ def build_detail(rows):
     output = []
     for row in rows:
         week = row.get("week_ending", "").strip()
-        key_events = to_number(row.get("key_events"), 0)
+        cta_clicks = to_number(row.get("cta_clicks"), 0)
+        wow_pct = to_number(row.get("wow_pct"))
         output.append({
             "最新周次": week_label(week),
             "截止日期": week,
-            "solution名称": display_slug(row.get("slug")),
+            "方案名称": display_slug(row.get("slug")),
             "落地页访问量": to_number(row.get("landing_pv"), 0),
             "独立访客数": to_number(row.get("users"), 0),
-            "session": to_number(row.get("sessions"), 0),
+            "Session": to_number(row.get("sessions"), 0),
             "平均停留时长（秒）": to_number(row.get("avg_eng_s")),
             "参与率": to_number(row.get("engagement_rate")),
             "主要流量来源": to_text(row.get("top_channel"), ""),
-            "CTA点击量（key event）": str(key_events),
-            "表单提交": "未接入",
-            "数据状态": data_status_for_detail(week),
+            "CTA点击量": cta_clicks,
+            "leads": to_number(row.get("form_submits"), 0),
+            "数据状态": to_text(row.get("data_status"), data_status_for_detail(week)),
+            "周环比": (wow_pct / 100.0) if wow_pct is not None else None,
         })
     return output
 
@@ -337,17 +339,18 @@ def build_funnel(rows):
         week = row.get("week_ending", "").strip()
         page_pv = to_number(row.get("page_pv"), 0)
         cta_clicks = to_number(row.get("cta_clicks"), 0)
+        form_submits = to_number(row.get("form_submits"), 0)
         output.append({
             "最新周次": week_label(week),
             "截止日期": week,
-            "solution名称": display_slug(row.get("slug")),
+            "方案名称": display_slug(row.get("slug")),
             "页面访问量（PV）": page_pv,
-            "参与会话数": to_number(row.get("engaged_sessions"), 0),
+            "Session": to_number(row.get("sessions"), 0),
             "CTA点击量": cta_clicks,
-            "表单提交": "未接入CRM",
-            "页面->CTA转化率": rounded_ratio(cta_clicks, page_pv),
-            "CTA->表单转化率": None,
-            "数据状态": "未接入CRM",
+            "表单提交（Leads）": form_submits,
+            "CTA点击率": to_number(row.get("pv_to_cta_rate")),
+            "表单转化率": round(100 * form_submits / page_pv, 2) if page_pv else 0,
+            "数据状态": to_text(row.get("data_status"), "未接入CRM"),
         })
     return output
 
@@ -365,7 +368,7 @@ def key_for(table_key, row):
         return str(row.get("周次", "")).strip()
     if table_key in {"02", "03"}:
         week = str(row.get("最新周次", "")).strip()
-        name = str(row.get("solution名称", "")).strip()
+        name = str(row.get("方案名称", "")).strip()
         slug = NAME_TO_SLUG.get(name, name)
         return f"{week}|{slug}"
     return ""
@@ -377,9 +380,10 @@ def validate_rows(table_key, rows, field_types):
     sample = rows[0]
     unknown = [name for name in sample if name not in field_types]
     if unknown:
-        raise SystemExit(
-            f"{TABLES[table_key]} has unexpected field(s) {unknown}; "
-            f"actual fields are {sorted(field_types)}"
+        print(
+            f"WARNING: {TABLES[table_key]} will skip field(s) not present "
+            f"in Feishu table: {unknown}",
+            flush=True,
         )
 
 
@@ -438,6 +442,7 @@ def main():
             fields = {
                 name: coerce_field_value(name, value, field_types)
                 for name, value in row.items()
+                if name in field_types
             }
             result = upsert_record(token, app_token, table_id, existing.get(key), fields)
             if result == "created":
