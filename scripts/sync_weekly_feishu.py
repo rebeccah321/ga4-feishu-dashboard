@@ -180,9 +180,15 @@ def request_json(method, url, token=None, body=None, retries=3):
             if attempt < retries:
                 time.sleep(1.5 * attempt)
             continue
-        if payload.get("code") != 0:
-            raise SystemExit(f"Feishu code={payload.get('code')}: {payload.get('msg')}")
-        return payload
+        code = payload.get("code")
+        if code == 0:
+            return payload
+        # Feishu 偶发内部错误可重试
+        if code in {2200, 500} and attempt < retries:
+            last_error = f"Feishu code={code}: {payload.get('msg')}"
+            time.sleep(1.5 * attempt)
+            continue
+        raise SystemExit(f"Feishu code={code}: {payload.get('msg')}")
     raise SystemExit(f"Feishu request failed: {last_error}")
 
 
@@ -447,13 +453,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--inspect-only", action="store_true")
+    parser.add_argument("--only", choices=["01", "02", "03"], default=None, help="只同步指定表")
     args = parser.parse_args()
 
     table_data = build_data()
-    print(f"Prepared rows: 01={len(table_data['01'])}, 02={len(table_data['02'])}, 03={len(table_data['03'])}")
+    if args.only:
+        table_data = {args.only: table_data[args.only]}
+    print(f"Prepared rows: " + ", ".join(f"{k}={len(v)}" for k, v in table_data.items()))
 
     if args.dry_run:
-        for key in ("01", "02", "03"):
+        for key in table_data:
             print(f"\n=== {TABLES[key]} sample ===")
             print(json.dumps(table_data[key][:2], ensure_ascii=False, indent=2))
         return
@@ -471,7 +480,7 @@ def main():
         raise SystemExit("Existing Feishu tables not found: " + ", ".join(missing))
 
     schemas = {}
-    for table_key in ("01", "02", "03"):
+    for table_key in table_data:
         table_name = TABLES[table_key]
         table_id = available[table_name]
         field_types = list_fields(token, app_token, table_id)
@@ -483,7 +492,7 @@ def main():
         print("inspect-only: field checks passed, no records written.")
         return
 
-    for table_key in ("01", "02", "03"):
+    for table_key in table_data:
         table_name, table_id, field_types = schemas[table_key]
         rows = table_data[table_key]
         existing_records = list_records(token, app_token, table_id)
@@ -506,7 +515,7 @@ def main():
                 created += 1
             else:
                 updated += 1
-            time.sleep(0.15)
+            time.sleep(float(os.environ.get("FEISHU_SYNC_DELAY", "0.15")))
         print(f"{table_name}: {created} created, {updated} updated")
 
 
