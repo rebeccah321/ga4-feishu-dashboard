@@ -1,5 +1,6 @@
 week_ending,solution_users,solution_pv,solution_sessions,total_site_pv,cta_clicks,cta_click_rate,key_events,key_event_conv_rate,fastest_growing_solution,top_traffic_solution,social_impressions,solution_wow_pct,form_submits
-2026-09-13,782,897,913,15086,62,6.91,3,0.0033,indoor-outdoor-positioning (+27.3%),voicecollectionanalysis,未接入,-21.5,1
+2026-09-20,327,417,410,5232,38,9.11,1,0.0024,hazard-response (+0.0%),voicecollectionanalysis,未接入,-53.8,0
+2026-09-13,772,902,902,15205,62,6.87,3,0.0033,indoor-outdoor-positioning (+27.3%),voicecollectionanalysis,未接入,-21.1,1
 2026-09-06,954,1143,1090,22316,126,11.02,4,0.0037,conversational-voice-ai (+96.2%),conversational-voice-ai,未接入,22.4,4
 2026-08-30,800,934,946,13245,102,10.92,0,0.0,smart-warehouse-management (+70.0%),voicecollectionanalysis,未接入,5.8,0
 2026-08-23,766,883,883,11896,84,9.51,3,0.0034,hazard-response (+76.0%),conversational-voice-ai,未接入,-9.1,4
@@ -12,4 +13,5 @@ week_ending,solution_users,solution_pv,solution_sessions,total_site_pv,cta_click
 2026-07-05,708,811,836,11017,61,7.52,5,0.006,hazard-response (+96.2%),voicecollectionanalysis,未接入,-8.0,6
 2026-06-28,726,882,878,11803,76,8.62,2,0.0023,indoor-outdoor-positioning (+132.4%),voicecollectionanalysis,未接入,37.4,2
 2026-06-21,546,642,635,11014,50,7.79,1,0.0016,campus-safety-management (+18.2%),voicecollectionanalysis,未接入,-8.7,2
-2026-06-14,610,703,734,11328,89,12.66,1,0.0014,,conversational-voice-ai,未接入,,4
+2026-06-14,610,703,734,11328,89,12.66,1,0.0014,intelligent-video-analytics (+27.3%),conversational-voice-ai,未接入,-6.4,4
+2026-06-07,614,751,728,11776,77,10.25,1,0.0014,,conversational-voice-ai,未接入,,1
