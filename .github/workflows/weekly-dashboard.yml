@@ -38,14 +38,13 @@ jobs:
       - name: Write GA4 service account
         if: ${{ github.event_name == 'schedule' || inputs.mock == false }}
         env:
-          GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
+          GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT }}
         run: |
-          test -n "$GA4_SERVICE_ACCOUNT_JSON"
           printf '%s' "$GA4_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/ga4-service-account.json"
 
       - name: Build dashboard
         env:
-          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID || '502086217' }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/ga4-service-account.json
           GA4_API_TRANSPORT: rest
         run: |

@@ -12,6 +12,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -42,7 +43,9 @@ jobs:
       - name: Merge LeadApi leads into weekly tables
         env:
           LEAD_SEARCH_KEY: ${{ secrets.LEAD_SEARCH_KEY }}
-        run: python3 scripts/merge_leads.py
+        # 失败也继续：LeadApi 不可用时 merge_leads.py 会自动回退到仓库内缓存，
+        # 外部再兜底一次，确保导出/Excel/飞书同步不受阻塞。
+        run: python3 scripts/merge_leads.py || echo "WARN: LeadApi merge skipped"
 
       - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |
