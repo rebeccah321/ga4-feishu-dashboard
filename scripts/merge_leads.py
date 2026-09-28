@@ -120,7 +120,9 @@ def search_leads(key: str) -> list[dict]:
         }
         result_item = curl_search(key, params)
         if not result_item:
-            break
+            raise RuntimeError(f"LeadApi page {page} failed; refusing to publish incomplete leads")
+        if "hits" not in result_item or "found" not in result_item:
+            raise RuntimeError(f"LeadApi page {page} returned an invalid response")
         hits = result_item.get("hits", [])
         all_docs.extend(hit["document"] for hit in hits)
         total = int(result_item.get("found", 0))
@@ -128,35 +130,12 @@ def search_leads(key: str) -> list[dict]:
             f"  page {page}: got {len(hits)}, total {len(all_docs)}/{total}",
             flush=True,
         )
-        if not hits or len(all_docs) >= total:
+        if len(all_docs) >= total:
             break
+        if not hits:
+            raise RuntimeError(f"LeadApi ended early: received {len(all_docs)} of {total} documents")
         page += 1
     return all_docs
-
-
-def load_cached_docs() -> list[dict]:
-    """Live LeadApi 不可用时，从已提交的 leads_weekly.csv 回退，避免管道中断."""
-    path = LEADS_DIR / "leads_weekly.csv"
-    if not path.exists():
-        return []
-    docs: list[dict] = []
-    idx = 0
-    with open(path, newline="", encoding="utf-8-sig") as fh:
-        for row in csv.DictReader(fh):
-            week = str(row.get("week_ending") or "").strip()
-            slug = str(row.get("slug") or "").strip()
-            try:
-                count = int(float(row.get("form_submits") or 0))
-            except (TypeError, ValueError):
-                count = 0
-            for _ in range(count):
-                idx += 1
-                docs.append({
-                    "submission_id": f"cached-{week}-{slug}-{idx}",
-                    "create_at": week,
-                    "pageLocation": f"/solutions/{slug}",
-                })
-    return docs
 
 
 def load_docs_from_pages_dir(pages_dir: str) -> list[dict]:
@@ -305,29 +284,12 @@ def main() -> None:
     if args.pages_dir:
         docs = load_docs_from_pages_dir(args.pages_dir)
     else:
-        docs = []
-        key = None
-        try:
-            key = load_key()
-        except SystemExit as exc:
-            print(f"WARNING: LeadApi key unavailable: {exc}", flush=True)
-        if key:
-            print("Fetching leads from LeadApi...", flush=True)
-            try:
-                docs = search_leads(key)
-            except Exception as exc:  # curl/timeout/网络异常不做为失败
-                print(f"WARNING: LeadApi fetch failed: {exc}", flush=True)
-                docs = []
-        if not docs:
-            docs = load_cached_docs()
-            if docs:
-                print(
-                    f"Live LeadApi unavailable; using {len(docs)} cached lead entries",
-                    flush=True,
-                )
-            else:
-                print("WARNING: no LeadApi data and no cached leads; skipping merge", flush=True)
-                return
+        key = load_key()
+        print("Fetching leads from LeadApi...", flush=True)
+        docs = search_leads(key)
+
+    if not docs:
+        raise SystemExit("No lead documents available; aborting merge")
 
     by_week_slug, total_by_week, _distinct, _matched = count_leads(docs)
     write_leads_weekly(by_week_slug)
