@@ -2,7 +2,6 @@ name: Weekly GA4 Tables
 
 on:
   schedule:
-    # 每周一北京时间 9:00 = UTC 周一 1:00
     - cron: '0 1 * * 1'
   workflow_dispatch:
 
@@ -43,9 +42,7 @@ jobs:
       - name: Merge LeadApi leads into weekly tables
         env:
           LEAD_SEARCH_KEY: ${{ secrets.LEAD_SEARCH_KEY }}
-        # 失败也继续：LeadApi 不可用时 merge_leads.py 会自动回退到仓库内缓存，
-        # 外部再兜底一次，确保导出/Excel/飞书同步不受阻塞。
-        run: python3 scripts/merge_leads.py || echo "WARN: LeadApi merge skipped"
+        run: python3 scripts/merge_leads.py
 
       - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |
