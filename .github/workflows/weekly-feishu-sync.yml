@@ -2,9 +2,6 @@ name: Weekly Feishu Sync
 
 on:
   workflow_dispatch:
-  schedule:
-    # 每周一 09:30 Asia/Shanghai 兜底（在周报 workflow 之后）
-    - cron: "30 1 * * 1"
   workflow_run:
     workflows: ["Weekly GA4 Tables"]
     types: [completed]
