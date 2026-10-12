@@ -27,6 +27,8 @@ CORE_SLUGS = {
     "indoor-outdoor-positioning", "environment-monitoring",
     "building-energy-management", "campus-safety-management",
     "building-energy-retrofit", "hazard-response",
+    "off-grid-mesh-communication", "acoustic-audio-ai",
+    "home-building-automation",
 }
 
 
