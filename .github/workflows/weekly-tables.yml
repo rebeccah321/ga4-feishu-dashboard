@@ -2,7 +2,10 @@ name: Weekly GA4 Tables
 
 on:
   schedule:
+    # 每周一北京时间 9:00 = UTC 周一 1:00（主调度；GitHub 可能延迟数小时）
     - cron: '0 1 * * 1'
+    # 兜底：若主调度被跳过/延迟过久，周一 14:00 北京时间再补一次；已生成本周则自动跳过
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -15,6 +18,28 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
+
+      - name: Skip if this week already generated (scheduled runs only)
+        if: github.event_name == 'schedule'
+        run: |
+          python3 - <<'PY'
+          import csv, datetime as dt, os
+          p = 'data/analysis/方案增长总览.csv'
+          if not os.path.exists(p):
+              print('Proceed: no existing tables')
+              raise SystemExit(0)
+          rows = list(csv.DictReader(open(p, encoding='utf-8')))
+          if not rows:
+              print('Proceed: empty tables')
+              raise SystemExit(0)
+          today = dt.date.today()
+          this_sunday = today - dt.timedelta(days=today.weekday() + 1)
+          latest = rows[-1]['week_ending'].strip()
+          if latest >= this_sunday.isoformat():
+              print(f'Skip: latest week {latest} already generated for {this_sunday.isoformat()}')
+              raise SystemExit(0)
+          print(f'Proceed: latest week {latest} < expected {this_sunday.isoformat()}')
+          PY
 
       - name: Set up Python
         uses: actions/setup-python@v5
