@@ -1,9 +1,24 @@
 {
-  "generated_at": "2026-10-05T06:38:38+00:00",
+  "generated_at": "2026-10-12T02:20:05+00:00",
   "source": "ga4_weekly_tables",
   "property": "502086217",
-  "latest_week_ending": "2026-10-04",
+  "latest_week_ending": "2026-10-11",
   "overview": [
+    {
+      "week_ending": "2026-10-11",
+      "solution_users": 761,
+      "solution_pv": 845,
+      "solution_sessions": 876,
+      "key_events": 0,
+      "key_event_conv_rate": 0,
+      "solution_wow_pct": -3.5,
+      "cta_clicks": 48,
+      "cta_click_rate": 5.68,
+      "social_impressions": null,
+      "form_submits": 0,
+      "fastest_growing_solution": "智能仓储管理 (+28.2%)",
+      "top_traffic_solution": "智慧农业感知"
+    },
     {
       "week_ending": "2026-10-04",
       "solution_users": 794,
@@ -191,31 +206,196 @@
       "solution_sessions": 814,
       "key_events": 2,
       "key_event_conv_rate": 0.0025,
-      "solution_wow_pct": 2.5,
+      "solution_wow_pct": null,
       "cta_clicks": 101,
       "cta_click_rate": 12.15,
       "social_impressions": null,
       "form_submits": 2,
-      "fastest_growing_solution": "智能仓储管理 (+164.2%)",
-      "top_traffic_solution": "语音采集分析"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_users": 708,
-      "solution_pv": 811,
-      "solution_sessions": 836,
-      "key_events": 5,
-      "key_event_conv_rate": 0.006,
-      "solution_wow_pct": null,
-      "cta_clicks": 61,
-      "cta_click_rate": 7.52,
-      "social_impressions": null,
-      "form_submits": 6,
       "fastest_growing_solution": null,
       "top_traffic_solution": "语音采集分析"
     }
   ],
   "detail": [
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智慧农业感知",
+      "landing_pv": 197,
+      "users": 197,
+      "sessions": 211,
+      "avg_eng_s": 9.5,
+      "engagement_rate_pct": 20.38,
+      "top_channel": "Direct",
+      "cta_clicks": 12,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -6.2
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "语音采集分析",
+      "landing_pv": 140,
+      "users": 125,
+      "sessions": 141,
+      "avg_eng_s": 28.2,
+      "engagement_rate_pct": 54.61,
+      "top_channel": "Unassigned",
+      "cta_clicks": 3,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": 10.2
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智能视频分析",
+      "landing_pv": 94,
+      "users": 75,
+      "sessions": 88,
+      "avg_eng_s": 40.1,
+      "engagement_rate_pct": 79.55,
+      "top_channel": "Direct",
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": 17.5
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智慧畜牧",
+      "landing_pv": 85,
+      "users": 65,
+      "sessions": 91,
+      "avg_eng_s": 40.7,
+      "engagement_rate_pct": 49.45,
+      "top_channel": "Direct",
+      "cta_clicks": 12,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -1.2
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "楼宇能源管理",
+      "landing_pv": 71,
+      "users": 66,
+      "sessions": 74,
+      "avg_eng_s": 27.8,
+      "engagement_rate_pct": 54.05,
+      "top_channel": "Direct",
+      "cta_clicks": 3,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": 16.4
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智能仓储管理",
+      "landing_pv": 50,
+      "users": 42,
+      "sessions": 49,
+      "avg_eng_s": 80.7,
+      "engagement_rate_pct": 69.39,
+      "top_channel": "Direct",
+      "cta_clicks": 6,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": 28.2
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "环境监测",
+      "landing_pv": 47,
+      "users": 40,
+      "sessions": 49,
+      "avg_eng_s": 18.3,
+      "engagement_rate_pct": 73.47,
+      "top_channel": "Direct",
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -19
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "对话式语音AI",
+      "landing_pv": 45,
+      "users": 46,
+      "sessions": 51,
+      "avg_eng_s": 35.7,
+      "engagement_rate_pct": 60.78,
+      "top_channel": "Direct",
+      "cta_clicks": 4,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -35.7
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "校园安全管理",
+      "landing_pv": 41,
+      "users": 35,
+      "sessions": 41,
+      "avg_eng_s": 12.3,
+      "engagement_rate_pct": 56.1,
+      "top_channel": "Direct",
+      "cta_clicks": 4,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -22.6
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "室内外定位",
+      "landing_pv": 30,
+      "users": 28,
+      "sessions": 31,
+      "avg_eng_s": 20.7,
+      "engagement_rate_pct": 74.19,
+      "top_channel": "Direct",
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -6.2
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "应急响应",
+      "landing_pv": 23,
+      "users": 24,
+      "sessions": 29,
+      "avg_eng_s": 34.8,
+      "engagement_rate_pct": 75.86,
+      "top_channel": "Direct",
+      "cta_clicks": 2,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": -43.9
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "楼宇节能改造",
+      "landing_pv": 22,
+      "users": 18,
+      "sessions": 21,
+      "avg_eng_s": 30.6,
+      "engagement_rate_pct": 71.43,
+      "top_channel": "Direct",
+      "cta_clicks": 2,
+      "form_submits": 0,
+      "key_events": 0,
+      "data_status": "GA4+LeadApi已接入",
+      "wow_pct": 15.8
+    },
     {
       "week_ending": "2026-10-04",
       "solution_name": "智慧农业感知",
@@ -2389,7 +2569,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -6.8
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2404,7 +2584,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": 164.2
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2419,7 +2599,7 @@
       "form_submits": 1,
       "key_events": 1,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": 0
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2434,7 +2614,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -8.7
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2449,7 +2629,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": 29.7
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2464,7 +2644,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -28.3
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2479,7 +2659,7 @@
       "form_submits": 1,
       "key_events": 1,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -4.7
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2494,7 +2674,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -9.3
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2509,7 +2689,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -2.7
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2524,7 +2704,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -8.6
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2539,7 +2719,7 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -45.1
+      "wow_pct": null
     },
     {
       "week_ending": "2026-07-12",
@@ -2554,190 +2734,142 @@
       "form_submits": 0,
       "key_events": 0,
       "data_status": "GA4+LeadApi已接入",
-      "wow_pct": -41.7
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "语音采集分析",
-      "landing_pv": 192,
-      "users": 163,
-      "sessions": 194,
-      "avg_eng_s": 25,
-      "engagement_rate_pct": 57.73,
-      "top_channel": "Unassigned",
-      "cta_clicks": 4,
-      "form_submits": 2,
-      "key_events": 2,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "对话式语音AI",
-      "landing_pv": 105,
-      "users": 80,
-      "sessions": 100,
-      "avg_eng_s": 46.6,
-      "engagement_rate_pct": 71.0,
-      "top_channel": "Direct",
-      "cta_clicks": 12,
-      "form_submits": 3,
-      "key_events": 3,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智慧农业感知",
-      "landing_pv": 92,
-      "users": 74,
-      "sessions": 83,
-      "avg_eng_s": 53.7,
-      "engagement_rate_pct": 69.88,
-      "top_channel": "Direct",
-      "cta_clicks": 6,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智慧畜牧",
-      "landing_pv": 64,
-      "users": 55,
-      "sessions": 70,
-      "avg_eng_s": 16.6,
-      "engagement_rate_pct": 48.57,
-      "top_channel": "Direct",
-      "cta_clicks": 7,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智能视频分析",
-      "landing_pv": 60,
-      "users": 55,
-      "sessions": 67,
-      "avg_eng_s": 28.4,
-      "engagement_rate_pct": 65.67,
-      "top_channel": "Direct",
-      "cta_clicks": 7,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智能仓储管理",
-      "landing_pv": 53,
-      "users": 53,
-      "sessions": 57,
-      "avg_eng_s": 40.1,
-      "engagement_rate_pct": 73.68,
-      "top_channel": "Direct",
-      "cta_clicks": 10,
-      "form_submits": 1,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "应急响应",
-      "landing_pv": 51,
-      "users": 47,
-      "sessions": 56,
-      "avg_eng_s": 28.8,
-      "engagement_rate_pct": 60.71,
-      "top_channel": "Direct",
-      "cta_clicks": 4,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "室内外定位",
-      "landing_pv": 43,
-      "users": 41,
-      "sessions": 52,
-      "avg_eng_s": 27.8,
-      "engagement_rate_pct": 63.46,
-      "top_channel": "Direct",
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "楼宇能源管理",
-      "landing_pv": 43,
-      "users": 41,
-      "sessions": 43,
-      "avg_eng_s": 26.2,
-      "engagement_rate_pct": 62.79,
-      "top_channel": "Direct",
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "环境监测",
-      "landing_pv": 37,
-      "users": 35,
-      "sessions": 44,
-      "avg_eng_s": 47,
-      "engagement_rate_pct": 72.73,
-      "top_channel": "Direct",
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "楼宇节能改造",
-      "landing_pv": 36,
-      "users": 35,
-      "sessions": 37,
-      "avg_eng_s": 53,
-      "engagement_rate_pct": 72.97,
-      "top_channel": "Direct",
-      "cta_clicks": 0,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
-      "wow_pct": null
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "校园安全管理",
-      "landing_pv": 35,
-      "users": 29,
-      "sessions": 33,
-      "avg_eng_s": 38.7,
-      "engagement_rate_pct": 75.76,
-      "top_channel": "Direct",
-      "cta_clicks": 2,
-      "form_submits": 0,
-      "key_events": 0,
-      "data_status": "GA4+LeadApi已接入",
       "wow_pct": null
     }
   ],
   "funnel": [
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智慧农业感知",
+      "page_pv": 197,
+      "sessions": 211,
+      "cta_clicks": 12,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 6.09,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "语音采集分析",
+      "page_pv": 140,
+      "sessions": 141,
+      "cta_clicks": 3,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 2.14,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智能视频分析",
+      "page_pv": 94,
+      "sessions": 88,
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 0,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智慧畜牧",
+      "page_pv": 85,
+      "sessions": 91,
+      "cta_clicks": 12,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 14.12,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "楼宇能源管理",
+      "page_pv": 71,
+      "sessions": 74,
+      "cta_clicks": 3,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 4.23,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "智能仓储管理",
+      "page_pv": 50,
+      "sessions": 49,
+      "cta_clicks": 6,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 12,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "环境监测",
+      "page_pv": 47,
+      "sessions": 49,
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 0,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "对话式语音AI",
+      "page_pv": 45,
+      "sessions": 51,
+      "cta_clicks": 4,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 8.89,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "校园安全管理",
+      "page_pv": 41,
+      "sessions": 41,
+      "cta_clicks": 4,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 9.76,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "室内外定位",
+      "page_pv": 30,
+      "sessions": 31,
+      "cta_clicks": 0,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 0,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "应急响应",
+      "page_pv": 23,
+      "sessions": 29,
+      "cta_clicks": 2,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 8.7,
+      "data_status": "GA4+LeadApi已接入"
+    },
+    {
+      "week_ending": "2026-10-11",
+      "solution_name": "楼宇节能改造",
+      "page_pv": 22,
+      "sessions": 21,
+      "cta_clicks": 2,
+      "form_submits": 0,
+      "add_to_cart": null,
+      "pv_to_cta_rate": 9.09,
+      "data_status": "GA4+LeadApi已接入"
+    },
     {
       "week_ending": "2026-10-04",
       "solution_name": "智慧农业感知",
@@ -4452,138 +4584,6 @@
       "form_submits": 0,
       "add_to_cart": null,
       "pv_to_cta_rate": 9.52,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "语音采集分析",
-      "page_pv": 192,
-      "sessions": 194,
-      "cta_clicks": 4,
-      "form_submits": 2,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 2.08,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "对话式语音AI",
-      "page_pv": 105,
-      "sessions": 100,
-      "cta_clicks": 12,
-      "form_submits": 3,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 11.43,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智慧农业感知",
-      "page_pv": 92,
-      "sessions": 83,
-      "cta_clicks": 6,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 6.52,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智慧畜牧",
-      "page_pv": 64,
-      "sessions": 70,
-      "cta_clicks": 7,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 10.94,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智能视频分析",
-      "page_pv": 60,
-      "sessions": 67,
-      "cta_clicks": 7,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 11.67,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "智能仓储管理",
-      "page_pv": 53,
-      "sessions": 57,
-      "cta_clicks": 10,
-      "form_submits": 1,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 18.87,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "应急响应",
-      "page_pv": 51,
-      "sessions": 56,
-      "cta_clicks": 4,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 7.84,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "室内外定位",
-      "page_pv": 43,
-      "sessions": 52,
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 6.98,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "楼宇能源管理",
-      "page_pv": 43,
-      "sessions": 43,
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 6.98,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "环境监测",
-      "page_pv": 37,
-      "sessions": 44,
-      "cta_clicks": 3,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 8.11,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "楼宇节能改造",
-      "page_pv": 36,
-      "sessions": 37,
-      "cta_clicks": 0,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 0,
-      "data_status": "GA4+LeadApi已接入"
-    },
-    {
-      "week_ending": "2026-07-05",
-      "solution_name": "校园安全管理",
-      "page_pv": 35,
-      "sessions": 33,
-      "cta_clicks": 2,
-      "form_submits": 0,
-      "add_to_cart": null,
-      "pv_to_cta_rate": 5.71,
       "data_status": "GA4+LeadApi已接入"
     }
   ]
