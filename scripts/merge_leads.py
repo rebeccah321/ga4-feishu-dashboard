@@ -52,6 +52,9 @@ CORE_SLUGS = [
     "campus-safety-management",
     "building-energy-retrofit",
     "hazard-response",
+    "off-grid-mesh-communication",
+    "acoustic-audio-ai",
+    "home-building-automation",
 ]
 
 
