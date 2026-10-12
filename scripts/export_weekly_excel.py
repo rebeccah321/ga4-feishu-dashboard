@@ -126,7 +126,15 @@ def funnel_rows(payload: dict) -> list[list]:
 def main() -> None:
     payload = load()
     latest = payload.get("latest_week_ending", "unknown")
-    out_path = EXPORTS / f"Seeed周度三表_W23-W36_{latest}.xlsx"
+    weeks = payload.get("detail", [])
+    weekends = sorted({str(r.get("week_ending", "")) for r in weeks})
+    if len(weekends) >= 2:
+        first = dt.date.fromisoformat(weekends[0])
+        last = dt.date.fromisoformat(weekends[-1])
+        week_label = f"W{first.isocalendar()[1]}-W{last.isocalendar()[1]}"
+    else:
+        week_label = "周度"
+    out_path = EXPORTS / f"Seeed周度三表_{week_label}_{latest}.xlsx"
     EXPORTS.mkdir(parents=True, exist_ok=True)
 
     wb = Workbook()
