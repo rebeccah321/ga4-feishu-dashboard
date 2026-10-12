@@ -55,6 +55,9 @@ SLUG_CN = {
     "campus-safety-management": "校园安全管理",
     "building-energy-retrofit": "楼宇能源改造",
     "hazard-response": "应急响应",
+    "off-grid-mesh-communication": "离网通信",
+    "acoustic-audio-ai": "声学与音频AI",
+    "home-building-automation": "家庭与楼宇自动化",
 }
 
 # 历史记录里出现过、但已统一为 SLUG_CN 主名称的旧别名；仅在 upsert 匹配时使用。
