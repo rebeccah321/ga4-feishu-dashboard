@@ -1,6 +1,6 @@
 slug,lang,screen_page_views,active_users,sessions,avg_engagement_seconds,key_events
 acoustic-audio-ai,CN,46,39,42,32.2,0
-acoustic-audio-ai,EN,159,149,155,27.6,0
+acoustic-audio-ai,EN,159,150,155,27.6,0
 acoustic-audio-ai,JP,8,8,9,58.4,0
 ai-vision-analytics,EN,1,1,1,3.0,0
 building-energy-management,CN,55,55,60,46.6,0
@@ -32,7 +32,7 @@ https-www-seeedstudio-com-cn-post-smart-spatial-interaction,EN,1,1,1,0.0,0
 in-person-conversation-intelligence,EN,4,3,5,0.6,0
 indoor-outdoor-integrated-positioning-emergency-alert,EN,1,1,1,0.0,0
 indoor-outdoor-positioning,CN,41,44,49,39.9,0
-indoor-outdoor-positioning,EN,165,157,175,26.4,0
+indoor-outdoor-positioning,EN,165,156,175,26.4,0
 indoor-outdoor-positioning,JP,5,5,6,26.3,0
 industrial-control-automation,EN,6,4,4,22.8,0
 industrial-control-automation,JP,1,1,1,2.0,0
@@ -59,7 +59,7 @@ smart-poultry-farm-in-canada-enhancing-production-efficiency-and-animal-welfare-
 smart-restaurant,EN,3,3,3,1.3,0
 smart-retail-store,EN,6,5,6,1.2,0
 smart-spatial-interaction,EN,12,10,10,3.0,0
-smart-warehouse-management,CN,97,89,98,74.6,0
+smart-warehouse-management,CN,97,88,97,75.4,0
 smart-warehouse-management,EN,234,211,239,30.6,1
 smart-warehouse-management,JP,7,6,7,22.0,0
 surface-crack-detection-and-localization-with-seeeds-raspberry-pi-powered-reterminal,CN,1,1,1,77.0,0
