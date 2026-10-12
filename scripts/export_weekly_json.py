@@ -35,6 +35,9 @@ SLUG_DISPLAY = {
     "building-energy-retrofit": "楼宇节能改造",
     "campus-safety-management": "校园安全管理",
     "hazard-response": "应急响应",
+    "off-grid-mesh-communication": "离网通信",
+    "acoustic-audio-ai": "声学与音频AI",
+    "home-building-automation": "家庭与楼宇自动化",
 }
 
 
