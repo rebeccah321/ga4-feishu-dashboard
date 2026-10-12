@@ -45,6 +45,9 @@ SOLUTIONS = [
     "campus-safety-management",
     "building-energy-retrofit",
     "hazard-response",
+    "off-grid-mesh-communication",
+    "acoustic-audio-ai",
+    "home-building-automation",
 ]
 
 DIMS = ["date", "hostName", "sessionDefaultChannelGroup"]
@@ -202,6 +205,10 @@ def iso_date(value: str) -> dt.date:
 def date_window(args) -> tuple[str, str]:
     if args.start and args.end:
         return args.start, args.end
+    if args.start:
+        today = dt.date.today()
+        end = today - dt.timedelta(days=today.weekday() + 1)  # 最近一个已完整的周日
+        return args.start, end.isoformat()
     today = dt.date.today()
     monday = today - dt.timedelta(days=today.weekday())
     if args.include_current:
