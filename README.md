@@ -130,6 +130,10 @@ python3 scripts/render_dashboard.py
 | `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv` |
 | `05_参考设计Top3` | `最新周次 + 排名` | `data/analysis_v3/04_参考设计Top3.csv` |
 
+> 编号互不相干：本地 `data/analysis_v3/NN_*.csv` 是流水线内部编号，与飞书表编号不是一回事。
+> 例如本地 `03_页面流量明细.csv` 只是生成 01/02/04 的页面级原料（方案页全列 + 参考设计 Top3 + “其余页面”合计），**不上飞书**；
+> 飞书 `03_转化漏斗` 读的是老口径 `data/analysis/转换漏斗.csv`，飞书 `04_社媒内容表现` 不由本仓库脚本写入。
+
 > 注：飞书应用当前无“新建数据表”权限（RolePermNotAllow），`05_参考设计Top3` 需先在飞书 Base 手动新建同名空表；
 > 建好后运行 `python3 scripts/sync_weekly_feishu.py --only 05` 灌数（应用可正常建字段/写记录）。未建表时同步自动跳过 05，不影响 01/02/03。
 
