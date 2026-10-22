@@ -141,7 +141,7 @@ def main():
     for path, a in cur_agg.items():
         cat = g.final_cat(path, titles.get(path, ""), dead_now)
         sessions = a["sessions"] or 1
-        items.append({"path": path, "category": cat, "name": g.page_name(path, titles),
+        items.append({"path": path, "category": cat, "name": g.page_name(path, titles, week=end),
                       "pv": a["pv"], "users": a["users"], "sessions": a["sessions"],
                       "avg_eng_s": round(a["dur"] / sessions, 1),
                       "engagement_rate": round(min(a["eng"] / sessions, 1.0), 4)})

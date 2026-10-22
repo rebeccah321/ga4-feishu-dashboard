@@ -88,6 +88,45 @@ SLUG_CN = {
     'in-person-conversation-intelligence': '现场对话智能',
     'sensecraft-solution': 'SenseCraft工业方案',
 }
+
+# 页面类型：与站内 solutionMeta.docType 对齐（入口页指 /solutions/sensecraft-solution 这类品牌/引导页）。
+# 用于 02 单方案明细：15 场景页 + 7 技术页 + 1 入口页；
+# 场景页与技术页是站点的两层结构（技术页按 by-tech 聚合，向下链接场景页），不是重复页。
+DOC_TYPE = {
+    'smart-warehouse-management': '场景页',
+    'voicecollectionanalysis': '场景页',
+    'conversational-voice-ai': '场景页',
+    'smart-agriculture-sensing': '场景页',
+    'smart-livestock-farming': '场景页',
+    'intelligent-video-analytics': '技术页',
+    'indoor-outdoor-positioning': '技术页',
+    'environment-monitoring': '技术页',
+    'building-energy-management': '场景页',
+    'campus-safety-management': '场景页',
+    'building-energy-retrofit': '场景页',
+    'hazard-response': '场景页',
+    'off-grid-mesh-communication': '技术页',
+    'acoustic-audio-ai': '技术页',
+    'home-building-automation': '技术页',
+    'elderly-care-monitoring': '场景页',
+    'whole-home-smart-living': '场景页',
+    'parking-traffic-vision': '场景页',
+    'smart-retail-store': '场景页',
+    'industrial-control-automation': '技术页',
+    'industrial-visual-inspection': '场景页',
+    'in-person-conversation-intelligence': '场景页',
+    'sensecraft-solution': '入口页',
+}
+
+# 页面改名记录：改名发生的那一周（含）起用新名，之前的周保留旧名，不做历史追溯。
+# 生效周依据 GA4 逐日 pageTitle 实测：两页均在 2026-10-05~10-11（W41）完成中英文标题切换
+# （voicecollectionanalysis 10-08 由 "Voice Collection & Analysis" 切到门店质检定位；
+#   conversational-voice-ai 10-08 起由 "On-Device Voice AI" 切到现场/离线语音控制定位）。
+SLUG_RENAME = {
+    'voicecollectionanalysis': {'old': '语音采集分析', 'new': '门店客服质检', 'since': '2026-10-11'},
+    'conversational-voice-ai': {'old': '对话式语音AI', 'new': '离线语音控制', 'since': '2026-10-11'},
+}
+
 CATEGORY_CN = {
     "solution": "方案页",
     "refdesign": "参考设计",
@@ -175,12 +214,26 @@ def path_or_filter() -> dict:
     }
 
 
-def page_name(path: str, title_map: dict[str, str]) -> str:
+def solution_name(slug: str, week: str | None = None) -> str:
+    """方案展示名：默认取当前名；有改名记录时按周取旧名/新名（改名周起用新名）。"""
+    base = SLUG_CN.get(slug, slug)
+    rename = SLUG_RENAME.get(slug)
+    if not rename or not week:
+        return base
+    try:
+        current = dt.date.fromisoformat(str(week)).isocalendar()[:2]
+        since = dt.date.fromisoformat(rename["since"]).isocalendar()[:2]
+    except ValueError:
+        return base
+    return rename["new"] if current >= since else rename["old"]
+
+
+def page_name(path: str, title_map: dict[str, str], week: str | None = None) -> str:
     """核心页用固定中文名；其他页优先 pageTitle（剔除无效/Seeed 后缀），最后 slug 可读名。"""
     m = PATH_RE.match(path)
     slug = m.group(1) if m else None
     if slug and slug in SLUG_CN:
-        return SLUG_CN[slug]
+        return solution_name(slug, week)
     title = title_map.get(path, "").strip()
     if title and title.lower() not in ("(not set)", "not set", ""):
         title = re.sub(r"\s*\|\s*Seeed Studio.*$", "", title)
@@ -331,7 +384,7 @@ def main():
             items.append({
                 "path": path,
                 "category": cat,
-                "name": page_name(path, titles),
+                "name": page_name(path, titles, week=we),
                 "pv": a["pv"], "users": a["users"], "sessions": a["sessions"],
                 "avg_eng_s": round(a["dur"] / sessions, 1),
                 "engagement_rate": round(min(a["eng"] / sessions, 1.0), 4),

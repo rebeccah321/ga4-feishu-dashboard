@@ -17,9 +17,11 @@
   01：周次 / 截止日期 / 方案区独立访客数 / 方案区浏览PV / CTA点击量 / CTA点击率(%) /
       浏览PV周环比(%) / 流量最高方案 / 增长最快方案 / 社媒总曝光量
       （方案区整树总量：含参考设计/场景页/旧目录页，不单独列出）
-  02：最新周次 / 截止日期 / 方案名称 / 方案页浏览PV / 独立访客数 / 会话数 /
+  02：最新周次 / 截止日期 / 方案名称 / 页面类型 / 方案页浏览PV / 独立访客数 / 会话数 /
       平均停留时长(秒) / 参与率 / 主要流量来源 / CTA点击量 / leads / 周环比(%) / 数据状态
       （按实际情况：方案页首次出现流量那一周才起行，之后每周一行；没上线/没出现的方案不出行。历史 12 方案 → 新增方案按上线周逐步增加）
+      （页面类型 = 场景页/技术页/入口页，与站内 solutionMeta.docType 对齐；
+        改名页（门店客服质检、离线语音控制）从改名生效周起换名，之前的周保留旧名）
   04：最新周次 / 截止日期 / 排名 / 页面名称（统一短中文名）/ 浏览PV / 数据状态
       （参考设计单页每周流量前三；只计入 01 总量，不进 02。
        名称按路径登记短中文名（REF_NAME_CN），统一语言、统一长度；未登记页面退化并告警；
@@ -266,7 +268,7 @@ def main():
             except (KeyError, TypeError, ValueError):
                 continue
 
-    o2 = [["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数", "会话数",
+    o2 = [["最新周次", "截止日期", "方案名称", "页面类型", "方案页浏览PV", "独立访客数", "会话数",
            "平均停留时长(秒)", "参与率", "主要流量来源", "CTA点击量", "leads", "周环比(%)", "数据状态"]]
     live = set()
     for we in weeks_sorted:
@@ -276,14 +278,15 @@ def main():
             if slug not in live:
                 continue
             key = "/solutions/" + slug
-            name = v3.SLUG_CN.get(slug, slug)
+            name = v3.solution_name(slug, we)
+            doc_type = v3.DOC_TYPE.get(slug, "")
             lead = leads_by_key.get((we, slug), 0)
             r = det_by_key.get((we, slug))
             if r is None:
-                o2.append(["W%d" % week_no(we), we, name, 0, 0, 0, "", "",
+                o2.append(["W%d" % week_no(we), we, name, doc_type, 0, 0, 0, "", "",
                            "Unassigned", 0, lead, "", status])
             else:
-                o2.append(["W%d" % week_no(we), we, name,
+                o2.append(["W%d" % week_no(we), we, name, doc_type,
                            round(num(r["浏览PV"])), round(num(r["访客数"])), round(num(r["会话数"])),
                            r["平均停留时长(秒)"], r["参与率"],
                            top_channel.get((we, key), "Unassigned"),

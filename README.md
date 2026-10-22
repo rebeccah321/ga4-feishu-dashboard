@@ -84,7 +84,7 @@ python3 scripts/render_dashboard.py
 | `generate_tables_v3.py` | 方案区整树周表（`/solutions/`、`/solutions-by-scenarios`、旧目录树）：01 方案区总览 / 02 流量类别 / 03 页面流量明细 → `data/analysis_v3/` |
 | `partial_week_v3.py` | “本周至今”部分周表（环比=上周同期）→ `data/analysis_v3_partial/` |
 | `merge_leads.py` | LeadApi 线索回填：只统计 23 个方案页（与 `generate_tables_v3.CORE_SLUGS` 同源）的去重 submission_id → `data/leads/leads_weekly.csv` |
-| `build_v3_tables.py` | 合成对外表 → `01_方案增长总览.csv`、`02_单方案流量明细.csv`（按实际方案数：方案首次出现流量那一周起行 + `leads` 列）、`04_参考设计Top3.csv`（每周流量前三；`--no-partial` 供 CI 只出完整周） |
+| `build_v3_tables.py` | 合成对外表 → `01_方案增长总览.csv`、`02_单方案流量明细.csv`（按实际方案数：方案首次出现流量那一周起行 + `页面类型` + `leads` 列）、`04_参考设计Top3.csv`（每周流量前三；`--no-partial` 供 CI 只出完整周） |
 | `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 沿用旧漏斗表 |
 | `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
 
@@ -93,8 +93,10 @@ python3 scripts/render_dashboard.py
 - 独立访客/会话 = 整树逐周去重（无 date 维度的 totals 查询）；
 - 404 死页（多语言 Not Found 标题）归入“其他页面”，只计入总数不列明细；
 - CTA = `click_solution_link` + `click_contact_expert`。
-- 02 表按实际情况出行：方案页（共 23 个候选 = 15 个方案 + 8 个 by-tech 落地页）在**首次出现流量那一周**才起行，之后每周一行，
+- 02 表按实际情况出行：方案页（共 23 个候选 = **15 个场景页 + 7 个技术页 + 1 个入口页**，与站内 `solutionMeta.docType` 对齐）在**首次出现流量那一周**才起行，之后每周一行，
   尚未上线/尚未出现的方案不出行（历史行数 12 → 13 → 14 → 15 → 21 → 22 → 23）；行数会变，改结构后用 `sync_weekly_feishu.py --prune` 清掉飞书里多出来的旧行；
+- 02 表 `页面类型` 列（场景页/技术页/入口页）：场景页与技术页是站点两层结构（技术页按 by-tech 聚合、向下链接场景页），不是重复页；入口页指 `/solutions/sensecraft-solution` 这类品牌/引导页；
+- 页面改名按周处理：改名**发生的那一周**起用新名，之前的周保留旧名（`generate_tables_v3.SLUG_RENAME`）。当前记录：`voicecollectionanalysis` 语音采集分析 → **门店客服质检**、`conversational-voice-ai` 对话式语音AI → **离线语音控制**，均自 W41（2026-10-11）起（依据 GA4 逐日 pageTitle 实测）；
 - 参考设计等其他页面只计入 01 总量、不单独列为方案，其每周流量前三列在 04/05 表；`leads` 只统计这些方案页来源的表单提交。
 
 飞书字段名变化（2026-10）：
@@ -109,6 +111,7 @@ python3 scripts/render_dashboard.py
 | 02 | 平均停留时长（秒） | 平均停留时长(秒) |
 | 02 | 周环比 | 周环比(%) |
 | 02 | leads | 已恢复每周更新：23 个方案页的 LeadApi 表单提交（此前"历史全 0"为误判，数据一直存在） |
+| 02 | （2026-10 新增列）页面类型 | 场景页 / 技术页 / 入口页（文本字段；`migrate_feishu_fields.py` 自动补字段） |
 
 ## 需要配置的 GitHub Secrets
 

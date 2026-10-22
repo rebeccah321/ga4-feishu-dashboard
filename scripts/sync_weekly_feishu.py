@@ -73,10 +73,12 @@ SLUG_CN = {
 
 # 历史记录里出现过、但已统一为 SLUG_CN 主名称的旧别名；仅在 upsert 匹配时使用。
 SLUG_ALIASES = {
-    "voicecollectionanalysis": ["语音采集分析"],
+    "voicecollectionanalysis": ["语音采集分析", "门店客服质检"],
     "smart-agriculture-sensing": ["智慧农业感知"],
     "smart-livestock-farming": ["智慧畜牧"],
     "building-energy-retrofit": ["楼宇节能改造"],
+    # 2026-10-05~10-11（W41）改名后的新名；用于把旧名行升级为新名而不是重复建档
+    "conversational-voice-ai": ["离线语音控制"],
 }
 
 NAME_TO_SLUG = {name: slug for slug, name in SLUG_CN.items()}
@@ -89,7 +91,7 @@ REQUIRED_FIELDS = {
     "01": ["周次", "截止日期", "方案区独立访客数", "方案区浏览PV",
            "CTA点击量", "CTA点击率(%)", "浏览PV周环比(%)",
            "流量最高方案", "增长最快方案"],
-    "02": ["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数",
+    "02": ["最新周次", "截止日期", "方案名称", "页面类型", "方案页浏览PV", "独立访客数",
            "会话数", "平均停留时长(秒)", "参与率", "主要流量来源",
            "CTA点击量", "leads", "周环比(%)", "数据状态"],
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
@@ -112,6 +114,7 @@ FIELD_ALIASES = {
     },
     "02": {
         "方案名称": ["solution名称"],
+        "页面类型": ["页面类别"],
         "方案页浏览PV": ["落地页访问量"],
         "会话数": ["Session", "session"],
         "平均停留时长(秒)": ["平均停留时长（秒）"],
@@ -405,6 +408,7 @@ def build_detail(rows):
             "最新周次": str(row.get("最新周次", "")).strip() or week_label(week),
             "截止日期": week,
             "方案名称": to_text(row.get("方案名称"), ""),
+            "页面类型": to_text(row.get("页面类型"), ""),
             "方案页浏览PV": to_number(row.get("方案页浏览PV"), 0),
             "独立访客数": to_number(row.get("独立访客数"), 0),
             "会话数": to_number(row.get("会话数"), 0),
