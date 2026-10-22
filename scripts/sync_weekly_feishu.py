@@ -15,7 +15,7 @@ upsert key：
   - 01：周次
   - 02：最新周次 + 方案名称
   - 03：最新周次 + 方案名称
-  - 05：周次 + 排名（字段：周次 / 截止日期 / 排名 / 页面名称（短名）/ 浏览PV / 数据状态）
+  - 05：最新周次 + 排名（字段：最新周次 / 截止日期 / 排名 / 页面名称（短中文名）/ 浏览PV / 数据状态）
 
 --prune：按 CSV 为准，删除飞书表里多出来的旧记录（键不在本次 CSV 内），
          用于 02 这类行数会随"实际方案数"变化的表；本轮未被写入的记录（含同键重复行、
@@ -95,7 +95,7 @@ REQUIRED_FIELDS = {
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
            "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率(%)", "表单转化率(%)",
            "数据状态"],
-    "05": ["周次", "截止日期", "排名", "页面名称", "浏览PV", "数据状态"],
+    "05": ["最新周次", "截止日期", "排名", "页面名称", "浏览PV", "数据状态"],
 }
 
 # 当飞书表的旧字段名尚未迁移时，按优先级回退；新名优先。
@@ -126,7 +126,7 @@ FIELD_ALIASES = {
         "表单转化率(%)": ["表单转化率", "CTA->表单转化率"],
     },
     "05": {
-        "周次": ["最新周次"],
+        "最新周次": ["周次", "周"],
     },
 }
 
@@ -206,8 +206,8 @@ def request_json(method, url, token=None, body=None, retries=3):
         code = payload.get("code")
         if code == 0:
             return payload
-        # Feishu 偶发内部错误可重试
-        if code in {2200, 500} and attempt < retries:
+        # Feishu 偶发内部错误可重试（1663 = internal error，偶发）
+        if code in {2200, 500, 1663} and attempt < retries:
             last_error = f"Feishu code={code}: {payload.get('msg')}"
             time.sleep(1.5 * attempt)
             continue
@@ -459,7 +459,7 @@ def build_refdesign(rows):
     for row in rows:
         week = str(row.get("截止日期", "")).strip()
         output.append({
-            "周次": str(row.get("周次") or row.get("最新周次", "")).strip() or week_label(week),
+            "最新周次": str(row.get("最新周次") or row.get("周次", "")).strip() or week_label(week),
             "截止日期": week,
             "排名": to_number(row.get("排名"), 0),
             "页面名称": to_text(row.get("页面名称"), ""),
@@ -478,7 +478,7 @@ def key_for(table_key, row):
         slug = NAME_TO_SLUG.get(name, name)
         return f"{week}|{slug}"
     if table_key == "05":
-        week = str(row.get("周次") or row.get("最新周次", "")).strip()
+        week = str(row.get("最新周次") or row.get("周次", "")).strip()
         rank = str(row.get("排名", "")).strip()
         return f"{week}|{rank}"
     return ""

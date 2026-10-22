@@ -20,9 +20,9 @@
   02：最新周次 / 截止日期 / 方案名称 / 方案页浏览PV / 独立访客数 / 会话数 /
       平均停留时长(秒) / 参与率 / 主要流量来源 / CTA点击量 / leads / 周环比(%) / 数据状态
       （按实际情况：方案页首次出现流量那一周才起行，之后每周一行；没上线/没出现的方案不出行。历史 12 方案 → 新增方案按上线周逐步增加）
-  04：周次 / 截止日期 / 排名 / 页面名称（短名）/ 浏览PV / 数据状态
+  04：最新周次 / 截止日期 / 排名 / 页面名称（统一短中文名）/ 浏览PV / 数据状态
       （参考设计单页每周流量前三；只计入 01 总量，不进 02。
-       名称只留可识别的短名（去掉 "| 副标题" 与尾部残缺的 Reference Design 片段）；
+       名称按路径登记短中文名（REF_NAME_CN），统一语言、统一长度；未登记页面退化并告警；
        指标只留浏览PV；数据状态体现是否为完整周）
 """
 from __future__ import annotations
@@ -58,7 +58,7 @@ REF_SUBPAGE = re.compile(r"^/solutions/reference-designs/[^/]+/([^/]+)/?$")
 
 
 def short_ref_name(name: str, path: str = "", limit: int = 42) -> str:
-    """参考设计展示名：可识别即可，不追求全称。"""
+    """参考设计展示名：可识别即可，不追求全称（未登记页面的兜底逻辑）。"""
     text = re.split(r"\s*[|｜]\s*", str(name).strip())[0]
     # GA4 标题被截断后会留下 “Reference D / Referen” 这类残片，直接去掉
     text = re.sub(r"\s*ref(?:erence)?(?:\s+des(?:ign)?)?\w*.*$", "", text, flags=re.I)
@@ -72,6 +72,41 @@ def short_ref_name(name: str, path: str = "", limit: int = 42) -> str:
     if m:
         text += "（部署页）" if m.group(1).startswith("deploy") else "（子页）"
     return text
+
+
+# 参考设计展示名：统一用短中文名（同一路径的英文标题在不同时期会变，所以按路径登记）
+REF_NAME_CN = {
+    "/solutions/reference-designs/conversational_voice_ai": "端侧对话式语音AI",
+    "/solutions/reference-designs/edge-anpr-plate-recognition": "边缘车牌识别",
+    "/solutions/reference-designs/edge_security": "边缘安防",
+    "/solutions/reference-designs/fall_detection": "端侧跌倒检测",
+    "/solutions/reference-designs/indoor_positioning_ble_lorawan": "园区蓝牙信标定位",
+    "/solutions/reference-designs/industrial_security_jetson": "Jetson工业安防",
+    "/solutions/reference-designs/jetson_voice_assistant": "本地语音服务",
+    "/solutions/reference-designs/reachy_claw_voice_robot": "桌面对话机器人",
+    "/solutions/reference-designs/recamera_ecosystem": "即插即用AI相机",
+    "/solutions/reference-designs/recamera_heatmap_grafana": "门店客流热力图",
+    "/solutions/reference-designs/recamera_sheep_counter_lora": "LoRa羊只计数",
+    "/solutions/reference-designs/respeaker_flex_soarm": "语音控制机械臂",
+    "/solutions/reference-designs/retail_voice": "零售语音",
+    "/solutions/reference-designs/smart_warehouse": "语音仓库管理",
+    "/solutions/reference-designs/unmanned_store_access": "无人门店门禁",
+    "/solutions/reference-designs/voice_robot_lekiwi": "LeKiwi语音机器人",
+}
+
+
+def ref_display_name(path: str, name: str) -> str:
+    """已登记的参考设计用短中文名；子页带（部署页）标记；未登记的退化并提示补录。"""
+    p = str(path).rstrip("/")
+    if p in REF_NAME_CN:
+        return REF_NAME_CN[p]
+    m = REF_SUBPAGE.match(p)
+    if m:
+        base = REF_NAME_CN.get(p.rsplit("/", 1)[0])
+        if base:
+            return base + ("（部署页）" if m.group(1).startswith("deploy") else "（子页）")
+    print(f"WARNING: 参考设计未登记中文名，暂用英文短名: {path}", flush=True)
+    return short_ref_name(name, path)
 
 
 def num(x):
@@ -262,13 +297,13 @@ def main():
         if r["流量类别"] == "参考设计" and not NOT_FOUND_NAME.search(r["页面名称"]):
             rd_by_week[r["week_ending"]].append(r)
 
-    o4 = [["周次", "截止日期", "排名", "页面名称", "浏览PV", "数据状态"]]
+    o4 = [["最新周次", "截止日期", "排名", "页面名称", "浏览PV", "数据状态"]]
     for we in weeks_sorted:
         status = "本周（未完整）" if (is_partial and we == weeks_sorted[-1]) else "完整周"
         top3 = sorted(rd_by_week.get(we, []), key=lambda r: -num(r["浏览PV"]))[:3]
         for idx, r in enumerate(top3, 1):
             o4.append(["W%d" % week_no(we), we, idx,
-                       short_ref_name(r["页面名称"], r["页面路径"]),
+                       ref_display_name(r["页面路径"], r["页面名称"]),
                        round(num(r["浏览PV"])), status])
 
     OUT_DATA.mkdir(parents=True, exist_ok=True)
