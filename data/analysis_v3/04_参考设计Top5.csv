@@ -1,0 +1,104 @@
+﻿最新周次,截止日期,排名,页面名称,页面路径,浏览PV,访客数,会话数,数据状态
+W23,2026-06-07,1,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,16,18,19,已确认
+W23,2026-06-07,2,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,14,11,15,已确认
+W23,2026-06-07,3,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,9,10,12,已确认
+W23,2026-06-07,4,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,9,6,9,已确认
+W23,2026-06-07,5,HVAC Automation Control,/solutions/reference-designs/smart_hvac_control,9,10,11,已确认
+W24,2026-06-14,1,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,26,18,23,已确认
+W24,2026-06-14,2,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,20,14,18,已确认
+W24,2026-06-14,3,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,14,14,14,已确认
+W24,2026-06-14,4,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13,14,14,已确认
+W24,2026-06-14,5,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,12,10,11,已确认
+W25,2026-06-21,1,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,27,22,31,已确认
+W25,2026-06-21,2,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,12,11,13,已确认
+W25,2026-06-21,3,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,11,8,9,已确认
+W25,2026-06-21,4,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,11,11,12,已确认
+W25,2026-06-21,5,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,10,9,9,已确认
+W26,2026-06-28,1,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,23,21,21,已确认
+W26,2026-06-28,2,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,18,16,20,已确认
+W26,2026-06-28,3,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,11,11,14,已确认
+W26,2026-06-28,4,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,8,7,9,已确认
+W27,2026-07-05,1,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,32,24,31,已确认
+W27,2026-07-05,2,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,14,11,16,已确认
+W27,2026-07-05,3,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11,10,13,已确认
+W27,2026-07-05,4,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,10,8,9,已确认
+W27,2026-07-05,5,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,10,8,12,已确认
+W28,2026-07-12,1,Smart Retail People Flow Heatmap,/solutions/reference-designs/recamera_heatmap_grafana,21,14,21,已确认
+W28,2026-07-12,2,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,15,10,16,已确认
+W28,2026-07-12,3,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,15,15,18,已确认
+W28,2026-07-12,4,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,15,14,16,已确认
+W28,2026-07-12,5,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,10,9,9,已确认
+W29,2026-07-19,1,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,25,15,22,已确认
+W29,2026-07-19,2,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,15,12,15,已确认
+W29,2026-07-19,3,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,13,12,15,已确认
+W29,2026-07-19,4,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,13,14,16,已确认
+W29,2026-07-19,5,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,10,11,12,已确认
+W30,2026-07-26,1,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,20,15,20,已确认
+W30,2026-07-26,2,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,17,12,16,已确认
+W30,2026-07-26,3,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,17,10,15,已确认
+W30,2026-07-26,4,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,14,7,12,已确认
+W30,2026-07-26,5,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,13,11,12,已确认
+W31,2026-08-02,1,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,24,24,24,已确认
+W31,2026-08-02,2,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,24,21,24,已确认
+W31,2026-08-02,3,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,16,13,18,已确认
+W31,2026-08-02,4,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13,9,10,已确认
+W31,2026-08-02,5,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,12,9,11,已确认
+W32,2026-08-09,1,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,24,20,24,已确认
+W32,2026-08-09,2,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,22,18,22,已确认
+W32,2026-08-09,3,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,14,13,16,已确认
+W32,2026-08-09,4,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11,6,10,已确认
+W32,2026-08-09,5,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,11,9,14,已确认
+W33,2026-08-16,1,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,70,23,31,已确认
+W33,2026-08-16,2,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,23,17,17,已确认
+W33,2026-08-16,3,Industrial Security on Jetson,/solutions/reference-designs/industrial_security_jetson,21,16,20,已确认
+W33,2026-08-16,4,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13,10,12,已确认
+W33,2026-08-16,5,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11,9,14,已确认
+W34,2026-08-23,1,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,37,14,25,已确认
+W34,2026-08-23,2,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,25,11,17,已确认
+W34,2026-08-23,3,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,20,17,21,已确认
+W34,2026-08-23,4,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,18,11,13,已确认
+W34,2026-08-23,5,Industrial Security on Jetson,/solutions/reference-designs/industrial_security_jetson,14,12,13,已确认
+W35,2026-08-30,1,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,20,14,15,已确认
+W35,2026-08-30,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,20,19,23,已确认
+W35,2026-08-30,3,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,19,13,16,已确认
+W35,2026-08-30,4,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,16,16,20,已确认
+W35,2026-08-30,5,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,12,7,11,已确认
+W36,2026-09-06,1,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,44,40,47,已确认
+W36,2026-09-06,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,26,17,21,已确认
+W36,2026-09-06,3,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,20,15,16,已确认
+W36,2026-09-06,4,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,19,19,20,已确认
+W36,2026-09-06,5,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,16,15,17,已确认
+W37,2026-09-13,1,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,30,25,32,已确认
+W37,2026-09-13,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,23,20,24,已确认
+W37,2026-09-13,3,无人门店人脸门禁参考设计 | 版本化人脸库、继电器开门、可校验审计日志,/solutions/reference-designs/unmanned_store_access,21,4,10,已确认
+W37,2026-09-13,4,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,13,13,13,已确认
+W37,2026-09-13,5,投放点垃圾分类参考设计 | 端侧物料识别 + MQTT 出口,/solutions/reference-designs/edge_waste_sorting,12,3,7,已确认
+W38,2026-09-20,1,边缘安防参考设计 | 端侧禁区入侵、越线与滞留告警,/solutions/reference-designs/edge_security,64,10,13,已确认
+W38,2026-09-20,2,零售语音参考设计 | 门店、会议、咨询对话转文字,/solutions/reference-designs/retail_voice,35,8,10,已确认
+W38,2026-09-20,3,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,33,24,33,已确认
+W38,2026-09-20,4,AI 视觉枪支检测,/solutions/reference-designs/gun_detection_frigate,27,4,8,已确认
+W38,2026-09-20,5,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,25,10,16,已确认
+W39,2026-09-27,1,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,17,16,18,已确认
+W39,2026-09-27,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,16,14,15,已确认
+W39,2026-09-27,3,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,15,14,15,已确认
+W39,2026-09-27,4,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,14,8,11,已确认
+W39,2026-09-27,5,打造空间AI智能体,/solutions/reference-designs/smart_space_assistant,14,13,16,已确认
+W40,2026-10-04,1,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,17,12,16,已确认
+W40,2026-10-04,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,15,11,15,已确认
+W40,2026-10-04,3,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,14,14,19,已确认
+W40,2026-10-04,4,打造空间AI智能体,/solutions/reference-designs/smart_space_assistant,12,12,12,已确认
+W41,2026-10-11,1,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,24,23,27,已确认
+W41,2026-10-11,2,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,20,25,27,已确认
+W41,2026-10-11,3,Campus-level BLE Beacon Positioning System — ,/solutions/reference-designs/indoor_positioning_ble_lorawan/deploy,13,12,12,已确认
+W41,2026-10-11,4,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,13,13,16,已确认
+W41,2026-10-11,5,Product Recognition Reference Design | Shelf ,/solutions/reference-designs/edge_retail_recognition,10,9,10,已确认
+W42,2026-10-18,1,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,54,42,49,已确认
+W42,2026-10-18,2,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,34,21,28,已确认
+W42,2026-10-18,3,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,17,13,21,已确认
+W42,2026-10-18,4,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,14,12,16,已确认
+W42,2026-10-18,5,零售语音参考设计 | 门店、会议、咨询对话转文字,/solutions/reference-designs/retail_voice,12,13,15,已确认
+W43,2026-10-21,1,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,22,21,23,本周（未完整）
+W43,2026-10-21,2,BLE and LoRaWAN Positioning Reference Design ,/solutions/reference-designs/indoor_positioning_ble_lorawan,9,6,6,本周（未完整）
+W43,2026-10-21,3,零售客流热力图可部署方案 | Grafana 看板,/solutions/reference-designs/recamera_heatmap_grafana,8,7,8,本周（未完整）
+W43,2026-10-21,4,Voice-Operated Warehouse Management Reference,/solutions/reference-designs/smart_warehouse,8,4,6,本周（未完整）
+W43,2026-10-21,5,端侧跌倒检测可部署方案 | 本地判定 + MQTT 告警,/solutions/reference-designs/fall_detection,8,6,9,本周（未完整）

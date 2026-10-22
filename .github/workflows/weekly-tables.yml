@@ -67,13 +67,13 @@ jobs:
       - name: Generate v3 solution-area tables (last 20 complete weeks)
         run: python3 scripts/generate_tables_v3.py --weeks 20
 
-      - name: Build new-field 01/02 tables (v3口径)
-        run: python3 scripts/build_v3_tables.py --no-partial
-
       - name: Merge LeadApi leads into weekly tables
         env:
           LEAD_SEARCH_KEY: ${{ secrets.LEAD_SEARCH_KEY }}
         run: python3 scripts/merge_leads.py
+
+      - name: Build v3 outbound tables (01/02 + 参考设计Top5, incl. leads)
+        run: python3 scripts/build_v3_tables.py --no-partial
 
       - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |

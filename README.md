@@ -66,12 +66,12 @@ python3 scripts/render_dashboard.py
 - `Weekly GA4 Tables` 成功后自动触发（或每周一 09:30 兜底）
 - 自动识别并写入已有的 `01_方案增长总览`、`02_单方案流量明细`、`03_转化漏斗`
 - 不创建、不重命名表；按 `周次`/`周次+方案名称` upsert
-- 01/02 读取 v3 口径对外表（见下节），03 沿用 `data/analysis/转换漏斗.csv`
+- 01/02/05 读取 v3 口径对外表（见下节），03 沿用 `data/analysis/转换漏斗.csv`
 
 ### 周报表与飞书拉取（`weekly-tables.yml`）
 - 每周一 09:00 Asia/Shanghai 拉取 42 天数据并生成三张周度 CSV
-- 追加生成 v3 方案区口径：`generate_tables_v3.py --weeks 20` + `build_v3_tables.py --no-partial`
-  （输出 `data/analysis_v3/`，其中 `01_方案增长总览.csv`、`02_单方案流量明细.csv` 为飞书 01/02 表数据源）
+- 追加生成 v3 方案区口径：`generate_tables_v3.py --weeks 20` → `merge_leads.py` → `build_v3_tables.py --no-partial`
+  （顺序不能颠倒：先拉线索再合成对外表；输出 `data/analysis_v3/`，`01_方案增长总览.csv`、`02_单方案流量明细.csv`、`04_参考设计Top5.csv` 为飞书 01/02/05 表数据源）
 - 导出 `dashboard/data/weekly/weekly_tables.json`（完整三表）和 `weekly_summary.json`（单条方案增长汇总）
 - 提交到 GitHub Pages，供飞书多维表格自动化每周一 09:10 拉取
 
@@ -83,8 +83,9 @@ python3 scripts/render_dashboard.py
 |------|------|
 | `generate_tables_v3.py` | 方案区整树周表（`/solutions/`、`/solutions-by-scenarios`、旧目录树）：01 方案区总览 / 02 流量类别 / 03 页面流量明细 → `data/analysis_v3/` |
 | `partial_week_v3.py` | “本周至今”部分周表（环比=上周同期）→ `data/analysis_v3_partial/` |
-| `build_v3_tables.py` | 合成对外两张表（旧表结构 + 新字段名）→ `data/analysis_v3/01_方案增长总览.csv`、`02_单方案流量明细.csv`（`--no-partial` 供 CI 只出完整周） |
-| `sync_weekly_feishu.py` | 飞书同步：01/02 读 v3 对外表，03 沿用旧漏斗表 |
+| `merge_leads.py` | LeadApi 线索回填：只统计 23 个方案页（与 `generate_tables_v3.CORE_SLUGS` 同源）的去重 submission_id → `data/leads/leads_weekly.csv` |
+| `build_v3_tables.py` | 合成对外表 → `01_方案增长总览.csv`、`02_单方案流量明细.csv`（固定 23 个方案 × 每周 + `leads` 列）、`04_参考设计Top5.csv`（每周流量前五；`--no-partial` 供 CI 只出完整周） |
+| `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 沿用旧漏斗表 |
 | `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
 
 口径要点：
@@ -92,6 +93,8 @@ python3 scripts/render_dashboard.py
 - 独立访客/会话 = 整树逐周去重（无 date 维度的 totals 查询）；
 - 404 死页（多语言 Not Found 标题）归入“其他页面”，只计入总数不列明细；
 - CTA = `click_solution_link` + `click_contact_expert`。
+- 02 表固定 23 个落地方案页（15 个方案 + 8 个 by-tech 落地页）× 每周一行，未上线/无流量补 0；
+- 参考设计等其他页面只计入 01 总量、不单独列为方案，其每周流量前五列在 04/05 表；`leads` 只统计这 23 个方案页来源的表单提交。
 
 飞书字段名变化（2026-10）：
 
@@ -104,7 +107,7 @@ python3 scripts/render_dashboard.py
 | 02 | Session | 会话数 |
 | 02 | 平均停留时长（秒） | 平均停留时长(秒) |
 | 02 | 周环比 | 周环比(%) |
-| 02 | leads | 已停用（历史值全 0），可用 `migrate_feishu_fields.py --delete-fields` 删除 |
+| 02 | leads | 已恢复每周更新：23 个方案页的 LeadApi 表单提交（此前"历史全 0"为误判，数据一直存在） |
 
 ## 需要配置的 GitHub Secrets
 
@@ -124,6 +127,10 @@ python3 scripts/render_dashboard.py
 | `01_方案增长总览` | `周次` | `data/analysis_v3/01_方案增长总览.csv`（v3 口径） |
 | `02_单方案流量明细` | `最新周次 + 方案名称` | `data/analysis_v3/02_单方案流量明细.csv`（v3 口径） |
 | `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv` |
+| `05_参考设计Top5` | `最新周次 + 排名` | `data/analysis_v3/04_参考设计Top5.csv` |
+
+> 注：飞书应用当前无“新建数据表”权限（RolePermNotAllow），`05_参考设计Top5` 需先在飞书 Base 手动新建同名空表；
+> 建好后运行 `python3 scripts/sync_weekly_feishu.py --only 05` 灌数（应用可正常建字段/写记录）。未建表时同步自动跳过 05，不影响 01/02/03。
 
 ## 认证双模式
 

@@ -3,7 +3,8 @@
 merge_leads.py — 从 LeadApi/Typesense 拉取真实线索，并合并到周度三表。
 
 口径：
-  - form_submits 只统计能映射到 12 个 solution 落地页的去重 submission_id。
+  - form_submits 只统计能映射到 23 个落地方案页（与 02 单方案流量明细一致）的去重 submission_id。
+  - 参考设计 / 场景页 / 旧目录页不属于 23 个方案页，不单独计数（只计入 01 方案区总量）。
   - lead_rate 已从对外字段中移除，不再写入表格。
   - CTA / key event 的现有列保持原样，不在本脚本中重新定义。
 
@@ -24,11 +25,15 @@ import json
 import os
 import re
 import subprocess
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import generate_tables_v3 as g  # noqa: E402
+
 ANALYSIS_DIR = ROOT / "data" / "analysis"
 LEADS_DIR = ROOT / "data" / "leads"
 
@@ -39,23 +44,8 @@ HOST = "https://rel-search.seeedstudio.com"
 CST = dt.timezone(dt.timedelta(hours=8))
 NA = "未接入"
 
-CORE_SLUGS = [
-    "smart-warehouse-management",
-    "voicecollectionanalysis",
-    "conversational-voice-ai",
-    "smart-agriculture-sensing",
-    "smart-livestock-farming",
-    "intelligent-video-analytics",
-    "indoor-outdoor-positioning",
-    "environment-monitoring",
-    "building-energy-management",
-    "campus-safety-management",
-    "building-energy-retrofit",
-    "hazard-response",
-    "off-grid-mesh-communication",
-    "acoustic-audio-ai",
-    "home-building-automation",
-]
+# 单一来源：与 02 单方案流量明细/01 单方案口径保持完全一致的 23 个方案页
+CORE_SLUGS = list(g.CORE_SLUGS)
 
 
 def week_ending(create_at: str) -> str | None:

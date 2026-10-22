@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-sync_weekly_feishu.py — 把周度三表同步到飞书已有的多维表格。
+sync_weekly_feishu.py — 把周度表同步到飞书已有的多维表格。
 
 只更新已有表，不创建、不重命名表：
   - 01_方案增长总览（v3 口径：data/analysis_v3/01_方案增长总览.csv）
   - 02_单方案流量明细（v3 口径：data/analysis_v3/02_单方案流量明细.csv）
   - 03_转化漏斗
+  - 05_参考设计Top5（v3 口径：data/analysis_v3/04_参考设计Top5.csv）
 
 字段名以 v3 口径对外表为准（方案区独立访客数/方案区浏览PV/浏览PV周环比(%)、
 方案页浏览PV/会话数/平均停留时长(秒)/周环比(%) 等），旧字段名通过 FIELD_ALIASES 回退兼容。
@@ -14,6 +15,7 @@ upsert key：
   - 01：周次
   - 02：最新周次 + 方案名称
   - 03：最新周次 + 方案名称
+  - 05：最新周次 + 排名
 
 环境变量：
   FEISHU_APP_ID
@@ -43,6 +45,7 @@ TABLES = {
     "01": "01_方案增长总览",
     "02": "02_单方案流量明细",
     "03": "03_转化漏斗",
+    "05": "05_参考设计Top5",
 }
 
 # 与飞书现有表最新周方案名称保持一致的中文名
@@ -84,10 +87,12 @@ REQUIRED_FIELDS = {
            "流量最高方案", "增长最快方案"],
     "02": ["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数",
            "会话数", "平均停留时长(秒)", "参与率", "主要流量来源",
-           "CTA点击量", "周环比(%)", "数据状态"],
+           "CTA点击量", "leads", "周环比(%)", "数据状态"],
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
            "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率(%)", "表单转化率(%)",
            "数据状态"],
+    "05": ["最新周次", "截止日期", "排名", "页面名称", "页面路径",
+           "浏览PV", "访客数", "会话数", "数据状态"],
 }
 
 # 当飞书表的旧字段名尚未迁移时，按优先级回退；新名优先。
@@ -391,6 +396,7 @@ def build_detail(rows):
             "参与率": to_number(row.get("参与率")),
             "主要流量来源": to_text(row.get("主要流量来源"), ""),
             "CTA点击量": to_number(row.get("CTA点击量"), 0),
+            "leads": to_number(row.get("leads"), 0),
             "周环比(%)": pct_fraction(row.get("周环比(%)")),
             "数据状态": to_text(
                 row.get("数据状态"),
@@ -428,7 +434,26 @@ def build_data():
         "01": build_overview(read_csv("01_方案增长总览.csv", V3_DIR)),
         "02": build_detail(read_csv("02_单方案流量明细.csv", V3_DIR)),
         "03": build_funnel(read_csv("转换漏斗.csv")),
+        "05": build_refdesign(read_csv("04_参考设计Top5.csv", V3_DIR)),
     }
+
+
+def build_refdesign(rows):
+    output = []
+    for row in rows:
+        week = str(row.get("截止日期", "")).strip()
+        output.append({
+            "最新周次": str(row.get("最新周次", "")).strip() or week_label(week),
+            "截止日期": week,
+            "排名": to_number(row.get("排名"), 0),
+            "页面名称": to_text(row.get("页面名称"), ""),
+            "页面路径": to_text(row.get("页面路径"), ""),
+            "浏览PV": to_number(row.get("浏览PV"), 0),
+            "访客数": to_number(row.get("访客数"), 0),
+            "会话数": to_number(row.get("会话数"), 0),
+            "数据状态": to_text(row.get("数据状态"), "已确认"),
+        })
+    return output
 
 
 def key_for(table_key, row):
@@ -439,6 +464,10 @@ def key_for(table_key, row):
         name = str(row.get("方案名称", "")).strip()
         slug = NAME_TO_SLUG.get(name, name)
         return f"{week}|{slug}"
+    if table_key == "05":
+        week = str(row.get("最新周次", "")).strip()
+        rank = str(row.get("排名", "")).strip()
+        return f"{week}|{rank}"
     return ""
 
 
@@ -469,7 +498,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--inspect-only", action="store_true")
-    parser.add_argument("--only", choices=["01", "02", "03"], default=None, help="只同步指定表")
+    parser.add_argument("--only", choices=["01", "02", "03", "05"], default=None, help="只同步指定表")
     args = parser.parse_args()
 
     table_data = build_data()
@@ -491,9 +520,17 @@ def main():
     print("Step 2: listing tables in Base", flush=True)
 
     available = list_tables(token, app_token)
-    missing = [TABLES[k] for k in ("01", "02", "03") if TABLES[k] not in available]
-    if missing:
-        raise SystemExit("Existing Feishu tables not found: " + ", ".join(missing))
+    missing = [TABLES[k] for k in table_data if TABLES[k] not in available]
+    required_missing = [name for name in missing if name != TABLES["05"]]
+    optional_missing = [name for name in missing if name == TABLES["05"]]
+    if required_missing:
+        raise SystemExit("Existing Feishu tables not found: " + ", ".join(required_missing))
+    if optional_missing:
+        # 05_参考设计Top5 需要先在飞书手动建表（应用无建表权限）；未建好时跳过，不影响 01/02/03。
+        print(f"WARNING: 表未创建，本次跳过：{', '.join(optional_missing)}", flush=True)
+        for key in list(table_data):
+            if TABLES[key] in optional_missing:
+                table_data.pop(key)
 
     schemas = {}
     for table_key in table_data:
