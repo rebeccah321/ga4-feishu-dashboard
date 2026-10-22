@@ -6,7 +6,7 @@ sync_weekly_feishu.py — 把周度表同步到飞书已有的多维表格。
   - 01_方案增长总览（v3 口径：data/analysis_v3/01_方案增长总览.csv）
   - 02_单方案流量明细（v3 口径：data/analysis_v3/02_单方案流量明细.csv）
   - 03_转化漏斗
-  - 05_参考设计Top5（v3 口径：data/analysis_v3/04_参考设计Top5.csv）
+  - 05_参考设计Top3（v3 口径：data/analysis_v3/04_参考设计Top3.csv）
 
 字段名以 v3 口径对外表为准（方案区独立访客数/方案区浏览PV/浏览PV周环比(%)、
 方案页浏览PV/会话数/平均停留时长(秒)/周环比(%) 等），旧字段名通过 FIELD_ALIASES 回退兼容。
@@ -16,6 +16,9 @@ upsert key：
   - 02：最新周次 + 方案名称
   - 03：最新周次 + 方案名称
   - 05：最新周次 + 排名
+
+--prune：按 CSV 为准，删除飞书表里多出来的旧记录（键不在本次 CSV 内），
+         用于 02 这类行数会随"实际方案数"变化的表。
 
 环境变量：
   FEISHU_APP_ID
@@ -45,7 +48,7 @@ TABLES = {
     "01": "01_方案增长总览",
     "02": "02_单方案流量明细",
     "03": "03_转化漏斗",
-    "05": "05_参考设计Top5",
+    "05": "05_参考设计Top3",
 }
 
 # 与飞书现有表最新周方案名称保持一致的中文名
@@ -284,6 +287,16 @@ def upsert_record(token, app_token, table_id, record_id, fields):
     return "created"
 
 
+def batch_delete_records(token, app_token, table_id, record_ids):
+    """按 record_id 批量删除（每批 500），用于 --prune 清掉 CSV 里已不存在的旧行。"""
+    if not record_ids:
+        return 0
+    url = f"{FEISHU_BASE}/bitable/v1/apps/{app_token}/tables/{table_id}/records/batch_delete"
+    for i in range(0, len(record_ids), 500):
+        request_json("POST", url, token=token, body={"records": record_ids[i:i + 500]})
+    return len(record_ids)
+
+
 def to_number(value, default=None):
     text = str(value or "").strip()
     if text in {"", "未接入", "N/A", "NA", "-"}:
@@ -434,7 +447,7 @@ def build_data():
         "01": build_overview(read_csv("01_方案增长总览.csv", V3_DIR)),
         "02": build_detail(read_csv("02_单方案流量明细.csv", V3_DIR)),
         "03": build_funnel(read_csv("转换漏斗.csv")),
-        "05": build_refdesign(read_csv("04_参考设计Top5.csv", V3_DIR)),
+        "05": build_refdesign(read_csv("04_参考设计Top3.csv", V3_DIR)),
     }
 
 
@@ -498,6 +511,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--inspect-only", action="store_true")
+    parser.add_argument("--prune", action="store_true",
+                        help="删除飞书表里键不在本次 CSV 内的旧记录（01/02/05 生效）")
     parser.add_argument("--only", choices=["01", "02", "03", "05"], default=None, help="只同步指定表")
     args = parser.parse_args()
 
@@ -526,7 +541,7 @@ def main():
     if required_missing:
         raise SystemExit("Existing Feishu tables not found: " + ", ".join(required_missing))
     if optional_missing:
-        # 05_参考设计Top5 需要先在飞书手动建表（应用无建表权限）；未建好时跳过，不影响 01/02/03。
+        # 05_参考设计Top3 需要先在飞书手动建表（应用无建表权限）；未建好时跳过，不影响 01/02/03。
         print(f"WARNING: 表未创建，本次跳过：{', '.join(optional_missing)}", flush=True)
         for key in list(table_data):
             if TABLES[key] in optional_missing:
@@ -569,7 +584,13 @@ def main():
             else:
                 updated += 1
             time.sleep(float(os.environ.get("FEISHU_SYNC_DELAY", "0.15")))
-        print(f"{table_name}: {created} created, {updated} updated")
+        pruned = 0
+        if args.prune and table_key in {"01", "02", "05"}:
+            wanted = {key_for(table_key, row) for row in rows}
+            stale = [rid for key, rid in existing.items() if key not in wanted]
+            pruned = batch_delete_records(token, app_token, table_id, stale)
+        print(f"{table_name}: {created} created, {updated} updated"
+              + (f", {pruned} pruned" if args.prune else ""))
 
 
 if __name__ == "__main__":

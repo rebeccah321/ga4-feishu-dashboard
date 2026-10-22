@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""按 v3 口径生成对外表：01 方案区增长总览 / 02 单方案流量明细 / 04 参考设计Top5。
+"""按 v3 口径生成对外表：01 方案区增长总览 / 02 单方案流量明细 / 04 参考设计Top3。
 
 数据来源：
   - data/analysis_v3/         完整周表（generate_tables_v3.py 产物）
@@ -10,7 +10,7 @@
 输出：
   - data/analysis_v3/01_方案增长总览.csv
   - data/analysis_v3/02_单方案流量明细.csv
-  - data/analysis_v3/04_参考设计Top5.csv
+  - data/analysis_v3/04_参考设计Top3.csv
   - outputs/v3口径_*.csv（镜像副本）
 
 字段口径（自解释、只保留必要字段）：
@@ -19,9 +19,9 @@
       （方案区整树总量：含参考设计/场景页/旧目录页，不单独列出）
   02：最新周次 / 截止日期 / 方案名称 / 方案页浏览PV / 独立访客数 / 会话数 /
       平均停留时长(秒) / 参与率 / 主要流量来源 / CTA点击量 / leads / 周环比(%) / 数据状态
-      （固定 23 个方案页 × 每周一行，未上线/无流量的周补 0）
+      （按实际情况：方案页首次出现流量那一周才起行，之后每周一行；没上线/没出现的方案不出行。历史 12 方案 → 新增方案按上线周逐步增加）
   04：最新周次 / 截止日期 / 排名 / 页面名称 / 页面路径 / 浏览PV / 访客数 / 会话数 / 数据状态
-      （参考设计单页每周流量前五；只计入 01 总量，不进 02）
+      （参考设计单页每周流量前三；只计入 01 总量，不进 02）
 """
 from __future__ import annotations
 
@@ -186,7 +186,7 @@ def main():
                    r.get("solution_wow_pct") or "", top, growth, "未接入"])
         prev = dict(pv_by_page)
 
-    # ---------------- 02 单方案流量明细（23 个方案 × 每周一行，无流量补 0） ----------------
+    # ---------------- 02 单方案流量明细（按实际情况：首次出现流量那一周起行，之后每周一行） ----------------
     det_by_key = {}
     for r in det:
         if r["流量类别"] != "方案页" or NOT_FOUND_NAME.search(r["页面名称"]):
@@ -194,6 +194,12 @@ def main():
         slug = slug_of(r["页面路径"])
         if slug:
             det_by_key[(r["week_ending"], slug)] = r
+
+    # 首次出现周（该方案第一次在方案页明细里出现的那一周）；新增方案从这一周起才进 02 表
+    first_week = {}
+    for (we, slug) in det_by_key:
+        if slug not in first_week or we < first_week[slug]:
+            first_week[slug] = we
 
     leads_by_key = {}
     leads_path = ROOT / "data" / "leads" / "leads_weekly.csv"
@@ -206,9 +212,13 @@ def main():
 
     o2 = [["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数", "会话数",
            "平均停留时长(秒)", "参与率", "主要流量来源", "CTA点击量", "leads", "周环比(%)", "数据状态"]]
+    live = set()
     for we in weeks_sorted:
         status = "本周（未完整）" if (is_partial and we == weeks_sorted[-1]) else "GA4+LeadApi已接入"
+        live |= {s for s in v3.CORE_SLUGS if first_week.get(s) == we}
         for slug in v3.CORE_SLUGS:
+            if slug not in live:
+                continue
             key = "/solutions/" + slug
             name = v3.SLUG_CN.get(slug, slug)
             lead = leads_by_key.get((we, slug), 0)
@@ -225,7 +235,7 @@ def main():
                            lead,
                            r.get("浏览量周环比") or "", status])
 
-    # ---------------- 04 参考设计 Top5（每周流量前五；只进 01 总量，不单独列为方案） ----------------
+    # ---------------- 04 参考设计 Top3（每周流量前三；只进 01 总量，不单独列为方案） ----------------
     rd_by_week = defaultdict(list)
     for r in det:
         if r["流量类别"] == "参考设计" and not NOT_FOUND_NAME.search(r["页面名称"]):
@@ -235,14 +245,14 @@ def main():
            "浏览PV", "访客数", "会话数", "数据状态"]]
     for we in weeks_sorted:
         status = "本周（未完整）" if (is_partial and we == weeks_sorted[-1]) else "已确认"
-        top5 = sorted(rd_by_week.get(we, []), key=lambda r: -num(r["浏览PV"]))[:5]
-        for idx, r in enumerate(top5, 1):
+        top3 = sorted(rd_by_week.get(we, []), key=lambda r: -num(r["浏览PV"]))[:3]
+        for idx, r in enumerate(top3, 1):
             o4.append(["W%d" % week_no(we), we, idx, r["页面名称"], r["页面路径"],
                        round(num(r["浏览PV"])), round(num(r["访客数"])), round(num(r["会话数"])), status])
 
     OUT_DATA.mkdir(parents=True, exist_ok=True)
     OUT_MIRROR.mkdir(parents=True, exist_ok=True)
-    for name, rows in (("01_方案增长总览", o1), ("02_单方案流量明细", o2), ("04_参考设计Top5", o4)):
+    for name, rows in (("01_方案增长总览", o1), ("02_单方案流量明细", o2), ("04_参考设计Top3", o4)):
         with open(OUT_DATA / f"{name}.csv", "w", newline="", encoding="utf-8-sig") as f:
             csv.writer(f).writerows(rows)
     # 镜像副本（保留用户之前看到的两份文件）
@@ -250,10 +260,10 @@ def main():
         csv.writer(f).writerows(o1)
     with open(OUT_MIRROR / "v3口径_02_单方案流量明细.csv", "w", newline="", encoding="utf-8-sig") as f:
         csv.writer(f).writerows(o2)
-    with open(OUT_MIRROR / "v3口径_04_参考设计Top5.csv", "w", newline="", encoding="utf-8-sig") as f:
+    with open(OUT_MIRROR / "v3口径_04_参考设计Top3.csv", "w", newline="", encoding="utf-8-sig") as f:
         csv.writer(f).writerows(o4)
     print(f"01 rows: {len(o1)-1} | 02 rows: {len(o2)-1} | 04 rows: {len(o4)-1}")
-    print(f"saved {OUT_DATA}/01_方案增长总览.csv + 02_单方案流量明细.csv + 04_参考设计Top5.csv (+ mirrors)")
+    print(f"saved {OUT_DATA}/01_方案增长总览.csv + 02_单方案流量明细.csv + 04_参考设计Top3.csv (+ mirrors)")
 
 
 if __name__ == "__main__":

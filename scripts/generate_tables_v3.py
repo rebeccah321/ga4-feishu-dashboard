@@ -8,8 +8,8 @@ generate_tables_v3.py — 方案区三级下钻周表（整树口径）。
   - 按新版方案官网的三大流量承接入口分类：方案页 / 参考设计 / 场景案例。
       01 方案区总览  （每周 1 行：全量 PV/Users/Sessions + CTA + 环比）
       02 流量类别    （每周 每类 1 行合计，全部页面都计入）
-      03 页面明细    （每周：全部方案页 + 全部场景案例 + 参考设计 Top5 + “其余页面”合计行）
-  - 参考设计只展示流量 Top5 细节，未上榜的参考设计与其余页面仍计入总数，只是不单独列出。
+      03 页面明细    （每周：全部方案页 + 全部场景案例 + 参考设计 Top3 + “其余页面”合计行）
+  - 参考设计只展示流量 Top3 细节，未上榜的参考设计与其余页面仍计入总数，只是不单独列出。
   - 输出目录 data/analysis_v3/，不动原 data/analysis/ 三张表。
 
 口径：
@@ -289,8 +289,8 @@ def main():
     parser.add_argument("--end", default=None)
     parser.add_argument("--weeks", type=int, default=8,
                         help="展示最近 N 个完整周（多拉一周用于环比计算）")
-    parser.add_argument("--ref-top", type=int, default=5,
-                        help="页面明细中参考设计按流量展示的 Top N 个（默认 5）")
+    parser.add_argument("--ref-top", type=int, default=3,
+                        help="页面明细中参考设计按流量展示的 Top N 个（默认 3）")
     args = parser.parse_args()
 
     start, end = date_window(args)

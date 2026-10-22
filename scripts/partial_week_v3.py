@@ -3,7 +3,7 @@
 partial_week_v3.py — 生成“本周至今”部分周方案区周表（口径与 generate_tables_v3.py 完全一致）。
 
 用法：
-  python3 scripts/partial_week_v3.py --start 2026-10-19 --end 2026-10-21 --ref-top 5
+  python3 scripts/partial_week_v3.py --start 2026-10-19 --end 2026-10-21 --ref-top 3
 
 输出到 data/analysis_v3_partial/：
   01_方案区总览.csv / 02_流量类别.csv / 03_页面流量明细.csv
@@ -90,7 +90,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--start", required=True)
     ap.add_argument("--end", required=True)
-    ap.add_argument("--ref-top", type=int, default=5)
+    ap.add_argument("--ref-top", type=int, default=3)
     args = ap.parse_args()
     end = args.end
 

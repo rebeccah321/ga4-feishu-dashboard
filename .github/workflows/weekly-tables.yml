@@ -72,7 +72,7 @@ jobs:
           LEAD_SEARCH_KEY: ${{ secrets.LEAD_SEARCH_KEY }}
         run: python3 scripts/merge_leads.py
 
-      - name: Build v3 outbound tables (01/02 + 参考设计Top5, incl. leads)
+      - name: Build v3 outbound tables (01/02 + 参考设计Top3, incl. leads)
         run: python3 scripts/build_v3_tables.py --no-partial
 
       - name: Export weekly JSON and stable CSV files for Feishu/Pages

@@ -23,10 +23,8 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-10-18,方案页,室内外定位,/solutions/indoor-outdoor-positioning,33.0,31.0,35.0,14.0,0.6,10.0
 2026-10-18,方案页,家庭与楼宇自动化,/solutions/home-building-automation,25.0,23.0,24.0,21.5,0.8333,-56.1
 2026-10-18,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,17.0,13.0,21.0,20.8,0.4762,-15.0
-2026-10-18,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,14.0,12.0,16.0,8.1,0.375,40.0
 2026-10-18,方案页,工业控制自动化,/solutions/industrial-control-automation,12.0,11.0,11.0,64.0,0.5455,71.4
-2026-10-18,参考设计,零售语音参考设计 | 门店、会议、咨询对话转文字,/solutions/reference-designs/retail_voice,12.0,13.0,15.0,21.9,0.6667,
-2026-10-18,其余页面,其余页面（含旧目录页、未上榜参考设计等 178 个页面）,,949.0,814,904,15.0,0.5,33.1
+2026-10-18,其余页面,其余页面（含旧目录页、未上榜参考设计等 180 个页面）,,975.0,839,935,15.0,0.5005,34.9
 2026-10-11,方案页,语音采集分析,/solutions/voicecollectionanalysis,131.0,119.0,135.0,29.5,0.6074,15.9
 2026-10-11,方案页,智能视频分析,/solutions/intelligent-video-analytics,94.0,79.0,92.0,38.3,0.8152,17.5
 2026-10-11,方案页,离网通信,/solutions/off-grid-mesh-communication,73.0,60.0,73.0,27.9,0.7671,58.7
@@ -46,15 +44,13 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-10-11,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,20.0,25.0,27.0,16.4,0.6296,42.9
 2026-10-11,方案页,全屋智能,/solutions/whole-home-smart-living,16.0,14.0,14.0,2.7,0.7857,
 2026-10-11,参考设计,Campus-level BLE Beacon Positioning System — ,/solutions/reference-designs/indoor_positioning_ble_lorawan/deploy,13.0,12.0,12.0,16.6,0.4167,
-2026-10-11,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,13.0,13.0,16.0,65.9,0.5625,-13.3
-2026-10-11,参考设计,Product Recognition Reference Design | Shelf ,/solutions/reference-designs/edge_retail_recognition,10.0,9.0,10.0,42.4,0.6,11.1
 2026-10-11,方案页,工业控制自动化,/solutions/industrial-control-automation,7.0,5.0,5.0,18.6,1.0,
 2026-10-11,方案页,智慧零售,/solutions/smart-retail-store,6.0,5.0,6.0,1.2,0.3333,
 2026-10-11,方案页,现场对话智能,/solutions/in-person-conversation-intelligence,4.0,3.0,5.0,0.6,0.2,
 2026-10-11,方案页,工业视觉检测,/solutions/industrial-visual-inspection,4.0,3.0,4.0,2.5,0.75,
 2026-10-11,方案页,老人监护,/solutions/elderly-care-monitoring,2.0,1.0,1.0,4.0,1.0,
 2026-10-11,方案页,停车视觉监测,/solutions/parking-traffic-vision,2.0,2.0,2.0,1.5,1.0,
-2026-10-11,其余页面,其余页面（含旧目录页、未上榜参考设计等 112 个页面）,,789.0,681,742,15.0,0.4703,23.9
+2026-10-11,其余页面,其余页面（含旧目录页、未上榜参考设计等 114 个页面）,,812.0,703,768,16.4,0.4739,22.8
 2026-10-04,方案页,语音采集分析,/solutions/voicecollectionanalysis,113.0,103.0,117.0,25.5,0.6581,-5.0
 2026-10-04,方案页,智慧畜牧,/solutions/smart-livestock-farming,82.0,78.0,90.0,20.3,0.5444,-2.4
 2026-10-04,方案页,智能视频分析,/solutions/intelligent-video-analytics,80.0,69.0,75.0,29.4,0.8267,-13.0
@@ -73,15 +69,13 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-10-04,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,17.0,12.0,16.0,54.1,0.8125,142.9
 2026-10-04,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,15.0,11.0,15.0,31.1,0.8,-6.2
 2026-10-04,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,14.0,14.0,19.0,55.3,0.7368,-6.7
-2026-10-04,参考设计,Demo Not Found,/solutions/reference-designs/multi_protocol_gateway,13.0,13.0,14.0,18.9,0.7857,30.0
-2026-10-04,参考设计,打造空间AI智能体,/solutions/reference-designs/smart_space_assistant,12.0,12.0,12.0,40.6,0.9167,-14.3
 2026-10-04,方案页,全屋智能,/solutions/whole-home-smart-living,4.0,2.0,4.0,13.8,0.75,
 2026-10-04,方案页,工业视觉检测,/solutions/industrial-visual-inspection,2.0,2.0,4.0,9.5,0.75,
 2026-10-04,方案页,现场对话智能,/solutions/in-person-conversation-intelligence,1.0,2.0,3.0,2.7,0.6667,
 2026-10-04,方案页,工业控制自动化,/solutions/industrial-control-automation,1.0,1.0,2.0,16.5,1.0,
 2026-10-04,方案页,停车视觉监测,/solutions/parking-traffic-vision,1.0,2.0,2.0,22.0,0.5,
 2026-10-04,方案页,智慧零售,/solutions/smart-retail-store,1.0,1.0,2.0,14.0,1.0,
-2026-10-04,其余页面,其余页面（含旧目录页、未上榜参考设计等 129 个页面）,,698.0,632,685,14.5,0.4584,0.3
+2026-10-04,其余页面,其余页面（含旧目录页、未上榜参考设计等 131 个页面）,,723.0,657,711,15.0,0.4726,0.4
 2026-09-27,方案页,语音采集分析,/solutions/voicecollectionanalysis,119.0,109.0,139.0,23.2,0.5683,-36.0
 2026-09-27,方案页,智能视频分析,/solutions/intelligent-video-analytics,92.0,68.0,85.0,19.9,0.6824,-20.7
 2026-09-27,方案页,对话式语音AI,/solutions/conversational-voice-ai,87.0,72.0,84.0,34.1,0.7262,-47.3
@@ -100,9 +94,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-09-27,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,17.0,16.0,18.0,26.6,0.6667,30.8
 2026-09-27,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,16.0,14.0,15.0,33.3,0.6,-36.0
 2026-09-27,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,15.0,14.0,15.0,20.3,0.7333,-31.8
-2026-09-27,参考设计,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,14.0,8.0,11.0,11.5,0.6364,-57.6
-2026-09-27,参考设计,打造空间AI智能体,/solutions/reference-designs/smart_space_assistant,14.0,13.0,16.0,9.2,0.625,-26.3
-2026-09-27,其余页面,其余页面（含旧目录页、未上榜参考设计等 134 个页面）,,807.0,671,741,10.3,0.5155,-30.0
+2026-09-27,其余页面,其余页面（含旧目录页、未上榜参考设计等 136 个页面）,,835.0,692,768,10.3,0.5195,-30.7
 2026-09-20,方案页,语音采集分析,/solutions/voicecollectionanalysis,186.0,148.0,186.0,28.0,0.6344,10.7
 2026-09-20,方案页,对话式语音AI,/solutions/conversational-voice-ai,165.0,129.0,158.0,54.8,0.7405,1.2
 2026-09-20,方案页,智能视频分析,/solutions/intelligent-video-analytics,116.0,73.0,94.0,46.3,0.6809,63.4
@@ -120,10 +112,8 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-09-20,参考设计,零售语音参考设计 | 门店、会议、咨询对话转文字,/solutions/reference-designs/retail_voice,35.0,8.0,10.0,14.4,0.9,337.5
 2026-09-20,参考设计,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,33.0,24.0,33.0,32.8,0.7273,10.0
 2026-09-20,方案页,楼宇节能改造,/solutions/building-energy-retrofit,27.0,23.0,27.0,43.3,0.5926,22.7
-2026-09-20,参考设计,AI 视觉枪支检测,/solutions/reference-designs/gun_detection_frigate,27.0,4.0,8.0,30.2,0.75,
-2026-09-20,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,25.0,10.0,16.0,15.1,0.625,8.7
 2026-09-20,方案页,家庭与楼宇自动化,/solutions/home-building-automation,13.0,8.0,9.0,6.4,0.8889,
-2026-09-20,其余页面,其余页面（含旧目录页、未上榜参考设计等 123 个页面）,,1185.0,996,1101,15.4,0.5804,30.5
+2026-09-20,其余页面,其余页面（含旧目录页、未上榜参考设计等 125 个页面）,,1237.0,1010,1125,15.5,0.5822,32.9
 2026-09-13,方案页,语音采集分析,/solutions/voicecollectionanalysis,168.0,155.0,173.0,25.5,0.5145,-9.7
 2026-09-13,方案页,对话式语音AI,/solutions/conversational-voice-ai,163.0,143.0,174.0,57.7,0.7241,-21.6
 2026-09-13,方案页,离网通信,/solutions/off-grid-mesh-communication,103.0,88.0,100.0,32.1,0.68,10.8
@@ -140,10 +130,8 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-09-13,方案页,楼宇节能改造,/solutions/building-energy-retrofit,22.0,22.0,24.0,28.2,0.8333,-51.1
 2026-09-13,参考设计,无人门店人脸门禁参考设计 | 版本化人脸库、继电器开门、可校验审计日志,/solutions/reference-designs/unmanned_store_access,21.0,4.0,10.0,40.8,1.0,
 2026-09-13,方案页,应急响应,/solutions/hazard-response,17.0,16.0,20.0,62.9,0.8,-62.2
-2026-09-13,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,13.0,13.0,13.0,32.7,0.8462,-70.5
-2026-09-13,参考设计,投放点垃圾分类参考设计 | 端侧物料识别 + MQTT 出口,/solutions/reference-designs/edge_waste_sorting,12.0,3.0,7.0,14.0,1.0,
 2026-09-13,方案页,声学与音频AI,/solutions/acoustic-audio-ai,1.0,1.0,1.0,0.0,0.0,
-2026-09-13,其余页面,其余页面（含旧目录页、未上榜参考设计等 96 个页面）,,931.0,739,851,15.6,0.6545,-3.6
+2026-09-13,其余页面,其余页面（含旧目录页、未上榜参考设计等 98 个页面）,,956.0,755,871,15.9,0.6602,-5.3
 2026-09-06,方案页,对话式语音AI,/solutions/conversational-voice-ai,208.0,190.0,214.0,57.1,0.8411,96.2
 2026-09-06,方案页,语音采集分析,/solutions/voicecollectionanalysis,186.0,162.0,184.0,32.2,0.6304,3.3
 2026-09-06,方案页,智能视频分析,/solutions/intelligent-video-analytics,132.0,79.0,101.0,57.3,0.6634,-3.6
@@ -160,9 +148,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-09-06,方案页,校园安全管理,/solutions/campus-safety-management,36.0,32.0,34.0,35.8,0.7353,44.0
 2026-09-06,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,26.0,17.0,21.0,27.9,0.8571,30.0
 2026-09-06,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,20.0,15.0,16.0,54.4,0.6875,25.0
-2026-09-06,参考设计,On-Device Conversational Voice AI Reference D,/solutions/reference-designs/conversational_voice_ai,19.0,19.0,20.0,65.5,0.75,
-2026-09-06,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,16.0,15.0,17.0,58.2,0.7059,33.3
-2026-09-06,其余页面,其余页面（含旧目录页、未上榜参考设计等 37 个页面）,,944.0,781,868,28.7,0.7535,45.2
+2026-09-06,其余页面,其余页面（含旧目录页、未上榜参考设计等 39 个页面）,,979.0,815,905,30.0,0.7525,47.4
 2026-08-30,方案页,语音采集分析,/solutions/voicecollectionanalysis,180.0,165.0,193.0,26.9,0.6166,62.2
 2026-08-30,方案页,智能视频分析,/solutions/intelligent-video-analytics,137.0,96.0,131.0,52.2,0.7252,63.1
 2026-08-30,方案页,对话式语音AI,/solutions/conversational-voice-ai,106.0,95.0,116.0,45.5,0.7672,-38.0
@@ -179,9 +165,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-08-30,参考设计,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,20.0,14.0,15.0,45.7,0.6667,53.8
 2026-08-30,参考设计,端侧跌倒检测参考设计 | 本地姿态估计 + MQTT 告警,/solutions/reference-designs/fall_detection,20.0,19.0,23.0,20.6,0.8696,-45.9
 2026-08-30,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,19.0,13.0,16.0,27.1,0.75,46.2
-2026-08-30,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,16.0,16.0,20.0,53.5,0.6,-11.1
-2026-08-30,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,12.0,7.0,11.0,104.4,0.7273,-7.7
-2026-08-30,其余页面,其余页面（含旧目录页、未上榜参考设计等 33 个页面）,,637.0,514,568,19.8,0.7042,6.5
+2026-08-30,其余页面,其余页面（含旧目录页、未上榜参考设计等 35 个页面）,,665.0,537,599,22.4,0.7012,5.7
 2026-08-23,方案页,对话式语音AI,/solutions/conversational-voice-ai,171.0,145.0,171.0,38.9,0.7193,44.9
 2026-08-23,方案页,语音采集分析,/solutions/voicecollectionanalysis,111.0,103.0,117.0,23.9,0.6239,-17.8
 2026-08-23,方案页,智慧畜牧,/solutions/smart-livestock-farming,87.0,64.0,81.0,35.0,0.6543,13.0
@@ -197,9 +181,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-08-23,方案页,环境监测,/solutions/environment-monitoring,35.0,35.0,37.0,31.5,0.7297,-22.2
 2026-08-23,参考设计,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,25.0,11.0,17.0,35.7,0.4706,212.5
 2026-08-23,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,20.0,17.0,21.0,68.7,0.619,-13.0
-2026-08-23,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,18.0,11.0,13.0,133.2,0.6923,-74.3
-2026-08-23,参考设计,Industrial Security on Jetson,/solutions/reference-designs/industrial_security_jetson,14.0,12.0,13.0,6.4,0.8462,-33.3
-2026-08-23,其余页面,其余页面（含旧目录页、未上榜参考设计等 33 个页面）,,611.0,506,567,19.6,0.6949,13.4
+2026-08-23,其余页面,其余页面（含旧目录页、未上榜参考设计等 35 个页面）,,643.0,529,593,21.8,0.6981,2.1
 2026-08-16,方案页,智能视频分析,/solutions/intelligent-video-analytics,154.0,106.0,142.0,39.4,0.6831,14.9
 2026-08-16,方案页,语音采集分析,/solutions/voicecollectionanalysis,135.0,117.0,144.0,33.2,0.6042,10.7
 2026-08-16,方案页,对话式语音AI,/solutions/conversational-voice-ai,118.0,86.0,107.0,45.5,0.6636,-9.9
@@ -215,9 +197,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-08-16,方案页,应急响应,/solutions/hazard-response,25.0,24.0,26.0,42.9,0.8846,-54.5
 2026-08-16,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,23.0,17.0,17.0,57.8,0.7647,109.1
 2026-08-16,参考设计,Industrial Security on Jetson,/solutions/reference-designs/industrial_security_jetson,21.0,16.0,20.0,35.5,0.55,320.0
-2026-08-16,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13.0,10.0,12.0,30.3,0.9167,-7.1
-2026-08-16,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11.0,9.0,14.0,17.9,0.7143,0.0
-2026-08-16,其余页面,其余页面（含旧目录页、未上榜参考设计等 30 个页面）,,539.0,424,474,20.6,0.7046,1.9
+2026-08-16,其余页面,其余页面（含旧目录页、未上榜参考设计等 32 个页面）,,563.0,443,500,20.7,0.71,1.6
 2026-08-09,方案页,智能视频分析,/solutions/intelligent-video-analytics,134.0,116.0,137.0,38.4,0.6642,30.1
 2026-08-09,方案页,对话式语音AI,/solutions/conversational-voice-ai,131.0,119.0,142.0,32.1,0.6972,-10.9
 2026-08-09,方案页,语音采集分析,/solutions/voicecollectionanalysis,122.0,109.0,134.0,26.0,0.709,-14.1
@@ -233,9 +213,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-08-09,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,24.0,20.0,24.0,34.8,0.7083,0.0
 2026-08-09,参考设计,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,22.0,18.0,22.0,45.6,0.7727,37.5
 2026-08-09,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,14.0,13.0,16.0,24.2,0.75,7.7
-2026-08-09,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11.0,6.0,10.0,28.3,0.5,10.0
-2026-08-09,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,11.0,9.0,14.0,22.7,0.6429,-54.2
-2026-08-09,其余页面,其余页面（含旧目录页、未上榜参考设计等 27 个页面）,,523.0,428,477,24.5,0.7128,7.2
+2026-08-09,其余页面,其余页面（含旧目录页、未上榜参考设计等 29 个页面）,,545.0,443,501,24.5,0.7066,4.4
 2026-08-02,方案页,智能仓储管理,/solutions/smart-warehouse-management,332.0,263.0,335.0,26.8,0.5403,97.6
 2026-08-02,方案页,对话式语音AI,/solutions/conversational-voice-ai,147.0,124.0,152.0,27.4,0.7829,18.5
 2026-08-02,方案页,语音采集分析,/solutions/voicecollectionanalysis,142.0,114.0,143.0,33.8,0.7343,12.7
@@ -251,9 +229,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-08-02,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,24.0,24.0,24.0,30.3,0.8333,41.2
 2026-08-02,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,24.0,21.0,24.0,31.0,0.7083,
 2026-08-02,参考设计,Sheep Counter with LoRa / Meshtastic,/solutions/reference-designs/recamera_sheep_counter_lora,16.0,13.0,18.0,23.6,0.6667,
-2026-08-02,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13.0,9.0,10.0,29.4,0.8,-7.1
-2026-08-02,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,12.0,9.0,11.0,15.6,0.7273,100.0
-2026-08-02,其余页面,其余页面（含旧目录页、未上榜参考设计等 35 个页面）,,510.0,431,483,18.1,0.7681,-2.7
+2026-08-02,其余页面,其余页面（含旧目录页、未上榜参考设计等 37 个页面）,,535.0,449,504,18.2,0.7679,-1.7
 2026-07-26,方案页,智能仓储管理,/solutions/smart-warehouse-management,168.0,136.0,159.0,33.4,0.6101,78.7
 2026-07-26,方案页,语音采集分析,/solutions/voicecollectionanalysis,126.0,112.0,140.0,33.2,0.6,-1.6
 2026-07-26,方案页,对话式语音AI,/solutions/conversational-voice-ai,124.0,105.0,134.0,70.5,0.7015,7.8
@@ -269,9 +245,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-07-26,参考设计,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,20.0,15.0,20.0,28.9,0.65,33.3
 2026-07-26,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,17.0,12.0,16.0,33.1,0.625,70.0
 2026-07-26,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,17.0,10.0,15.0,167.7,0.6667,-32.0
-2026-07-26,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,14.0,7.0,12.0,42.2,0.5833,
-2026-07-26,参考设计,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,13.0,11.0,12.0,52.5,0.5,
-2026-07-26,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,485.0,368,417,30.5,0.7314,-21.8
+2026-07-26,其余页面,其余页面（含旧目录页、未上榜参考设计等 30 个页面）,,512.0,386,441,31.4,0.7211,-18.2
 2026-07-19,方案页,语音采集分析,/solutions/voicecollectionanalysis,128.0,116.0,140.0,35.1,0.6214,-22.4
 2026-07-19,方案页,对话式语音AI,/solutions/conversational-voice-ai,115.0,113.0,129.0,30.8,0.7054,9.5
 2026-07-19,方案页,智能仓储管理,/solutions/smart-warehouse-management,94.0,62.0,90.0,68.6,0.6889,-32.9
@@ -287,9 +261,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-07-19,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,25.0,15.0,22.0,51.9,0.7727,177.8
 2026-07-19,参考设计,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,15.0,12.0,15.0,10.1,0.4667,66.7
 2026-07-19,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,13.0,12.0,15.0,101.9,0.8,-13.3
-2026-07-19,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,13.0,14.0,16.0,11.0,0.4375,-13.3
-2026-07-19,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,10.0,11.0,12.0,30.2,0.75,-33.3
-2026-07-19,其余页面,其余页面（含旧目录页、未上榜参考设计等 27 个页面）,,605.0,521,565,25.6,0.5823,2.0
+2026-07-19,其余页面,其余页面（含旧目录页、未上榜参考设计等 29 个页面）,,628.0,546,593,25.3,0.5818,0.8
 2026-07-12,方案页,语音采集分析,/solutions/voicecollectionanalysis,165.0,126.0,173.0,35.0,0.6416,-4.6
 2026-07-12,方案页,智能仓储管理,/solutions/smart-warehouse-management,140.0,86.0,122.0,73.9,0.6721,164.2
 2026-07-12,方案页,对话式语音AI,/solutions/conversational-voice-ai,105.0,86.0,104.0,56.7,0.7404,0.0
@@ -305,9 +277,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-07-12,参考设计,Smart Retail People Flow Heatmap,/solutions/reference-designs/recamera_heatmap_grafana,21.0,14.0,21.0,68.3,0.619,
 2026-07-12,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,15.0,10.0,16.0,34.7,0.6875,7.1
 2026-07-12,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,15.0,15.0,18.0,11.1,0.5556,50.0
-2026-07-12,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,15.0,14.0,16.0,55.8,0.875,-53.1
-2026-07-12,参考设计,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,10.0,9.0,9.0,26.9,0.7778,42.9
-2026-07-12,其余页面,其余页面（含旧目录页、未上榜参考设计等 26 个页面）,,582.0,449,522,24.8,0.6973,11.9
+2026-07-12,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,607.0,472,547,25.8,0.7039,8.6
 2026-07-05,方案页,语音采集分析,/solutions/voicecollectionanalysis,173.0,149.0,181.0,26.6,0.6409,-4.4
 2026-07-05,方案页,对话式语音AI,/solutions/conversational-voice-ai,105.0,83.0,103.0,45.3,0.7184,-9.5
 2026-07-05,方案页,智慧农业感知,/solutions/smart-agriculture-sensing,88.0,69.0,79.0,56.4,0.7342,-2.2
@@ -323,9 +293,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-07-05,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,32.0,24.0,31.0,27.5,0.7097,39.1
 2026-07-05,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,14.0,11.0,16.0,4.8,0.5,27.3
 2026-07-05,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,11.0,10.0,13.0,48.0,0.6154,57.1
-2026-07-05,参考设计,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,10.0,8.0,9.0,72.6,0.8889,42.9
-2026-07-05,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,10.0,8.0,12.0,5.8,0.25,-44.4
-2026-07-05,其余页面,其余页面（含旧目录页、未上榜参考设计等 26 个页面）,,513.0,395,446,19.6,0.7085,0.8
+2026-07-05,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,533.0,411,467,20.3,0.7002,-0.2
 2026-06-28,方案页,语音采集分析,/solutions/voicecollectionanalysis,181.0,138.0,178.0,33.2,0.6742,98.9
 2026-06-28,方案页,对话式语音AI,/solutions/conversational-voice-ai,116.0,100.0,129.0,51.2,0.7054,43.2
 2026-06-28,方案页,智能视频分析,/solutions/intelligent-video-analytics,95.0,81.0,90.0,52.5,0.6444,75.9
@@ -341,9 +309,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-06-28,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,23.0,21.0,21.0,72.6,0.8571,187.5
 2026-06-28,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,18.0,16.0,20.0,21.8,0.55,-33.3
 2026-06-28,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,11.0,11.0,14.0,39.1,0.7143,
-2026-06-28,参考设计,Demo Not Found,/solutions/reference-designs/ai_lab_vlm,8.0,8.0,8.0,1.1,0.125,
-2026-06-28,参考设计,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,8.0,7.0,9.0,13.2,0.6667,-20.0
-2026-06-28,其余页面,其余页面（含旧目录页、未上榜参考设计等 26 个页面）,,508.0,419,480,21.6,0.7271,-3.4
+2026-06-28,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,524.0,434,497,21.1,0.7163,-2.2
 2026-06-21,方案页,语音采集分析,/solutions/voicecollectionanalysis,91.0,67.0,78.0,37.6,0.7949,-1.1
 2026-06-21,方案页,对话式语音AI,/solutions/conversational-voice-ai,81.0,68.0,80.0,55.2,0.7125,-28.9
 2026-06-21,方案页,智慧农业感知,/solutions/smart-agriculture-sensing,73.0,69.0,81.0,24.5,0.7778,0.0
@@ -359,9 +325,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-06-21,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,27.0,22.0,31.0,11.0,0.6774,3.8
 2026-06-21,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,12.0,11.0,13.0,14.4,0.4615,100.0
 2026-06-21,参考设计,Local Voice Service,/solutions/reference-designs/jetson_voice_assistant,11.0,8.0,9.0,83.7,0.7778,57.1
-2026-06-21,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,11.0,11.0,12.0,55.9,0.5,-15.4
-2026-06-21,参考设计,智慧零售语音采集,/solutions/reference-designs/smart_retail_voice_ai,10.0,9.0,9.0,46.4,0.8889,11.1
-2026-06-21,其余页面,其余页面（含旧目录页、未上榜参考设计等 26 个页面）,,515.0,396,451,24.9,0.7007,-2.3
+2026-06-21,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,536.0,416,472,26.1,0.6991,-2.4
 2026-06-14,方案页,对话式语音AI,/solutions/conversational-voice-ai,114.0,98.0,121.0,35.3,0.7107,-3.4
 2026-06-14,方案页,语音采集分析,/solutions/voicecollectionanalysis,92.0,81.0,97.0,26.3,0.6392,-10.7
 2026-06-14,方案页,智慧农业感知,/solutions/smart-agriculture-sensing,73.0,65.0,74.0,49.7,0.8378,-8.8
@@ -377,9 +341,7 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-06-14,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,26.0,18.0,23.0,44.2,0.6522,188.9
 2026-06-14,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,20.0,14.0,18.0,49.6,0.6111,122.2
 2026-06-14,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,14.0,14.0,14.0,26.2,0.7857,-12.5
-2026-06-14,参考设计,Plug & Play AI Camera,/solutions/reference-designs/recamera_ecosystem,13.0,14.0,14.0,30.4,0.6429,85.7
-2026-06-14,参考设计,Voice-Controlled LeKiwi Robot,/solutions/reference-designs/voice_robot_lekiwi,12.0,10.0,11.0,41.1,0.8182,71.4
-2026-06-14,其余页面,其余页面（含旧目录页、未上榜参考设计等 23 个页面）,,527.0,460,515,25.3,0.7301,7.1
+2026-06-14,其余页面,其余页面（含旧目录页、未上榜参考设计等 25 个页面）,,552.0,484,540,25.7,0.7297,9.1
 2026-06-07,方案页,对话式语音AI,/solutions/conversational-voice-ai,118.0,94.0,126.0,50.7,0.746,11.3
 2026-06-07,方案页,语音采集分析,/solutions/voicecollectionanalysis,103.0,82.0,101.0,38.5,0.7129,171.1
 2026-06-07,方案页,智慧农业感知,/solutions/smart-agriculture-sensing,80.0,65.0,74.0,39.0,0.8514,12.7
@@ -395,6 +357,4 @@ week_ending,流量类别,页面名称,页面路径,浏览PV,访客数,会话数,
 2026-06-07,参考设计,Conversational Desktop Robot,/solutions/reference-designs/reachy_claw_voice_robot,16.0,18.0,19.0,80.2,0.7368,-27.3
 2026-06-07,参考设计,Campus-level BLE Beacon Positioning System,/solutions/reference-designs/indoor_positioning_ble_lorawan,14.0,11.0,15.0,21.1,0.5333,180.0
 2026-06-07,参考设计,Voice-Controlled SO-ARM Robotic Arm,/solutions/reference-designs/respeaker_flex_soarm,9.0,10.0,12.0,11.6,0.5833,-84.2
-2026-06-07,参考设计,语音仓库管理系统 | 边缘 WMS 参考设计,/solutions/reference-designs/smart_warehouse,9.0,6.0,9.0,5.4,0.3333,-55.0
-2026-06-07,参考设计,HVAC Automation Control,/solutions/reference-designs/smart_hvac_control,9.0,10.0,11.0,12.8,0.7273,28.6
-2026-06-07,其余页面,其余页面（含旧目录页、未上榜参考设计等 26 个页面）,,493.0,404,451,17.2,0.6874,-6.5
+2026-06-07,其余页面,其余页面（含旧目录页、未上榜参考设计等 28 个页面）,,511.0,420,471,16.8,0.6815,-7.8
