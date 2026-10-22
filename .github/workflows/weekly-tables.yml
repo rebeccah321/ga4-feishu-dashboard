@@ -64,6 +64,12 @@ jobs:
       - name: Generate weekly tables
         run: python3 scripts/generate_tables_correct.py --start 2026-06-01
 
+      - name: Generate v3 solution-area tables (last 20 complete weeks)
+        run: python3 scripts/generate_tables_v3.py --weeks 20
+
+      - name: Build new-field 01/02 tables (v3口径)
+        run: python3 scripts/build_v3_tables.py --no-partial
+
       - name: Merge LeadApi leads into weekly tables
         env:
           LEAD_SEARCH_KEY: ${{ secrets.LEAD_SEARCH_KEY }}

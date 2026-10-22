@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+"""按 v3 口径生成对外两张表：01 方案区增长总览 / 02 单方案流量明细（旧表结构，新字段）。
+
+数据来源：
+  - data/analysis_v3/         完整周表（generate_tables_v3.py 产物）
+  - data/analysis_v3_partial/ 本周至今部分周表（partial_week_v3.py 产物）
+  - GA4 补查：每页 CTA 事件数、每页主要流量来源（sessionDefaultChannelGroup）
+
+输出：
+  - data/analysis_v3/01_方案增长总览.csv
+  - data/analysis_v3/02_单方案流量明细.csv
+  - outputs/v3口径_01_方案区增长总览.csv / outputs/v3口径_02_单方案流量明细.csv（镜像副本）
+
+字段口径（自解释、只保留必要字段）：
+  01：周次 / 截止日期 / 方案区独立访客数 / 方案区浏览PV / CTA点击量 / CTA点击率(%) /
+      浏览PV周环比(%) / 流量最高方案 / 增长最快方案 / 社媒总曝光量
+  02：最新周次 / 截止日期 / 方案名称 / 方案页浏览PV / 独立访客数 / 会话数 /
+      平均停留时长(秒) / 参与率 / 主要流量来源 / CTA点击量 / 周环比(%) / 数据状态
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import datetime as dt
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import ga4_fetch  # noqa: E402
+
+V3 = ROOT / "data" / "analysis_v3"
+PART = ROOT / "data" / "analysis_v3_partial"
+OUT_DATA = V3
+OUT_MIRROR = ROOT / "outputs"
+
+CTA_EVENTS = ["click_solution_link", "click_contact_expert"]
+PREFIXES = ["/solutions/", "/solutions-by-scenarios",
+            "/category/solutions", "/category/reference-designs", "/category/success-cases"]
+
+# 一级方案页路径归一化：/solutions/<slug>（去掉 -zh-hans 等语言后缀）
+PATH_RE = re.compile(r"^/solutions/([^/]+?)(?:-zh-hans)?/?$")
+# 404/死页标题的兜底过滤（正常已在 generate_tables_v3 分类为“其他页面”）
+NOT_FOUND_NAME = re.compile(r"not\s*found|encontrado|見つかりません|未找到|页面不存在", re.I)
+
+
+def num(x):
+    return float(x) if x not in ("", "None", None) else 0.0
+
+
+def load(p):
+    with open(p, encoding="utf-8-sig") as f:
+        return list(csv.DictReader(f))
+
+
+def path_or_filter():
+    return {"orGroup": {"expressions": [
+        {"filter": {"fieldName": "pagePath", "stringFilter": {"matchType": "BEGINS_WITH", "value": p}}}
+        for p in PREFIXES]}}
+
+
+def path_of(path):
+    m = PATH_RE.match(path)
+    return ("/solutions/" + m.group(1)) if m else None
+
+
+def run(body, token):
+    return ga4_fetch.run_report(body, token)
+
+
+def week_no(we):
+    return dt.date.fromisoformat(we).isocalendar().week
+
+
+def week_ending(d):
+    return (d + dt.timedelta(days=(6 - d.weekday()) % 7)).isoformat()
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--no-ga4", action="store_true",
+                    help="不补查 GA4（CTA/来源留 0/Unassigned），用于离线重建")
+    ap.add_argument("--no-partial", action="store_true",
+                    help="不合并 data/analysis_v3_partial（CI 周更只输出完整周）")
+    args = ap.parse_args()
+
+    # ---- 读入 v3 数据（完整周 + 部分周） ----
+    ov = load(V3 / "01_方案区总览.csv")
+    det = load(V3 / "03_页面流量明细.csv")
+    if not args.no_partial:
+        ov += load(PART / "01_方案区总览.csv")
+        det += load(PART / "03_页面流量明细.csv")
+    weeks_all = [r["week_ending"] for r in ov]
+    weeks_sorted = sorted(set(weeks_all))
+    partial_week = weeks_sorted[-1] if weeks_sorted else None
+    # 部分周判定：01 表最后一周不是周日（即本周至今）时视为部分周
+    try:
+        last_sunday = week_ending(dt.date.fromisoformat(weeks_sorted[-1]))
+    except Exception:
+        last_sunday = weeks_sorted[-1] if weeks_sorted else None
+    is_partial = bool(weeks_sorted) and last_sunday != weeks_sorted[-1]
+
+    print(f"rows: ov={len(ov)} det={len(det)} | weeks={weeks_sorted[0]}~{weeks_sorted[-1]} "
+          f"partial={partial_week} ({is_partial})", flush=True)
+
+    cta_by_pageweek = defaultdict(float)
+    top_channel = {}
+
+    if not args.no_ga4:
+        token = ga4_fetch.get_token()  # 支持本地 ADC 与 CI service_account
+        start, end = weeks_sorted[0], weeks_sorted[-1]
+        print(f"GA4 CTA/channel range: {start} ~ {end}", flush=True)
+
+        cta_body = {
+            "dateRanges": [{"startDate": start, "endDate": end}],
+            "dimensions": [{"name": "date"}, {"name": "pagePath"}],
+            "metrics": [{"name": "eventCount"}],
+            "dimensionFilter": {"andGroup": {"expressions": [path_or_filter(),
+                {"filter": {"fieldName": "eventName", "inListFilter": {"values": CTA_EVENTS}}}]}},
+            "limit": 250000,
+        }
+        for r in run(cta_body, token).get("rows", []):
+            d, p = r["dimensionValues"]
+            d = f"{d['value'][:4]}-{d['value'][4:6]}-{d['value'][6:8]}"
+            we = week_ending(dt.date.fromisoformat(d))
+            key = path_of(p["value"])
+            if key:
+                cta_by_pageweek[(we, key)] += float(r["metricValues"][0]["value"])
+
+        ch_body = {
+            "dateRanges": [{"startDate": start, "endDate": end}],
+            "dimensions": [{"name": "date"}, {"name": "pagePath"}, {"name": "sessionDefaultChannelGroup"}],
+            "metrics": [{"name": "sessions"}],
+            "dimensionFilter": path_or_filter(),
+            "limit": 250000,
+        }
+        ch_by_pageweek = defaultdict(lambda: defaultdict(float))
+        for r in run(ch_body, token).get("rows", []):
+            d, p, ch = r["dimensionValues"]
+            d = f"{d['value'][:4]}-{d['value'][4:6]}-{d['value'][6:8]}"
+            we = week_ending(dt.date.fromisoformat(d))
+            key = path_of(p["value"])
+            if key:
+                ch_by_pageweek[(we, key)][ch["value"]] += float(r["metricValues"][0]["value"])
+        for k, chs in ch_by_pageweek.items():
+            top_channel[k] = max(chs.items(), key=lambda x: x[1])[0] if chs else "Unassigned"
+
+    # ---------------- 01 方案区增长总览 ----------------
+    pagepv = defaultdict(dict)
+    for r in det:
+        if r["流量类别"] == "方案页" and not NOT_FOUND_NAME.search(r["页面名称"]):
+            pagepv[r["week_ending"]][r["页面名称"]] = num(r["浏览PV"])
+
+    o1 = [["周次", "截止日期", "方案区独立访客数", "方案区浏览PV", "CTA点击量", "CTA点击率(%)",
+           "浏览PV周环比(%)", "流量最高方案", "增长最快方案", "社媒总曝光量"]]
+    prev = {}
+    for r in sorted(ov, key=lambda x: x["week_ending"]):
+        we = r["week_ending"]
+        pv = num(r["solution_pv"])
+        cta = num(r["cta_clicks"])
+        pv_by_page = pagepv.get(we, {})
+        top = max(pv_by_page.items(), key=lambda x: x[1])[0] if pv_by_page else ""
+        growth = ""
+        if pv_by_page and prev:
+            cand = [(100 * (v - prev.get(n, 0)) / prev[n], n)
+                    for n, v in pv_by_page.items() if prev.get(n, 0) > 0]
+            if cand:
+                g, n = max(cand)
+                growth = f"{n}({g:+.1f}%)"
+        o1.append(["W%d" % week_no(we), we, round(num(r["solution_users"])), round(pv),
+                   round(cta), round(100 * cta / pv, 2) if pv else 0,
+                   r.get("solution_wow_pct") or "", top, growth, "未接入"])
+        prev = dict(pv_by_page)
+
+    # ---------------- 02 单方案流量明细 ----------------
+    o2 = [["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数", "会话数",
+           "平均停留时长(秒)", "参与率", "主要流量来源", "CTA点击量", "周环比(%)", "数据状态"]]
+    for r in det:
+        if r["流量类别"] != "方案页" or NOT_FOUND_NAME.search(r["页面名称"]):
+            continue
+        we = r["week_ending"]
+        key = path_of(r["页面路径"]) or r["页面路径"]
+        status = "本周（未完整）" if (is_partial and we == weeks_sorted[-1]) else "GA4+LeadApi已接入"
+        o2.append(["W%d" % week_no(we), we, r["页面名称"],
+                   round(num(r["浏览PV"])), round(num(r["访客数"])), round(num(r["会话数"])),
+                   r["平均停留时长(秒)"], r["参与率"],
+                   top_channel.get((we, key), "Unassigned"),
+                   round(cta_by_pageweek.get((we, key), 0)),
+                   r.get("浏览量周环比") or "", status])
+
+    OUT_DATA.mkdir(parents=True, exist_ok=True)
+    OUT_MIRROR.mkdir(parents=True, exist_ok=True)
+    for name, rows in (("01_方案增长总览", o1), ("02_单方案流量明细", o2)):
+        with open(OUT_DATA / f"{name}.csv", "w", newline="", encoding="utf-8-sig") as f:
+            csv.writer(f).writerows(rows)
+    # 镜像副本（保留用户之前看到的两份文件）
+    with open(OUT_MIRROR / "v3口径_01_方案区增长总览.csv", "w", newline="", encoding="utf-8-sig") as f:
+        csv.writer(f).writerows(o1)
+    with open(OUT_MIRROR / "v3口径_02_单方案流量明细.csv", "w", newline="", encoding="utf-8-sig") as f:
+        csv.writer(f).writerows(o2)
+    print(f"01 rows: {len(o1)-1} | 02 rows: {len(o2)-1}")
+    print(f"saved {OUT_DATA}/01_方案增长总览.csv + 02_单方案流量明细.csv (+ mirrors)")
+
+
+if __name__ == "__main__":
+    main()

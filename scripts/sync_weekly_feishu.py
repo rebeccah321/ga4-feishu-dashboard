@@ -3,9 +3,12 @@
 sync_weekly_feishu.py — 把周度三表同步到飞书已有的多维表格。
 
 只更新已有表，不创建、不重命名表：
-  - 01_方案增长总览
-  - 02_单方案流量明细
+  - 01_方案增长总览（v3 口径：data/analysis_v3/01_方案增长总览.csv）
+  - 02_单方案流量明细（v3 口径：data/analysis_v3/02_单方案流量明细.csv）
   - 03_转化漏斗
+
+字段名以 v3 口径对外表为准（方案区独立访客数/方案区浏览PV/浏览PV周环比(%)、
+方案页浏览PV/会话数/平均停留时长(秒)/周环比(%) 等），旧字段名通过 FIELD_ALIASES 回退兼容。
 
 upsert key：
   - 01：周次
@@ -34,6 +37,7 @@ from pathlib import Path
 FEISHU_BASE = "https://open.feishu.cn/open-apis"
 ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS_DIR = ROOT / "data" / "analysis"
+V3_DIR = ROOT / "data" / "analysis_v3"
 
 TABLES = {
     "01": "01_方案增长总览",
@@ -75,12 +79,12 @@ for _slug, _names in SLUG_ALIASES.items():
 
 
 REQUIRED_FIELDS = {
-    "01": ["周次", "截止日期", "方案页独立访客数", "Solution页面总访问量",
-           "CTA点击量", "CTA点击率(%)", "Solution页面周环比",
+    "01": ["周次", "截止日期", "方案区独立访客数", "方案区浏览PV",
+           "CTA点击量", "CTA点击率(%)", "浏览PV周环比(%)",
            "流量最高方案", "增长最快方案"],
-    "02": ["最新周次", "截止日期", "方案名称", "落地页访问量", "独立访客数",
-           "Session", "平均停留时长（秒）", "参与率", "主要流量来源",
-           "CTA点击量", "leads", "周环比", "数据状态"],
+    "02": ["最新周次", "截止日期", "方案名称", "方案页浏览PV", "独立访客数",
+           "会话数", "平均停留时长(秒)", "参与率", "主要流量来源",
+           "CTA点击量", "周环比(%)", "数据状态"],
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
            "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率(%)", "表单转化率(%)",
            "数据状态"],
@@ -89,17 +93,22 @@ REQUIRED_FIELDS = {
 # 当飞书表的旧字段名尚未迁移时，按优先级回退；新名优先。
 FIELD_ALIASES = {
     "01": {
+        "方案区独立访客数": ["方案页独立访客数"],
+        "方案区浏览PV": ["Solution页面总访问量", "solution页面总访问量"],
         "Solution页面总访问量": ["solution页面总访问量"],
         "CTA点击量": ["关键事件(CTA)"],
         "CTA点击率(%)": ["CTA点击率", "CTA转化率"],
+        "浏览PV周环比(%)": ["Solution页面周环比", "Solution 页面周环比"],
         "Solution页面周环比": ["Solution 页面周环比"],
         "增长最快方案": ["增长最快solution"],
     },
     "02": {
         "方案名称": ["solution名称"],
-        "Session": ["session"],
+        "方案页浏览PV": ["落地页访问量"],
+        "会话数": ["Session", "session"],
+        "平均停留时长(秒)": ["平均停留时长（秒）"],
         "CTA点击量": ["CTA点击量（key event）"],
-        "leads": ["表单提交"],
+        "周环比(%)": ["周环比"],
     },
     "03": {
         "方案名称": ["solution名称"],
@@ -286,6 +295,12 @@ def to_text(value, fallback="未接入"):
     return fallback if text in {"", "NA", "N/A", "-"} else text
 
 
+def pct_fraction(value):
+    """把 “32.2”（百分数写法）转成 0.322（飞书百分比字段按小数存储）。"""
+    number = to_number(value)
+    return round(number / 100, 6) if number is not None else None
+
+
 def rounded_ratio(numerator, denominator, digits=6):
     try:
         num = float(numerator or 0)
@@ -329,8 +344,8 @@ def best_growth_text(value):
     return localize_overview_text(text).replace(" (", "(")
 
 
-def read_csv(name):
-    path = ANALYSIS_DIR / name
+def read_csv(name, base=None):
+    path = (base or ANALYSIS_DIR) / name
     if not path.exists():
         raise SystemExit(f"Missing analysis CSV: {path}")
     with open(path, newline="", encoding="utf-8-sig") as fh:
@@ -338,23 +353,20 @@ def read_csv(name):
 
 
 def build_overview(rows):
+    """01 方案区增长总览：直接读 v3 口径对外表（字段已就位，只做类型/百分比转换）。"""
     output = []
     for row in rows:
-        week = row.get("week_ending", "").strip()
-        solution_pv = to_number(row.get("solution_pv"))
-        cta_clicks = to_number(row.get("cta_clicks"), 0)
-        cta_rate = to_number(row.get("cta_click_rate"))
-        wow_pct = to_number(row.get("solution_wow_pct"))
+        week = str(row.get("截止日期", "")).strip()
         output.append({
-            "周次": week_label(week),
+            "周次": str(row.get("周次", "")).strip() or week_label(week),
             "截止日期": week,
-            "方案页独立访客数": to_number(row.get("solution_users"), 0),
-            "Solution页面总访问量": solution_pv,
-            "CTA点击量": cta_clicks,
-            "CTA点击率(%)": (round(cta_rate / 100, 6) if cta_rate is not None else None),
-            "Solution页面周环比": (wow_pct / 100.0) if wow_pct is not None else None,
-            "流量最高方案": display_slug(annotated_slug(row.get("top_traffic_solution"))),
-            "增长最快方案": best_growth_text(row.get("fastest_growing_solution")),
+            "方案区独立访客数": to_number(row.get("方案区独立访客数"), 0),
+            "方案区浏览PV": to_number(row.get("方案区浏览PV"), 0),
+            "CTA点击量": to_number(row.get("CTA点击量"), 0),
+            "CTA点击率(%)": pct_fraction(row.get("CTA点击率(%)")),
+            "浏览PV周环比(%)": pct_fraction(row.get("浏览PV周环比(%)")),
+            "流量最高方案": to_text(row.get("流量最高方案"), ""),
+            "增长最快方案": to_text(row.get("增长最快方案"), ""),
         })
     return output
 
@@ -364,25 +376,26 @@ def data_status_for_detail(week):
 
 
 def build_detail(rows):
+    """02 单方案流量明细：直接读 v3 口径对外表。"""
     output = []
     for row in rows:
-        week = row.get("week_ending", "").strip()
-        cta_clicks = to_number(row.get("cta_clicks"), 0)
-        wow_pct = to_number(row.get("wow_pct"))
+        week = str(row.get("截止日期", "")).strip()
         output.append({
-            "最新周次": week_label(week),
+            "最新周次": str(row.get("最新周次", "")).strip() or week_label(week),
             "截止日期": week,
-            "方案名称": display_slug(row.get("slug")),
-            "落地页访问量": to_number(row.get("landing_pv"), 0),
-            "独立访客数": to_number(row.get("users"), 0),
-            "Session": to_number(row.get("sessions"), 0),
-            "平均停留时长（秒）": to_number(row.get("avg_eng_s")),
-            "参与率": to_number(row.get("engagement_rate")),
-            "主要流量来源": to_text(row.get("top_channel"), ""),
-            "CTA点击量": cta_clicks,
-            "leads": to_number(row.get("form_submits"), 0),
-            "数据状态": to_text(row.get("data_status"), data_status_for_detail(week)),
-            "周环比": (wow_pct / 100.0) if wow_pct is not None else None,
+            "方案名称": to_text(row.get("方案名称"), ""),
+            "方案页浏览PV": to_number(row.get("方案页浏览PV"), 0),
+            "独立访客数": to_number(row.get("独立访客数"), 0),
+            "会话数": to_number(row.get("会话数"), 0),
+            "平均停留时长(秒)": to_number(row.get("平均停留时长(秒)")),
+            "参与率": to_number(row.get("参与率")),
+            "主要流量来源": to_text(row.get("主要流量来源"), ""),
+            "CTA点击量": to_number(row.get("CTA点击量"), 0),
+            "周环比(%)": pct_fraction(row.get("周环比(%)")),
+            "数据状态": to_text(
+                row.get("数据状态"),
+                "本周（未完整）" if is_current_week(week) else "已确认",
+            ),
         })
     return output
 
@@ -412,8 +425,8 @@ def build_funnel(rows):
 
 def build_data():
     return {
-        "01": build_overview(read_csv("方案增长总览.csv")),
-        "02": build_detail(read_csv("单方案流量明细.csv")),
+        "01": build_overview(read_csv("01_方案增长总览.csv", V3_DIR)),
+        "02": build_detail(read_csv("02_单方案流量明细.csv", V3_DIR)),
         "03": build_funnel(read_csv("转换漏斗.csv")),
     }
 

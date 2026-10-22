@@ -66,11 +66,45 @@ python3 scripts/render_dashboard.py
 - `Weekly GA4 Tables` 成功后自动触发（或每周一 09:30 兜底）
 - 自动识别并写入已有的 `01_方案增长总览`、`02_单方案流量明细`、`03_转化漏斗`
 - 不创建、不重命名表；按 `周次`/`周次+方案名称` upsert
+- 01/02 读取 v3 口径对外表（见下节），03 沿用 `data/analysis/转换漏斗.csv`
 
 ### 周报表与飞书拉取（`weekly-tables.yml`）
 - 每周一 09:00 Asia/Shanghai 拉取 42 天数据并生成三张周度 CSV
+- 追加生成 v3 方案区口径：`generate_tables_v3.py --weeks 20` + `build_v3_tables.py --no-partial`
+  （输出 `data/analysis_v3/`，其中 `01_方案增长总览.csv`、`02_单方案流量明细.csv` 为飞书 01/02 表数据源）
 - 导出 `dashboard/data/weekly/weekly_tables.json`（完整三表）和 `weekly_summary.json`（单条方案增长汇总）
 - 提交到 GitHub Pages，供飞书多维表格自动化每周一 09:10 拉取
+
+## v3 方案区口径（2026-10 起）
+
+脚本链路（本仓库 `scripts/`）：
+
+| 脚本 | 作用 |
+|------|------|
+| `generate_tables_v3.py` | 方案区整树周表（`/solutions/`、`/solutions-by-scenarios`、旧目录树）：01 方案区总览 / 02 流量类别 / 03 页面流量明细 → `data/analysis_v3/` |
+| `partial_week_v3.py` | “本周至今”部分周表（环比=上周同期）→ `data/analysis_v3_partial/` |
+| `build_v3_tables.py` | 合成对外两张表（旧表结构 + 新字段名）→ `data/analysis_v3/01_方案增长总览.csv`、`02_单方案流量明细.csv`（`--no-partial` 供 CI 只出完整周） |
+| `sync_weekly_feishu.py` | 飞书同步：01/02 读 v3 对外表，03 沿用旧漏斗表 |
+| `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
+
+口径要点：
+- 浏览 PV = 页级求和（不去重，含参考设计/场景案例/旧目录页/其他页面）；
+- 独立访客/会话 = 整树逐周去重（无 date 维度的 totals 查询）；
+- 404 死页（多语言 Not Found 标题）归入“其他页面”，只计入总数不列明细；
+- CTA = `click_solution_link` + `click_contact_expert`。
+
+飞书字段名变化（2026-10）：
+
+| 表 | 旧字段名 | 新字段名 |
+|----|---------|---------|
+| 01 | 方案页独立访客数 | 方案区独立访客数 |
+| 01 | Solution页面总访问量 | 方案区浏览PV |
+| 01 | Solution页面周环比 | 浏览PV周环比(%) |
+| 02 | 落地页访问量 | 方案页浏览PV |
+| 02 | Session | 会话数 |
+| 02 | 平均停留时长（秒） | 平均停留时长(秒) |
+| 02 | 周环比 | 周环比(%) |
+| 02 | leads | 已停用（历史值全 0），可用 `migrate_feishu_fields.py --delete-fields` 删除 |
 
 ## 需要配置的 GitHub Secrets
 
@@ -87,9 +121,9 @@ python3 scripts/render_dashboard.py
 
 | 飞书表 | upsert key | 数据来源 |
 |--------|-----------|---------|
-| `01_方案增长总览` | `周次` | `数据/analysis/方案增长总览.csv` |
-| `02_单方案流量明细` | `最新周次 + solution名称` | `数据/analysis/单方案流量明细.csv` |
-| `03_转化漏斗` | `最新周次 + 方案名称` | `数据/analysis/转换漏斗.csv` |
+| `01_方案增长总览` | `周次` | `data/analysis_v3/01_方案增长总览.csv`（v3 口径） |
+| `02_单方案流量明细` | `最新周次 + 方案名称` | `data/analysis_v3/02_单方案流量明细.csv`（v3 口径） |
+| `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv` |
 
 ## 认证双模式
 
