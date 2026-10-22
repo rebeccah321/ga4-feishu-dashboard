@@ -44,6 +44,8 @@ FEISHU_BASE = "https://open.feishu.cn/open-apis"
 ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS_DIR = ROOT / "data" / "analysis"
 V3_DIR = ROOT / "data" / "analysis_v3"
+sys.path.insert(0, str(ROOT / "scripts"))
+import generate_tables_v3 as v3  # noqa: E402
 
 TABLES = {
     "01": "01_方案增长总览",
@@ -52,34 +54,20 @@ TABLES = {
     "05": "05_参考设计Top3",
 }
 
-# 与飞书现有表最新周方案名称保持一致的中文名
-SLUG_CN = {
-    "smart-warehouse-management": "智能仓储管理",
-    "voicecollectionanalysis": "语音采集与分析",
-    "conversational-voice-ai": "对话式语音AI",
-    "smart-agriculture-sensing": "智慧农业传感",
-    "smart-livestock-farming": "智能畜牧养殖",
-    "intelligent-video-analytics": "智能视频分析",
-    "indoor-outdoor-positioning": "室内外定位",
-    "environment-monitoring": "环境监测",
-    "building-energy-management": "楼宇能源管理",
-    "campus-safety-management": "校园安全管理",
-    "building-energy-retrofit": "楼宇能源改造",
-    "hazard-response": "应急响应",
-    "off-grid-mesh-communication": "离网通信",
-    "acoustic-audio-ai": "声学与音频AI",
-    "home-building-automation": "家庭与楼宇自动化",
-}
+# 名称统一取自 v3 口径（generate_tables_v3.SLUG_CN / SLUG_RENAME），保证 02 与 03 表同名。
+# 03 转化漏斗按周取显示名：改名周之前用旧名、之后用新名（与 02 一致）。
+SLUG_CN = dict(v3.SLUG_CN)
 
-# 历史记录里出现过、但已统一为 SLUG_CN 主名称的旧别名；仅在 upsert 匹配时使用。
+# 旧别名（历史表里用过、或改名前后用过的写法）仅用于 upsert 键匹配，不做显示。
 SLUG_ALIASES = {
-    "voicecollectionanalysis": ["语音采集分析", "门店客服质检"],
-    "smart-agriculture-sensing": ["智慧农业感知"],
-    "smart-livestock-farming": ["智慧畜牧"],
-    "building-energy-retrofit": ["楼宇节能改造"],
-    # 2026-10-05~10-11（W41）改名后的新名；用于把旧名行升级为新名而不是重复建档
-    "conversational-voice-ai": ["离线语音控制"],
+    "voicecollectionanalysis": ["语音采集与分析"],
+    "smart-agriculture-sensing": ["智慧农业传感"],
+    "smart-livestock-farming": ["智能畜牧养殖"],
+    "building-energy-retrofit": ["楼宇能源改造"],
+    "in-person-conversation-intelligence": ["现场对话智能"],
 }
+for _slug, _rename in v3.SLUG_RENAME.items():
+    SLUG_ALIASES.setdefault(_slug, []).extend([_rename["old"], _rename["new"]])
 
 NAME_TO_SLUG = {name: slug for slug, name in SLUG_CN.items()}
 for _slug, _names in SLUG_ALIASES.items():
@@ -336,8 +324,11 @@ def rounded_ratio(numerator, denominator, digits=6):
     return round(num / den, digits)
 
 
-def display_slug(value):
+def display_slug(value, week: str | None = None):
+    """slug → 中文显示名；核心方案按周取（改名周起新名），未知 slug 原样返回。"""
     text = to_text(value, "")
+    if text in v3.SLUG_CN:
+        return v3.solution_name(text, week)
     return SLUG_CN.get(text, text)
 
 
@@ -437,7 +428,7 @@ def build_funnel(rows):
         output.append({
             "最新周次": week_label(week),
             "截止日期": week,
-            "方案名称": display_slug(row.get("slug")),
+            "方案名称": display_slug(row.get("slug"), week),
             "页面访问量（PV）": page_pv,
             "Session": to_number(row.get("sessions"), 0),
             "CTA点击量": cta_clicks,
@@ -516,7 +507,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--inspect-only", action="store_true")
     parser.add_argument("--prune", action="store_true",
-                        help="删除飞书表里键不在本次 CSV 内的旧记录（01/02/05 生效）")
+                        help="删除飞书表里键不在本次 CSV 内的旧记录（01/02/03/05 生效）")
     parser.add_argument("--only", choices=["01", "02", "03", "05"], default=None, help="只同步指定表")
     args = parser.parse_args()
 
@@ -593,7 +584,7 @@ def main():
                 updated += 1
             time.sleep(float(os.environ.get("FEISHU_SYNC_DELAY", "0.15")))
         pruned = 0
-        if args.prune and table_key in {"01", "02", "05"}:
+        if args.prune and table_key in {"01", "02", "03", "05"}:
             # 以 CSV 为准：本轮没有被写入过的记录（含同键重复行、周次错位的旧行）一律清掉
             stale = [item.get("record_id") for item in existing_records
                      if item.get("record_id") not in used_ids]

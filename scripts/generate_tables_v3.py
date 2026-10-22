@@ -85,7 +85,8 @@ SLUG_CN = {
     'smart-retail-store': '智慧零售',
     'industrial-control-automation': '工业控制自动化',
     'industrial-visual-inspection': '工业视觉检测',
-    'in-person-conversation-intelligence': '现场对话智能',
+    # 站内中文标题：智能工牌语音转写与会话分析（reSpeaker Clip 智能工牌）
+    'in-person-conversation-intelligence': '智能工牌会话分析',
     'sensecraft-solution': 'SenseCraft工业方案',
 }
 

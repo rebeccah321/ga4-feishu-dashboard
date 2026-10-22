@@ -97,6 +97,8 @@ python3 scripts/render_dashboard.py
   尚未上线/尚未出现的方案不出行（历史行数 12 → 13 → 14 → 15 → 21 → 22 → 23）；行数会变，改结构后用 `sync_weekly_feishu.py --prune` 清掉飞书里多出来的旧行；
 - 02 表 `页面类型` 列（场景页/技术页/入口页）：场景页与技术页是站点两层结构（技术页按 by-tech 聚合、向下链接场景页），不是重复页；入口页指 `/solutions/sensecraft-solution` 这类品牌/引导页；
 - 页面改名按周处理：改名**发生的那一周**起用新名，之前的周保留旧名（`generate_tables_v3.SLUG_RENAME`）。当前记录：`voicecollectionanalysis` 语音采集分析 → **门店客服质检**、`conversational-voice-ai` 对话式语音AI → **离线语音控制**，均自 W41（2026-10-11）起（依据 GA4 逐日 pageTitle 实测）；
+- 名称与网页对齐（非按周改名，全周统一）：`in-person-conversation-intelligence` → **智能工牌会话分析**（站内中文标题"智能工牌语音转写与会话分析"，reSpeaker Clip 智能工牌；旧表写的"现场对话智能"已作为别名兼容）；
+- 飞书 `03_转化漏斗` 的方案名称与 02 同源（`sync_weekly_feishu.py` 直接取 `generate_tables_v3.solution_name(slug, week)`），因此两张表的名称与改名周完全一致；旧写法（语音采集与分析 / 智慧农业传感 / 智能畜牧养殖 / 楼宇能源改造）已登记为别名，只用于 upsert 键匹配；
 - 参考设计等其他页面只计入 01 总量、不单独列为方案，其每周流量前三列在 04/05 表；`leads` 只统计这些方案页来源的表单提交。
 
 飞书字段名变化（2026-10）：
