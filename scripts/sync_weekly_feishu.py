@@ -15,10 +15,11 @@ upsert key：
   - 01：周次
   - 02：最新周次 + 方案名称
   - 03：最新周次 + 方案名称
-  - 05：最新周次 + 排名
+  - 05：周次 + 排名（字段：周次 / 截止日期 / 排名 / 页面名称（短名）/ 浏览PV / 数据状态）
 
 --prune：按 CSV 为准，删除飞书表里多出来的旧记录（键不在本次 CSV 内），
-         用于 02 这类行数会随"实际方案数"变化的表。
+         用于 02 这类行数会随"实际方案数"变化的表；本轮未被写入的记录（含同键重复行、
+         周次被手工改动的错位行）会被清掉，所以手工改表后跑一次即可自动对齐。
 
 环境变量：
   FEISHU_APP_ID
@@ -94,8 +95,7 @@ REQUIRED_FIELDS = {
     "03": ["最新周次", "截止日期", "方案名称", "页面访问量（PV）",
            "Session", "CTA点击量", "表单提交（Leads）", "CTA点击率(%)", "表单转化率(%)",
            "数据状态"],
-    "05": ["最新周次", "截止日期", "排名", "页面名称", "页面路径",
-           "浏览PV", "访客数", "会话数", "数据状态"],
+    "05": ["周次", "截止日期", "排名", "页面名称", "浏览PV", "数据状态"],
 }
 
 # 当飞书表的旧字段名尚未迁移时，按优先级回退；新名优先。
@@ -124,6 +124,9 @@ FIELD_ALIASES = {
         "表单提交（Leads）": ["表单提交"],
         "CTA点击率(%)": ["CTA点击率", "页面->CTA转化率"],
         "表单转化率(%)": ["表单转化率", "CTA->表单转化率"],
+    },
+    "05": {
+        "周次": ["最新周次"],
     },
 }
 
@@ -456,15 +459,12 @@ def build_refdesign(rows):
     for row in rows:
         week = str(row.get("截止日期", "")).strip()
         output.append({
-            "最新周次": str(row.get("最新周次", "")).strip() or week_label(week),
+            "周次": str(row.get("周次") or row.get("最新周次", "")).strip() or week_label(week),
             "截止日期": week,
             "排名": to_number(row.get("排名"), 0),
             "页面名称": to_text(row.get("页面名称"), ""),
-            "页面路径": to_text(row.get("页面路径"), ""),
             "浏览PV": to_number(row.get("浏览PV"), 0),
-            "访客数": to_number(row.get("访客数"), 0),
-            "会话数": to_number(row.get("会话数"), 0),
-            "数据状态": to_text(row.get("数据状态"), "已确认"),
+            "数据状态": to_text(row.get("数据状态"), "完整周"),
         })
     return output
 
@@ -478,7 +478,7 @@ def key_for(table_key, row):
         slug = NAME_TO_SLUG.get(name, name)
         return f"{week}|{slug}"
     if table_key == "05":
-        week = str(row.get("最新周次", "")).strip()
+        week = str(row.get("周次") or row.get("最新周次", "")).strip()
         rank = str(row.get("排名", "")).strip()
         return f"{week}|{rank}"
     return ""
@@ -569,6 +569,7 @@ def main():
             for item in existing_records
             if item.get("fields")
         }
+        used_ids = set()
         created = updated = 0
         for idx, row in enumerate(rows, 1):
             key = key_for(table_key, row)
@@ -578,7 +579,10 @@ def main():
                 actual = resolve_field(table_key, name, field_types)
                 if actual:
                     fields[actual] = coerce_field_value(actual, value, field_types)
-            result = upsert_record(token, app_token, table_id, existing.get(key), fields)
+            record_id = existing.get(key)
+            if record_id:
+                used_ids.add(record_id)
+            result = upsert_record(token, app_token, table_id, record_id, fields)
             if result == "created":
                 created += 1
             else:
@@ -586,8 +590,9 @@ def main():
             time.sleep(float(os.environ.get("FEISHU_SYNC_DELAY", "0.15")))
         pruned = 0
         if args.prune and table_key in {"01", "02", "05"}:
-            wanted = {key_for(table_key, row) for row in rows}
-            stale = [rid for key, rid in existing.items() if key not in wanted]
+            # 以 CSV 为准：本轮没有被写入过的记录（含同键重复行、周次错位的旧行）一律清掉
+            stale = [item.get("record_id") for item in existing_records
+                     if item.get("record_id") not in used_ids]
             pruned = batch_delete_records(token, app_token, table_id, stale)
         print(f"{table_name}: {created} created, {updated} updated"
               + (f", {pruned} pruned" if args.prune else ""))
