@@ -85,7 +85,8 @@ python3 scripts/render_dashboard.py
 | `partial_week_v3.py` | “本周至今”部分周表（环比=上周同期）→ `data/analysis_v3_partial/` |
 | `merge_leads.py` | LeadApi 线索回填：只统计 23 个方案页（与 `generate_tables_v3.CORE_SLUGS` 同源）的去重 submission_id → `data/leads/leads_weekly.csv` |
 | `build_v3_tables.py` | 合成对外表 → `01_方案增长总览.csv`、`02_单方案流量明细.csv`（按实际方案数：方案首次出现流量那一周起行 + `页面类型` + `leads` 列）、`04_参考设计Top3.csv`（每周流量前三；`--no-partial` 供 CI 只出完整周） |
-| `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 沿用旧漏斗表 |
+| `append_partial_funnel.py` | 给 03 漏斗表补“本周至今”行：从 02 表（v3 口径）取 PV/会话/CTA + LeadApi leads，只补历史已跟踪的方案，幂等可重复跑 |
+| `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 读 `data/analysis/转换漏斗.csv`（含“本周至今”行） |
 | `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
 
 口径要点：
@@ -100,6 +101,7 @@ python3 scripts/render_dashboard.py
 - 页面改名按周处理：改名**发生的那一周**起用新名，之前的周保留旧名（`generate_tables_v3.SLUG_RENAME`）。当前记录：`voicecollectionanalysis` 语音采集分析 → **门店客服质检**、`conversational-voice-ai` 对话式语音AI → **离线语音控制**，均自 W41（2026-10-11）起（依据 GA4 逐日 pageTitle 实测）；
 - 名称与网页对齐（非按周改名，全周统一）：`in-person-conversation-intelligence` → **智能工牌会话分析**（站内中文标题"智能工牌语音转写与会话分析"，reSpeaker Clip 智能工牌；旧表写的"现场对话智能"已作为别名兼容）；
 - 飞书 `03_转化漏斗` 的方案名称与 02 同源（`sync_weekly_feishu.py` 直接取 `generate_tables_v3.solution_name(slug, week)`），因此两张表的名称与改名周完全一致；旧写法（语音采集与分析 / 智慧农业传感 / 智能畜牧养殖 / 楼宇能源改造）已登记为别名，只用于 upsert 键匹配；
+- 飞书 `03_转化漏斗` 的“本周至今”行：历史行由 `generate_tables_correct.py` 只在完整周产出，本周行由 `append_partial_funnel.py` 从 02 表（同一批 GA4 数据）补上——PV/会话/CTA 与 01/02 完全对得上（`数据状态=本周（未完整）`，截止日期仍写当周周日）；该周转为完整周后会被完整口径覆盖；
 - 参考设计等其他页面只计入 01 总量、不单独列为方案，其每周流量前三列在 04/05 表；`leads` 只统计这些方案页来源的表单提交。
 
 飞书字段名变化（2026-10）：
@@ -133,7 +135,7 @@ python3 scripts/render_dashboard.py
 |--------|-----------|---------|
 | `01_方案增长总览` | `周次` | `data/analysis_v3/01_方案增长总览.csv`（v3 口径） |
 | `02_单方案流量明细` | `最新周次 + 方案名称` | `data/analysis_v3/02_单方案流量明细.csv`（v3 口径） |
-| `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv` |
+| `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv`（完整周 + `append_partial_funnel.py` 补的“本周至今”行） |
 | `05_参考设计Top3` | `最新周次 + 排名` | `data/analysis_v3/04_参考设计Top3.csv` |
 
 > 05 表字段：最新周次 / 截止日期 / 排名 / 页面名称（统一短中文名，按路径登记在 `REF_NAME_CN`）/ 浏览PV / 数据状态（`完整周` 或 `本周（未完整）`）。
@@ -142,6 +144,7 @@ python3 scripts/render_dashboard.py
 > 编号互不相干：本地 `data/analysis_v3/NN_*.csv` 是流水线内部编号，与飞书表编号不是一回事。
 > 例如本地 `03_页面流量明细.csv` 只是生成 01/02/04 的页面级原料（方案页全列 + 参考设计 Top3 + “其余页面”合计），**不上飞书**；
 > 飞书 `03_转化漏斗` 读的是老口径 `data/analysis/转换漏斗.csv`，飞书 `04_社媒内容表现` 不由本仓库脚本写入。
+> `03_转化漏斗` 当前只跟踪最初的 15 个方案页（`generate_tables_correct.SOLUTIONS`）；后上线的 8 个方案页只在 02 表里，需要时可扩展。
 
 > 注：飞书应用当前无“新建数据表”权限（RolePermNotAllow），`05_参考设计Top3` 需先在飞书 Base 手动新建同名空表；
 > 建好后运行 `python3 scripts/sync_weekly_feishu.py --only 05` 灌数（应用可正常建字段/写记录）。未建表时同步自动跳过 05，不影响 01/02/03。
