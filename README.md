@@ -22,6 +22,7 @@ GitHub (CSV/JSON 数据 + GitHub Pages dashboard)
 | 语言映射 | 无 | hostName → EN/CN/JP |
 | 更新频率 | 周更 | **日更**（GitHub）+ 周更（飞书） |
 | 飞书同步 | 手动 | GitHub Actions 自动推送 |
+| 02/03 首周 CTA/来源 | 每页 CTA、主要来源的 GA4 查询从「周最后一天」起算，最老一周（W23）只有周日一天进账（CTA 由 77 变成 5） | 查询起点回到该周周一（`build_v3_tables.py`），W23 恢复 77 |
 
 ## 标准化字段格式
 
@@ -85,18 +86,18 @@ python3 scripts/render_dashboard.py
 | `partial_week_v3.py` | “本周至今”部分周表（环比=上周同期）→ `data/analysis_v3_partial/` |
 | `merge_leads.py` | LeadApi 线索回填：只统计 23 个方案页（与 `generate_tables_v3.CORE_SLUGS` 同源）的去重 submission_id → `data/leads/leads_weekly.csv` |
 | `build_v3_tables.py` | 合成对外表 → `01_方案增长总览.csv`、`02_单方案流量明细.csv`（按实际方案数：方案首次出现流量那一周起行 + `页面类型` + `leads` 列）、`04_参考设计Top3.csv`（每周流量前三；`--no-partial` 供 CI 只出完整周） |
-| `append_partial_funnel.py` | 给 03 漏斗表补“本周至今”行：从 02 表（v3 口径）取 PV/会话/CTA + LeadApi leads，只补历史已跟踪的方案，幂等可重复跑 |
+| `build_funnel.py` | 生成 03 漏斗表数据源 `data/analysis/转换漏斗.csv`：整表从 02（v3 口径）重建，23 个方案、每个方案从首次出现流量那周起行，含“本周至今”行，周内按 PV 降序 |
 | `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 读 `data/analysis/转换漏斗.csv`（含“本周至今”行） |
 | `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
 
-本地“本周至今”刷新顺序（未完整周也进表；`merge_leads.py` → `append_partial_funnel.py` 不能颠倒）：
+本地“本周至今”刷新顺序（未完整周也进表；`merge_leads.py` → `build_v3_tables.py` → `build_funnel.py` 顺序不能颠倒）：
 
 ```bash
 python3 scripts/generate_tables_v3.py --weeks 8                     # 完整周
 python3 scripts/partial_week_v3.py --start <本周一> --end <今天>     # 本周至今
 python3 scripts/merge_leads.py                                     # 线索
 python3 scripts/build_v3_tables.py                                 # 合成 01/02/04(→飞书05)
-python3 scripts/append_partial_funnel.py                           # 03 本周行
+python3 scripts/build_funnel.py                                    # 03（从 02 重建，含本周行）
 python3 scripts/sync_weekly_feishu.py --prune                      # 同步飞书（--only 03 可只同步一张）
 ```
 
@@ -112,7 +113,8 @@ python3 scripts/sync_weekly_feishu.py --prune                      # 同步飞�
 - 页面改名按周处理：改名**发生的那一周**起用新名，之前的周保留旧名（`generate_tables_v3.SLUG_RENAME`）。当前记录：`voicecollectionanalysis` 语音采集分析 → **门店客服质检**、`conversational-voice-ai` 对话式语音AI → **离线语音控制**，均自 W41（2026-10-11）起（依据 GA4 逐日 pageTitle 实测）；
 - 名称与网页对齐（非按周改名，全周统一）：`in-person-conversation-intelligence` → **智能工牌会话分析**（站内中文标题"智能工牌语音转写与会话分析"，reSpeaker Clip 智能工牌；旧表写的"现场对话智能"已作为别名兼容）；
 - 飞书 `03_转化漏斗` 的方案名称与 02 同源（`sync_weekly_feishu.py` 直接取 `generate_tables_v3.solution_name(slug, week)`），因此两张表的名称与改名周完全一致；旧写法（语音采集与分析 / 智慧农业传感 / 智能畜牧养殖 / 楼宇能源改造）已登记为别名，只用于 upsert 键匹配；
-- 飞书 `03_转化漏斗` 的“本周至今”行：历史行由 `generate_tables_correct.py` 只在完整周产出，本周行由 `append_partial_funnel.py` 从 02 表（同一批 GA4 数据）补上——PV/会话/CTA 与 01/02 完全对得上（`数据状态=本周（未完整）`，截止日期仍写当周周日）；该周转为完整周后会被完整口径覆盖；
+- 飞书 `03_转化漏斗` 由 `build_funnel.py` 从 02 表整表重建：覆盖全部 23 个方案页（每个方案从**首次出现流量那一周**起行）、含“本周至今”行，PV/会话/CTA/leads 与 02 逐行一致（`数据状态=本周（未完整）`），03 的 CTA 合计与 01 对得上（差额只可能来自落在参考设计页的零星 CTA）；
+- `02_单方案流量明细` 每周内按**方案页浏览PV 从高到低**排序（无流量行排最后，同流量按站内方案顺序）；
 - 参考设计等其他页面只计入 01 总量、不单独列为方案，其每周流量前三列在 04/05 表；`leads` 只统计这些方案页来源的表单提交。
 
 飞书字段名变化（2026-10）：
@@ -146,7 +148,7 @@ python3 scripts/sync_weekly_feishu.py --prune                      # 同步飞�
 |--------|-----------|---------|
 | `01_方案增长总览` | `周次` | `data/analysis_v3/01_方案增长总览.csv`（v3 口径） |
 | `02_单方案流量明细` | `最新周次 + 方案名称` | `data/analysis_v3/02_单方案流量明细.csv`（v3 口径） |
-| `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv`（完整周 + `append_partial_funnel.py` 补的“本周至今”行） |
+| `03_转化漏斗` | `最新周次 + 方案名称` | `data/analysis/转换漏斗.csv`（由 `build_funnel.py` 从 02 表重建，23 方案 + 本周至今行） |
 | `05_参考设计Top3` | `最新周次 + 排名` | `data/analysis_v3/04_参考设计Top3.csv` |
 
 > 05 表字段：最新周次 / 截止日期 / 排名 / 页面名称（统一短中文名，按路径登记在 `REF_NAME_CN`）/ 浏览PV / 数据状态（`完整周` 或 `本周（未完整）`）。
@@ -155,7 +157,11 @@ python3 scripts/sync_weekly_feishu.py --prune                      # 同步飞�
 > 编号互不相干：本地 `data/analysis_v3/NN_*.csv` 是流水线内部编号，与飞书表编号不是一回事。
 > 例如本地 `03_页面流量明细.csv` 只是生成 01/02/04 的页面级原料（方案页全列 + 参考设计 Top3 + “其余页面”合计），**不上飞书**；
 > 飞书 `03_转化漏斗` 读的是老口径 `data/analysis/转换漏斗.csv`，飞书 `04_社媒内容表现` 不由本仓库脚本写入。
-> `03_转化漏斗` 当前只跟踪最初的 15 个方案页（`generate_tables_correct.SOLUTIONS`）；后上线的 8 个方案页只在 02 表里，需要时可扩展。
+> `03_转化漏斗` 已与 02 同源：覆盖全部 23 个方案页（2026-10 新纳入 8 个：全屋智能、停车视觉监测、智慧零售、工业控制自动化、工业视觉检测、智能工牌会话分析、老人监护、SenseCraft工业方案），各自从首次出现流量那周起行。
+
+> 飞书开放接口不支持写视图的分组/排序（`PATCH /views` 会被忽略，实测 `property` 仍为空），
+> 所以“每周按流量从高到低”是靠**记录顺序**实现的：`sync_weekly_feishu.py --recreate`
+> 会先清空目标表再按 CSV 行序重建（02/03 用这个方式重排过）。视图里的分组/排序仍需在表内手动设置。
 
 > 注：飞书应用当前无“新建数据表”权限（RolePermNotAllow），`05_参考设计Top3` 需先在飞书 Base 手动新建同名空表；
 > 建好后运行 `python3 scripts/sync_weekly_feishu.py --only 05` 灌数（应用可正常建字段/写记录）。未建表时同步自动跳过 05，不影响 01/02/03。

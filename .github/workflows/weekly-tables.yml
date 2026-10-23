@@ -75,6 +75,9 @@ jobs:
       - name: Build v3 outbound tables (01/02 + 参考设计Top3, incl. leads)
         run: python3 scripts/build_v3_tables.py --no-partial
 
+      - name: Build 03 funnel table from v3 data (口径与 02 同源, 23 方案)
+        run: python3 scripts/build_funnel.py
+
       - name: Export weekly JSON and stable CSV files for Feishu/Pages
         run: |
           mkdir -p dashboard/data/weekly

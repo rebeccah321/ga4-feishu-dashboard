@@ -21,6 +21,10 @@ upsert key：
          用于 02 这类行数会随"实际方案数"变化的表；本轮未被写入的记录（含同键重复行、
          周次被手工改动的错位行）会被清掉，所以手工改表后跑一次即可自动对齐。
 
+--recreate：先删掉目标表全部记录，再按 CSV 行序重建。飞书开放接口不生效视图排序
+          （PATCH /views 会被忽略），所以“每周按流量从高到低”这类展示顺序只能靠记录顺序实现：
+          CSV 行序 = 重建后的表内顺序。仅对需要重排的表使用，删除前请确认 CSV 是最新口径。
+
 环境变量：
   FEISHU_APP_ID
   FEISHU_APP_SECRET
@@ -509,6 +513,8 @@ def main():
     parser.add_argument("--prune", action="store_true",
                         help="删除飞书表里键不在本次 CSV 内的旧记录（01/02/03/05 生效）")
     parser.add_argument("--only", choices=["01", "02", "03", "05"], default=None, help="只同步指定表")
+    parser.add_argument("--recreate", action="store_true",
+                        help="先清空目标表记录，再按 CSV 行序重建（让表内顺序=CSV 顺序）")
     args = parser.parse_args()
 
     table_data = build_data()
@@ -559,6 +565,13 @@ def main():
         table_name, table_id, field_types = schemas[table_key]
         rows = table_data[table_key]
         existing_records = list_records(token, app_token, table_id)
+        if args.recreate:
+            wiped = batch_delete_records(
+                token, app_token, table_id,
+                [item.get("record_id") for item in existing_records],
+            )
+            print(f"{table_name}: 重建模式，先删除 {wiped} 条旧记录", flush=True)
+            existing_records = []
         existing = {
             key_for(table_key, item.get("fields", {})): item.get("record_id")
             for item in existing_records

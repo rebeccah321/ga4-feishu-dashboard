@@ -260,7 +260,7 @@ def update_tables(
     for row in funnel_rows:
         key = (row.get("week_ending", ""), row.get("slug", ""))
         row["form_submits"] = int(by_week_slug.get(key, 0))
-        # 本周至今行（append_partial_funnel.py 补的）保留"本周（未完整）"状态，只更新 leads
+        # 本周至今行（build_funnel.py 产生的）保留"本周（未完整）"状态，只更新 leads
         if "未完整" not in str(row.get("data_status", "")):
             row["data_status"] = "GA4+LeadApi已接入"
     write_csv(funnel_path, funnel_fields, funnel_rows)

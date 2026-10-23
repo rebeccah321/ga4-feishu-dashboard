@@ -9,6 +9,9 @@ generate_tables_correct.py — 用“按 solution 维度过滤”的正确口径
       solution_users=800，solution_pv=934，key_events=0
 
 输出：data/analysis/方案增长总览.csv、单方案流量明细.csv、转换漏斗.csv
+
+注意：转换漏斗.csv 的最终版本由 scripts/build_funnel.py 从 v3（02 单方案流量明细）重建
+（23 个方案页、含“本周至今”行）；本脚本写出的旧 15 方案漏斗只作为过渡产物，会被其覆盖。
 """
 from __future__ import annotations
 

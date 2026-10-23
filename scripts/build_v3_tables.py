@@ -20,6 +20,7 @@
   02：最新周次 / 截止日期 / 方案名称 / 页面类型 / 方案页浏览PV / 独立访客数 / 会话数 /
       平均停留时长(秒) / 参与率 / 主要流量来源 / CTA点击量 / leads / 周环比(%) / 数据状态
       （按实际情况：方案页首次出现流量那一周才起行，之后每周一行；没上线/没出现的方案不出行。历史 12 方案 → 新增方案按上线周逐步增加）
+      （每周内按“方案页浏览PV”从高到低排序；无流量行放最后，同流量按网站方案顺序）
       （页面类型 = 场景页/技术页/入口页，与站内 solutionMeta.docType 对齐；
         改名页（门店客服质检、离线语音控制）从改名生效周起换名，之前的周保留旧名）
       （截止日期/最新周次一律是"当周最后一天（周日）"：本周未跑完也写周日，未完整由"数据状态=本周（未完整）"表达）
@@ -183,7 +184,9 @@ def main():
 
     if not args.no_ga4:
         token = ga4_fetch.get_token()  # 支持本地 ADC 与 CI service_account
-        start = weeks_sorted[0]
+        # weeks_sorted 存的是“周最后一天”（周日）标签，查询起点要回到那一周的周一，
+        # 否则第一周只有周日一天进账，CTA/主要来源会明显偏小。
+        start = (dt.date.fromisoformat(weeks_sorted[0]) - dt.timedelta(days=6)).isoformat()
         # 部分周的 week_ending 是当周周日（可能还没到），GA4 查询截止日取今天
         end = min(weeks_sorted[-1], dt.date.today().isoformat())
         print(f"GA4 CTA/channel range: {start} ~ {end}", flush=True)
@@ -275,13 +278,19 @@ def main():
 
     o2 = [["最新周次", "截止日期", "方案名称", "页面类型", "方案页浏览PV", "独立访客数", "会话数",
            "平均停留时长(秒)", "参与率", "主要流量来源", "CTA点击量", "leads", "周环比(%)", "数据状态"]]
+    order_index = {slug: idx for idx, slug in enumerate(v3.CORE_SLUGS)}
+
+    def week_pv(we, slug):
+        row = det_by_key.get((we, slug))
+        return num(row["浏览PV"]) if row else 0.0
+
     live = set()
     for we in weeks_sorted:
         status = "本周（未完整）" if (is_partial and we == weeks_sorted[-1]) else "GA4+LeadApi已接入"
         live |= {s for s in v3.CORE_SLUGS if first_week.get(s) == we}
-        for slug in v3.CORE_SLUGS:
-            if slug not in live:
-                continue
+        # 每周内按流量从高到低（无流量/未出现记 0 排最后），同流量回退到网站方案顺序
+        week_slugs = sorted((s for s in live), key=lambda s: (-week_pv(we, s), order_index[s]))
+        for slug in week_slugs:
             key = "/solutions/" + slug
             name = v3.solution_name(slug, we)
             doc_type = v3.DOC_TYPE.get(slug, "")
@@ -316,16 +325,17 @@ def main():
 
     OUT_DATA.mkdir(parents=True, exist_ok=True)
     OUT_MIRROR.mkdir(parents=True, exist_ok=True)
+    # 行尾统一 LF：这些 CSV 每周提交进 git，CRLF 会让整文件 diff 无法阅读
+    def write_csv(path, rows):
+        with open(path, "w", newline="", encoding="utf-8-sig") as f:
+            csv.writer(f, lineterminator="\n").writerows(rows)
+
     for name, rows in (("01_方案增长总览", o1), ("02_单方案流量明细", o2), ("04_参考设计Top3", o4)):
-        with open(OUT_DATA / f"{name}.csv", "w", newline="", encoding="utf-8-sig") as f:
-            csv.writer(f).writerows(rows)
+        write_csv(OUT_DATA / f"{name}.csv", rows)
     # 镜像副本（保留用户之前看到的两份文件）
-    with open(OUT_MIRROR / "v3口径_01_方案区增长总览.csv", "w", newline="", encoding="utf-8-sig") as f:
-        csv.writer(f).writerows(o1)
-    with open(OUT_MIRROR / "v3口径_02_单方案流量明细.csv", "w", newline="", encoding="utf-8-sig") as f:
-        csv.writer(f).writerows(o2)
-    with open(OUT_MIRROR / "v3口径_04_参考设计Top3.csv", "w", newline="", encoding="utf-8-sig") as f:
-        csv.writer(f).writerows(o4)
+    write_csv(OUT_MIRROR / "v3口径_01_方案区增长总览.csv", o1)
+    write_csv(OUT_MIRROR / "v3口径_02_单方案流量明细.csv", o2)
+    write_csv(OUT_MIRROR / "v3口径_04_参考设计Top3.csv", o4)
     print(f"01 rows: {len(o1)-1} | 02 rows: {len(o2)-1} | 04 rows: {len(o4)-1}")
     print(f"saved {OUT_DATA}/01_方案增长总览.csv + 02_单方案流量明细.csv + 04_参考设计Top3.csv (+ mirrors)")
 
