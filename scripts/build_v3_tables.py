@@ -22,6 +22,7 @@
       （按实际情况：方案页首次出现流量那一周才起行，之后每周一行；没上线/没出现的方案不出行。历史 12 方案 → 新增方案按上线周逐步增加）
       （页面类型 = 场景页/技术页/入口页，与站内 solutionMeta.docType 对齐；
         改名页（门店客服质检、离线语音控制）从改名生效周起换名，之前的周保留旧名）
+      （截止日期/最新周次一律是"当周最后一天（周日）"：本周未跑完也写周日，未完整由"数据状态=本周（未完整）"表达）
   04：最新周次 / 截止日期 / 排名 / 页面名称（统一短中文名）/ 浏览PV / 数据状态
       （参考设计单页每周流量前三；只计入 01 总量，不进 02。
        名称按路径登记短中文名（REF_NAME_CN），统一语言、统一长度；未登记页面退化并告警；
@@ -82,6 +83,8 @@ REF_NAME_CN = {
     "/solutions/reference-designs/edge-anpr-plate-recognition": "边缘车牌识别",
     "/solutions/reference-designs/edge_security": "边缘安防",
     "/solutions/reference-designs/fall_detection": "端侧跌倒检测",
+    # 站内中文标题：Home Assistant 本地语音中枢与全屋智能联动可部署方案
+    "/solutions/reference-designs/home-assistant-local-voice-hub": "HA本地语音中枢",
     "/solutions/reference-designs/indoor_positioning_ble_lorawan": "园区蓝牙信标定位",
     "/solutions/reference-designs/industrial_security_jetson": "Jetson工业安防",
     "/solutions/reference-designs/jetson_voice_assistant": "本地语音服务",
@@ -159,18 +162,18 @@ def main():
     # ---- 读入 v3 数据（完整周 + 部分周） ----
     ov = load(V3 / "01_方案区总览.csv")
     det = load(V3 / "03_页面流量明细.csv")
+    part_weeks: set[str] = set()
     if not args.no_partial:
-        ov += load(PART / "01_方案区总览.csv")
+        part_ov = load(PART / "01_方案区总览.csv")
+        ov += part_ov
         det += load(PART / "03_页面流量明细.csv")
+        part_weeks = {r["week_ending"] for r in part_ov}
     weeks_all = [r["week_ending"] for r in ov]
     weeks_sorted = sorted(set(weeks_all))
     partial_week = weeks_sorted[-1] if weeks_sorted else None
-    # 部分周判定：01 表最后一周不是周日（即本周至今）时视为部分周
-    try:
-        last_sunday = week_ending(dt.date.fromisoformat(weeks_sorted[-1]))
-    except Exception:
-        last_sunday = weeks_sorted[-1] if weeks_sorted else None
-    is_partial = bool(weeks_sorted) and last_sunday != weeks_sorted[-1]
+    # 部分周判定：最后一周来自 partial 目录（本周至今）即为部分周。
+    # 注意 partial 表的 week_ending 写的是当周周日，所以不能用“是否周日”判断。
+    is_partial = bool(weeks_sorted) and weeks_sorted[-1] in part_weeks
 
     print(f"rows: ov={len(ov)} det={len(det)} | weeks={weeks_sorted[0]}~{weeks_sorted[-1]} "
           f"partial={partial_week} ({is_partial})", flush=True)
@@ -180,7 +183,9 @@ def main():
 
     if not args.no_ga4:
         token = ga4_fetch.get_token()  # 支持本地 ADC 与 CI service_account
-        start, end = weeks_sorted[0], weeks_sorted[-1]
+        start = weeks_sorted[0]
+        # 部分周的 week_ending 是当周周日（可能还没到），GA4 查询截止日取今天
+        end = min(weeks_sorted[-1], dt.date.today().isoformat())
         print(f"GA4 CTA/channel range: {start} ~ {end}", flush=True)
 
         cta_body = {
