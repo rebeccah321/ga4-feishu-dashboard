@@ -89,6 +89,17 @@ python3 scripts/render_dashboard.py
 | `sync_weekly_feishu.py` | 飞书同步：01/02/05 读 v3 对外表，03 读 `data/analysis/转换漏斗.csv`（含“本周至今”行） |
 | `migrate_feishu_fields.py` | 飞书字段迁移（幂等）：默认只改名/改类型/补字段；`--delete-fields` 才删除废弃列 |
 
+本地“本周至今”刷新顺序（未完整周也进表；`merge_leads.py` → `append_partial_funnel.py` 不能颠倒）：
+
+```bash
+python3 scripts/generate_tables_v3.py --weeks 8                     # 完整周
+python3 scripts/partial_week_v3.py --start <本周一> --end <今天>     # 本周至今
+python3 scripts/merge_leads.py                                     # 线索
+python3 scripts/build_v3_tables.py                                 # 合成 01/02/04(→飞书05)
+python3 scripts/append_partial_funnel.py                           # 03 本周行
+python3 scripts/sync_weekly_feishu.py --prune                      # 同步飞书（--only 03 可只同步一张）
+```
+
 口径要点：
 - 浏览 PV = 页级求和（不去重，含参考设计/场景案例/旧目录页/其他页面）；
 - 独立访客/会话 = 整树逐周去重（无 date 维度的 totals 查询）；
