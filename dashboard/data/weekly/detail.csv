@@ -1,4 +1,19 @@
 week_ending,slug,landing_pv,users,sessions,avg_eng_s,engagement_rate,top_channel,cta_clicks,form_submits,key_events,data_status,wow_pct
+2026-10-25,voicecollectionanalysis,114,104,128,25.0,0.5547,Unassigned,3,0,0,GA4+LeadApi已接入,-23.0
+2026-10-25,acoustic-audio-ai,96,78,90,21.7,0.6556,Organic Social,1,0,0,GA4+LeadApi已接入,-40.7
+2026-10-25,intelligent-video-analytics,71,56,69,35.4,0.7826,Direct,0,0,2,GA4+LeadApi已接入,-28.3
+2026-10-25,smart-livestock-farming,69,62,65,40.6,0.6,Direct,4,0,0,GA4+LeadApi已接入,-6.8
+2026-10-25,smart-agriculture-sensing,62,57,62,40.5,0.6129,Direct,9,0,0,GA4+LeadApi已接入,-11.4
+2026-10-25,conversational-voice-ai,58,39,50,35.1,0.56,Direct,7,0,0,GA4+LeadApi已接入,18.4
+2026-10-25,building-energy-management,54,52,54,29.3,0.5926,Unassigned,3,0,0,GA4+LeadApi已接入,8.0
+2026-10-25,smart-warehouse-management,52,47,51,53.6,0.6667,Unassigned,3,0,1,GA4+LeadApi已接入,-18.8
+2026-10-25,campus-safety-management,47,45,49,30.3,0.5306,Unassigned,2,0,0,GA4+LeadApi已接入,-9.6
+2026-10-25,hazard-response,42,40,40,35.1,0.875,Unassigned,0,0,0,GA4+LeadApi已接入,-31.1
+2026-10-25,indoor-outdoor-positioning,30,24,28,29.6,0.6786,Unassigned,0,0,0,GA4+LeadApi已接入,-9.1
+2026-10-25,off-grid-mesh-communication,30,23,24,33.5,0.8333,Unassigned,0,0,0,GA4+LeadApi已接入,-46.4
+2026-10-25,environment-monitoring,23,17,24,13.8,0.6667,Referral,0,0,0,GA4+LeadApi已接入,-36.1
+2026-10-25,building-energy-retrofit,19,20,23,30.3,0.6957,Unassigned,0,0,0,GA4+LeadApi已接入,-62.7
+2026-10-25,home-building-automation,19,15,16,41.6,0.625,Unassigned,0,0,0,GA4+LeadApi已接入,-24.0
 2026-10-18,acoustic-audio-ai,162,131,146,25.4,0.6849,Organic Social,0,0,0,GA4+LeadApi已接入,128.2
 2026-10-18,voicecollectionanalysis,148,134,154,20.7,0.487,Unassigned,6,0,0,GA4+LeadApi已接入,5.7
 2026-10-18,intelligent-video-analytics,99,75,86,27.0,0.6628,Unassigned,0,1,2,GA4+LeadApi已接入,5.3
