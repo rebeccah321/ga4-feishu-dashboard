@@ -82,13 +82,18 @@ def short_ref_name(name: str, path: str = "", limit: int = 42) -> str:
 REF_NAME_CN = {
     "/solutions/reference-designs/conversational_voice_ai": "端侧对话式语音AI",
     "/solutions/reference-designs/edge-anpr-plate-recognition": "边缘车牌识别",
+    # 站内中文标题：装配质检可部署方案
+    "/solutions/reference-designs/edge_inspection_assembly": "装配质检",
     "/solutions/reference-designs/edge_security": "边缘安防",
+    # 站内中文标题：墨水屏智能家居触控面板可部署方案
+    "/solutions/reference-designs/epaper-smart-home-panel": "墨水屏智能家居面板",
     "/solutions/reference-designs/fall_detection": "端侧跌倒检测",
     # 站内中文标题：Home Assistant 本地语音中枢与全屋智能联动可部署方案
     "/solutions/reference-designs/home-assistant-local-voice-hub": "HA本地语音中枢",
     "/solutions/reference-designs/indoor_positioning_ble_lorawan": "园区蓝牙信标定位",
     "/solutions/reference-designs/industrial_security_jetson": "Jetson工业安防",
     "/solutions/reference-designs/jetson_voice_assistant": "本地语音服务",
+    "/solutions/reference-designs/openclaw_deploy": "OpenClaw AI 网关",
     "/solutions/reference-designs/reachy_claw_voice_robot": "桌面对话机器人",
     "/solutions/reference-designs/recamera_ecosystem": "即插即用AI相机",
     "/solutions/reference-designs/recamera_heatmap_grafana": "门店客流热力图",

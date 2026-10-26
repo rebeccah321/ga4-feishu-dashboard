@@ -6,7 +6,7 @@ sync_weekly_feishu.py — 把周度表同步到飞书已有的多维表格。
   - 01_方案增长总览（v3 口径：data/analysis_v3/01_方案增长总览.csv）
   - 02_单方案流量明细（v3 口径：data/analysis_v3/02_单方案流量明细.csv）
   - 03_转化漏斗
-  - 05_参考设计Top3（v3 口径：data/analysis_v3/04_参考设计Top3.csv）
+  - 04_参考设计Top3（v3 口径：data/analysis_v3/04_参考设计Top3.csv；旧名 05_参考设计Top3 兼容）
 
 字段名以 v3 口径对外表为准（方案区独立访客数/方案区浏览PV/浏览PV周环比(%)、
 方案页浏览PV/会话数/平均停留时长(秒)/周环比(%) 等），旧字段名通过 FIELD_ALIASES 回退兼容。
@@ -55,8 +55,23 @@ TABLES = {
     "01": "01_方案增长总览",
     "02": "02_单方案流量明细",
     "03": "03_转化漏斗",
-    "05": "05_参考设计Top3",
+    # 键名沿用语义编号（"05" = 参考设计 Top3）；表名以飞书实际名称为准。
+    # 用户在 2026-10-26 调整过 Base 里的表顺序/名称：参考设计Top3 → 04_参考设计Top3，
+    # 社媒表 → 05_社媒（社媒表始终不由本脚本写入）。
+    "05": "04_参考设计Top3",
 }
+
+# 飞书表改名/换位后的旧名兼容（只在找不到新名时兜底）
+TABLE_ALIASES = {
+    "04_参考设计Top3": ["05_参考设计Top3"],
+}
+
+
+def table_id_of(available, name):
+    for candidate in (name, *TABLE_ALIASES.get(name, [])):
+        if candidate in available:
+            return available[candidate]
+    return None
 
 # 名称统一取自 v3 口径（generate_tables_v3.SLUG_CN / SLUG_RENAME），保证 02 与 03 表同名。
 # 03 转化漏斗按周取显示名：改名周之前用旧名、之后用新名（与 02 一致）。
@@ -536,13 +551,13 @@ def main():
     print("Step 2: listing tables in Base", flush=True)
 
     available = list_tables(token, app_token)
-    missing = [TABLES[k] for k in table_data if TABLES[k] not in available]
+    missing = [TABLES[k] for k in table_data if table_id_of(available, TABLES[k]) is None]
     required_missing = [name for name in missing if name != TABLES["05"]]
     optional_missing = [name for name in missing if name == TABLES["05"]]
     if required_missing:
         raise SystemExit("Existing Feishu tables not found: " + ", ".join(required_missing))
     if optional_missing:
-        # 05_参考设计Top3 需要先在飞书手动建表（应用无建表权限）；未建好时跳过，不影响 01/02/03。
+        # 参考设计 Top3 表需先在飞书手动建表（应用无建表权限）；未建好时跳过，不影响 01/02/03。
         print(f"WARNING: 表未创建，本次跳过：{', '.join(optional_missing)}", flush=True)
         for key in list(table_data):
             if TABLES[key] in optional_missing:
@@ -551,7 +566,7 @@ def main():
     schemas = {}
     for table_key in table_data:
         table_name = TABLES[table_key]
-        table_id = available[table_name]
+        table_id = table_id_of(available, table_name)
         field_types = list_fields(token, app_token, table_id)
         schemas[table_key] = (table_name, table_id, field_types)
         print(f"Step 3: {table_name} field types: {field_types}", flush=True)
