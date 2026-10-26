@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-26T05:51:07",
+  "generated_at": "2026-10-26T12:27:34",
   "date_range": {
     "start": "2026-09-14",
     "end": "2026-10-25"
@@ -7,8 +7,8 @@
   "property": "502086217",
   "summary": {
     "total_views": 85929,
-    "active_users": 74766,
-    "sessions": 82534,
+    "active_users": 74750,
+    "sessions": 82517,
     "by_day": {
       "2026-09-14": 2495,
       "2026-09-15": 2633,
@@ -54,11 +54,11 @@
       "2026-10-25": 1177
     },
     "by_channel": {
-      "Organic Search": 32902,
+      "Organic Search": 32921,
       "Direct": 24660,
-      "Unassigned": 16364,
+      "Unassigned": 16343,
       "Referral": 6284,
-      "Paid Search": 3475,
+      "Paid Search": 3477,
       "AI Assistant": 1663,
       "Organic Social": 267,
       "Email": 248,
@@ -68,18 +68,18 @@
     "by_lang": {
       "EN": {
         "pv": 48169,
-        "users": 42083,
-        "sessions": 46280
+        "users": 42075,
+        "sessions": 46271
       },
       "CN": {
         "pv": 31314,
-        "users": 27430,
-        "sessions": 30216
+        "users": 27426,
+        "sessions": 30212
       },
       "JP": {
         "pv": 6446,
-        "users": 5253,
-        "sessions": 6038
+        "users": 5249,
+        "sessions": 6034
       }
     },
     "top_pages": {
