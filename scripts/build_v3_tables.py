@@ -84,6 +84,8 @@ REF_NAME_CN = {
     "/solutions/reference-designs/edge-anpr-plate-recognition": "边缘车牌识别",
     # 站内中文标题：装配质检可部署方案
     "/solutions/reference-designs/edge_inspection_assembly": "装配质检",
+    "/solutions/reference-designs/edge_inspection_surface": "表面缺陷质检",
+    "/solutions/reference-designs/edge_retail_recognition": "商品识别",
     "/solutions/reference-designs/edge_security": "边缘安防",
     # 站内中文标题：墨水屏智能家居触控面板可部署方案
     "/solutions/reference-designs/epaper-smart-home-panel": "墨水屏智能家居面板",
@@ -95,14 +97,18 @@ REF_NAME_CN = {
     "/solutions/reference-designs/jetson_voice_assistant": "本地语音服务",
     "/solutions/reference-designs/openclaw_deploy": "OpenClaw AI 网关",
     "/solutions/reference-designs/reachy_claw_voice_robot": "桌面对话机器人",
+    "/solutions/reference-designs/rebot_agent_arm": "视觉机械臂",
+    "/solutions/reference-designs/rehab_posture_analysis": "端侧康复姿态分析",
     "/solutions/reference-designs/recamera_ecosystem": "即插即用AI相机",
     "/solutions/reference-designs/recamera_heatmap_grafana": "门店客流热力图",
     "/solutions/reference-designs/recamera_sheep_counter_lora": "LoRa羊只计数",
     "/solutions/reference-designs/respeaker_flex_soarm": "语音控制机械臂",
     "/solutions/reference-designs/retail_voice": "零售语音",
+    "/solutions/reference-designs/smart-badge-voice-transcription": "智能工牌语音转写",
     "/solutions/reference-designs/smart_warehouse": "语音仓库管理",
     "/solutions/reference-designs/unmanned_store_access": "无人门店门禁",
     "/solutions/reference-designs/voice_robot_lekiwi": "LeKiwi语音机器人",
+    "/solutions/reference-designs/wio_weather_station": "小型气象站",
 }
 
 
