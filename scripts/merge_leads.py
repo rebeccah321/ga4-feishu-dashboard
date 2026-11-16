@@ -78,6 +78,9 @@ def curl_search(key: str, params: dict) -> dict | None:
             f"{HOST}/multi_search",
             "-H", "Content-Type: application/json",
             "-H", f"X-TYPESENSE-API-KEY: {key}",
+            "-H", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "-H", "Accept: application/json",
             "-d", body,
         ],
         capture_output=True,
