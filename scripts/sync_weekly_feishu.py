@@ -300,6 +300,31 @@ def upsert_record(token, app_token, table_id, record_id, fields):
     return "created"
 
 
+def field_value_matches(desired, existing) -> bool:
+    """比较期望值与飞书返回的字段值（文本会以 [{text: ...}] 形式返回）。"""
+    if isinstance(existing, list):
+        existing = "".join(
+            str(seg.get("text", "")) for seg in existing if isinstance(seg, dict)
+        )
+    if isinstance(desired, (int, float)) and isinstance(existing, (int, float)):
+        return abs(float(desired) - float(existing)) < 1e-6
+    # 飞书数字字段可能以字符串返回（如 "0"），统一按数值比较
+    try:
+        return abs(float(desired) - float(existing)) < 1e-6
+    except (TypeError, ValueError):
+        pass
+    left = "" if desired is None else str(desired).strip()
+    right = "" if existing is None else str(existing).strip()
+    return left == right
+
+
+def fields_unchanged(desired: dict, existing: dict) -> bool:
+    if not existing:
+        return False
+    return all(field_value_matches(value, existing.get(name)) for name, value in desired.items()
+               if value is not None)
+
+
 def batch_delete_records(token, app_token, table_id, record_ids):
     """按 record_id 批量删除（每批 500），用于 --prune 清掉 CSV 里已不存在的旧行。"""
     if not record_ids:
@@ -592,8 +617,13 @@ def main():
             for item in existing_records
             if item.get("fields")
         }
+        existing_fields = {
+            key_for(table_key, item.get("fields", {})): item.get("fields", {})
+            for item in existing_records
+            if item.get("fields")
+        }
         used_ids = set()
-        created = updated = 0
+        created = updated = skipped = 0
         for idx, row in enumerate(rows, 1):
             key = key_for(table_key, row)
             print(f"    {table_name} [{idx}/{len(rows)}] {key}", flush=True)
@@ -605,6 +635,9 @@ def main():
             record_id = existing.get(key)
             if record_id:
                 used_ids.add(record_id)
+                if fields_unchanged(fields, existing_fields.get(key, {})):
+                    skipped += 1
+                    continue
             result = upsert_record(token, app_token, table_id, record_id, fields)
             if result == "created":
                 created += 1
@@ -617,7 +650,7 @@ def main():
             stale = [item.get("record_id") for item in existing_records
                      if item.get("record_id") not in used_ids]
             pruned = batch_delete_records(token, app_token, table_id, stale)
-        print(f"{table_name}: {created} created, {updated} updated"
+        print(f"{table_name}: {created} created, {updated} updated, {skipped} unchanged"
               + (f", {pruned} pruned" if args.prune else ""))
 
 
