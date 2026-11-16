@@ -1,20 +1,21 @@
 lang,channel_group,sessions,share_pct
-EN,Direct,3482,40.0
-EN,Unassigned,3094,35.5
-EN,Referral,1077,12.4
-EN,Organic Search,645,7.4
-EN,Organic Social,213,2.4
-EN,AI Assistant,129,1.5
-EN,Paid Search,60,0.7
-EN,Organic Video,15,0.2
-CN,Direct,995,40.5
-CN,Organic Search,795,32.3
-CN,Referral,471,19.2
-CN,Unassigned,185,7.5
-CN,AI Assistant,12,0.5
-JP,Organic Search,222,60.2
-JP,Direct,113,30.6
-JP,Referral,16,4.3
-JP,AI Assistant,14,3.8
-JP,Unassigned,3,0.8
-JP,Organic Social,1,0.3
+EN,Unassigned,3780,41.1
+EN,Direct,3066,33.3
+EN,Referral,1010,11.0
+EN,Organic Search,695,7.6
+EN,Organic Social,431,4.7
+EN,AI Assistant,149,1.6
+EN,Paid Search,51,0.6
+EN,Organic Video,16,0.2
+EN,Email,2,0.0
+CN,Direct,1286,42.7
+CN,Organic Search,949,31.5
+CN,Referral,593,19.7
+CN,Unassigned,165,5.5
+CN,AI Assistant,22,0.7
+JP,Organic Search,259,50.5
+JP,Direct,193,37.6
+JP,Referral,33,6.4
+JP,AI Assistant,20,3.9
+JP,Unassigned,7,1.4
+JP,Organic Social,1,0.2
