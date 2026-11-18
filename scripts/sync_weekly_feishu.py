@@ -216,10 +216,10 @@ def request_json(method, url, token=None, body=None, retries=3):
         code = payload.get("code")
         if code == 0:
             return payload
-        # Feishu 偶发内部错误可重试（1663 = internal error，偶发）
-        if code in {2200, 500, 1663} and attempt < retries:
+        # Feishu 偶发内部错误可重试（1663 = internal error；1254607 = 写入后索引未就绪）
+        if code in {2200, 500, 1663, 1254607} and attempt < retries:
             last_error = f"Feishu code={code}: {payload.get('msg')}"
-            time.sleep(1.5 * attempt)
+            time.sleep(6 * attempt if code == 1254607 else 1.5 * attempt)
             continue
         raise SystemExit(f"Feishu code={code}: {payload.get('msg')}")
     raise SystemExit(f"Feishu request failed: {last_error}")
@@ -249,7 +249,7 @@ def list_records(token, app_token, table_id):
             params["page_token"] = page_token
         url = (f"{FEISHU_BASE}/bitable/v1/apps/{app_token}/tables/{table_id}/records?"
                + urllib.parse.urlencode(params))
-        payload = request_json("GET", url, token=token)
+        payload = request_json("GET", url, token=token, retries=6)
         data = payload.get("data", {})
         records.extend(data.get("items", []))
         if not data.get("has_more"):
