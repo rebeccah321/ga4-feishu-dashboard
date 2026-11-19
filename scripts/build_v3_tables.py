@@ -105,6 +105,7 @@ REF_NAME_CN = {
     "/solutions/reference-designs/respeaker_flex_soarm": "语音控制机械臂",
     "/solutions/reference-designs/retail_voice": "零售语音",
     "/solutions/reference-designs/smart-badge-voice-transcription": "智能工牌语音转写",
+    "/solutions/reference-designs/smart-home-control-panel": "智能家居控制面板",
     "/solutions/reference-designs/smart_warehouse": "语音仓库管理",
     "/solutions/reference-designs/unmanned_store_access": "无人门店门禁",
     "/solutions/reference-designs/voice_robot_lekiwi": "LeKiwi语音机器人",
