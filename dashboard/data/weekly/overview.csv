@@ -1,9 +1,10 @@
 week_ending,solution_users,solution_pv,solution_sessions,total_site_pv,cta_clicks,cta_click_rate,key_events,key_event_conv_rate,fastest_growing_solution,top_traffic_solution,social_impressions,solution_wow_pct,form_submits
-2026-11-15,623,729,699,16381,22,3.02,2,0.0029,smart-warehouse-management (+55.6%),voicecollectionanalysis,未接入,0.8,0
-2026-11-08,640,723,724,16134,23,3.18,1,0.0014,off-grid-mesh-communication (+104.0%),voicecollectionanalysis,未接入,-1.1,0
-2026-11-01,609,731,710,15077,23,3.15,2,0.0028,home-building-automation (+78.9%),voicecollectionanalysis,未接入,-7.0,0
-2026-10-25,679,786,773,16072,32,4.07,3,0.0039,conversational-voice-ai (+18.4%),voicecollectionanalysis,未接入,-23.7,0
-2026-10-18,887,1030,998,16941,43,4.17,2,0.002,hazard-response (+165.2%),acoustic-audio-ai,未接入,-1.5,2
+2026-11-22,607,711,682,17226,18,2.53,1,0.0015,smart-warehouse-management (+31.0%),voicecollectionanalysis,未接入,-2.5,0
+2026-11-15,623,729,699,16381,22,3.02,2,0.0029,smart-warehouse-management (+55.6%),voicecollectionanalysis,未接入,0.8,3
+2026-11-08,640,723,724,16134,23,3.18,1,0.0014,off-grid-mesh-communication (+104.0%),voicecollectionanalysis,未接入,-1.1,3
+2026-11-01,609,731,710,15077,23,3.15,2,0.0028,home-building-automation (+78.9%),voicecollectionanalysis,未接入,-7.0,4
+2026-10-25,679,786,773,16072,32,4.07,3,0.0039,conversational-voice-ai (+18.4%),voicecollectionanalysis,未接入,-23.7,3
+2026-10-18,887,1030,998,16941,43,4.17,2,0.002,hazard-response (+165.2%),acoustic-audio-ai,未接入,-1.5,3
 2026-10-11,940,1046,1075,14031,51,4.88,0,0.0,off-grid-mesh-communication (+58.7%),smart-agriculture-sensing,未接入,-1.9,0
 2026-10-04,974,1066,1064,12761,64,6.0,0,0.0,smart-agriculture-sensing (+55.6%),smart-agriculture-sensing,未接入,-0.6,0
 2026-09-27,868,1072,1033,13818,63,5.88,2,0.0019,home-building-automation (+300.0%),smart-agriculture-sensing,未接入,-15.6,3
