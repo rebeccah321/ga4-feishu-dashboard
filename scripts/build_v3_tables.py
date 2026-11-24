@@ -87,6 +87,7 @@ REF_NAME_CN = {
     "/solutions/reference-designs/edge_inspection_surface": "表面缺陷质检",
     "/solutions/reference-designs/edge_retail_recognition": "商品识别",
     "/solutions/reference-designs/edge_security": "边缘安防",
+    "/solutions/reference-designs/edge_waste_sorting": "边缘垃圾分拣",
     # 站内中文标题：墨水屏智能家居触控面板可部署方案
     "/solutions/reference-designs/epaper-smart-home-panel": "墨水屏智能家居面板",
     "/solutions/reference-designs/fall_detection": "端侧跌倒检测",
